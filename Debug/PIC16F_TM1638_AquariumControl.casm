@@ -1,0 +1,2513 @@
+;/////////////////////////////////////////////////////////////////////////////////
+;// Code Generator: BoostC Compiler - http://www.sourceboost.com
+;// Version       : 8.01
+;// License Type  : Pro License
+;// Limitations   : PIC12,PIC16 max code size:Unlimited, max RAM banks:Unlimited
+;/////////////////////////////////////////////////////////////////////////////////
+
+#ifndef _PIC16F_TM1638_AquariumControl_H_
+#define _PIC16F_TM1638_AquariumControl_H_
+
+#define TASK_TIMER1 2
+#define TASK_TIMER1_START 3
+#define TASK_TIMER1_READ 4
+#define oneWireBus (porta.6)
+#define oneWireTris (trisa.6)
+#define tm1638dio (porta.1)
+#define tm1638clk (porta.0)
+#define tm1638dioTris (trisa.1)
+#define tm1638strobe (porta.7)
+// refresh interval - time in ms divided by 262. Max value is 252.
+#define TIMER_1_INTERVAL 114
+
+
+// i2c options
+#define use_i2c_SW
+// clock SCL on GP0, data SDA on GP1
+#define i2c_ARGS	2, PORTA, TRISA, 3, PORTA, TRISA, e_SSPCON1, e_SSPCON2, \
+					e_SSPSTAT, e_SSPBUF, e_SSPIF_BIT, e_SSPIF_PIR,			\
+					e_BCLIF_BIT, e_BCLIF_PIR, 7, e_SSPADD, (i2c_reset_wdt | i2c_SMP)
+// RAM used by the software i2c driver to emulate the equivalent i2c hardware registers					
+unsigned short swi2c_SSPCON1@0x40;	// define location for the emulated SSPCON1
+unsigned short swi2c_SSPCON2@0x41;	// define location for the emulated SSPCON2
+unsigned short swi2c_SSPSTAT@0x42;	// define location for the emulated SSPSTAT
+unsigned short swi2c_SSPBUF@0x43;	// define location for the emulated SSPBUF
+unsigned short swi2c_SSPIF_PIR@0x44;// define location for the emulated SSPIF_PIR
+unsigned short swi2c_BCLIF_PIR@0x45;// define location for the emulated BCLIF_PIR
+unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
+#define e_SSPCON1	0x40
+#define e_SSPCON2	0x41
+#define e_SSPSTAT	0x42
+#define e_SSPADD	0x43
+#define e_SSPBUF	0x44
+#define e_SSPIF_PIR	0x45
+#define e_BCLIF_PIR	0x46
+#define e_SSPIF_BIT	3
+#define e_BCLIF_BIT	3
+
+#define ds3231_addr 0xD0
+
+// Hold the upper and lower bytes from the ds18b20
+char cTempH = 0;
+02E2  1283  	BCF STATUS, RP0
+02E3  1303  	BCF STATUS, RP1
+02E4  01BD  	CLRF gbl_cTempH
+
+char cTempL = 0;
+02E5  01BE  	CLRF gbl_cTempL
+
+char iDecimalPosition = 2;
+02E6  3002  	MOVLW 0x02
+02E7  00BF  	MOVWF gbl_iDecimalPosition
+
+
+char oneWireIsPresent = 0;
+02E8  01C8  	CLRF gbl_oneWireIsPresent
+
+char oneWireResetStage = 0;
+02E9  01C9  	CLRF gbl_oneWireResetStage
+
+void oneWireBusReset();
+void oneWireTxByte(char data);
+void oneWireTxBytes(char data, char data2);
+char oneWireRxByte();
+
+// Used for counting timer 1 overflows. 
+// Initialise it close to interval so temp refresh on power on is near instant
+char iTimer1Count = TIMER_1_INTERVAL - 4; 
+02EA  306E  	MOVLW 0x6E
+02EB  00CA  	MOVWF gbl_iTimer1Count
+
+char cTask = 0; // Used for task scheduler
+02EC  01CB  	CLRF gbl_cTask
+
+
+// Used to output the segments from numbers
+char tm1638MaxDigits = 8;
+02ED  3008  	MOVLW 0x08
+02EE  00CC  	MOVWF gbl_tm1638MaxDigits
+
+char tm1638DisplayNumtoSeg[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f};
+02EF  303F  	MOVLW 0x3F
+02F0  00A0  	MOVWF gbl_tm1638DisplayNumtoSeg
+02F1  3006  	MOVLW 0x06
+02F2  00A1  	MOVWF gbl_tm1638DisplayNumtoSeg+D'1'
+02F3  305B  	MOVLW 0x5B
+02F4  00A2  	MOVWF gbl_tm1638DisplayNumtoSeg+D'2'
+02F5  304F  	MOVLW 0x4F
+02F6  00A3  	MOVWF gbl_tm1638DisplayNumtoSeg+D'3'
+02F7  3066  	MOVLW 0x66
+02F8  00A4  	MOVWF gbl_tm1638DisplayNumtoSeg+D'4'
+02F9  306D  	MOVLW 0x6D
+02FA  00A5  	MOVWF gbl_tm1638DisplayNumtoSeg+D'5'
+02FB  307D  	MOVLW 0x7D
+02FC  00A6  	MOVWF gbl_tm1638DisplayNumtoSeg+D'6'
+02FD  3007  	MOVLW 0x07
+02FE  00A7  	MOVWF gbl_tm1638DisplayNumtoSeg+D'7'
+02FF  307F  	MOVLW 0x7F
+0300  00A8  	MOVWF gbl_tm1638DisplayNumtoSeg+D'8'
+0301  306F  	MOVLW 0x6F
+0302  00A9  	MOVWF gbl_tm1638DisplayNumtoSeg+D'9'
+
+char tm1638Dot = 0x80;
+0303  3080  	MOVLW 0x80
+0304  00CD  	MOVWF gbl_tm1638Dot
+
+char tm1638Brightness = 7; // 0 to 7
+0305  3007  	MOVLW 0x07
+0306  00CE  	MOVWF gbl_tm1638Brightness
+
+// 0x40 [01000000] = indicate command to display data
+char tm1638ByteSetData = 0x40;
+0307  3040  	MOVLW 0x40
+0308  00CF  	MOVWF gbl_tm1638ByteSetData
+
+// 0x42 [01000010] = indicate command to read data
+char tm1638ByteReadData = 0x42;
+0309  3042  	MOVLW 0x42
+030A  00D0  	MOVWF gbl_tm1638ByteReadData
+
+// 0xC0 [11000000] = write out all bytes
+char tm1638ByteSetAddr = 0xC0;
+030B  30C0  	MOVLW 0xC0
+030C  00D1  	MOVWF gbl_tm1638ByteSetAddr
+
+// 0x88 [10001000] - Display ON, plus brightness
+char tm1638ByteSetOn = 0x88;
+030D  3088  	MOVLW 0x88
+030E  00D2  	MOVWF gbl_tm1638ByteSetOn
+
+
+// Copy of the data to write / on the display
+char tm1638Data[] = {0, 0, 0, 0, 0, 0, 0, 0};
+030F  01AA  	CLRF gbl_tm1638Data
+0310  01AB  	CLRF gbl_tm1638Data+D'1'
+0311  01AC  	CLRF gbl_tm1638Data+D'2'
+0312  01AD  	CLRF gbl_tm1638Data+D'3'
+0313  01AE  	CLRF gbl_tm1638Data+D'4'
+0314  01AF  	CLRF gbl_tm1638Data+D'5'
+0315  01B0  	CLRF gbl_tm1638Data+D'6'
+0316  01B1  	CLRF gbl_tm1638Data+D'7'
+
+// Copy of the LED status
+char tm1638LEDs[] = {0, 0, 0, 0, 0, 0, 0, 0};
+0317  01B2  	CLRF gbl_tm1638LEDs
+0318  01B3  	CLRF gbl_tm1638LEDs+D'1'
+0319  01B4  	CLRF gbl_tm1638LEDs+D'2'
+031A  01B5  	CLRF gbl_tm1638LEDs+D'3'
+031B  01B6  	CLRF gbl_tm1638LEDs+D'4'
+031C  01B7  	CLRF gbl_tm1638LEDs+D'5'
+031D  01B8  	CLRF gbl_tm1638LEDs+D'6'
+031E  01B9  	CLRF gbl_tm1638LEDs+D'7'
+
+// Copy of the keys
+char tm1638Keys = 0;
+031F  01D3  	CLRF gbl_tm1638Keys
+
+
+void tm1638ByteWrite(char bWrite);
+void tm1638UpdateDisplay();
+void tm1638ReadKeys();
+
+void displayTemp();
+void storeTempDigits4(int iValue);
+void startTemp();
+void readTemp();
+void processKeys();
+
+#endif
+
+#include <system.h>
+#include <i2c_driver.h>
+#include "PIC16F_TM1638_AquariumControl.h"
+
+//Target PIC16F627 configuration word
+#pragma DATA _CONFIG, _PWRTE_OFF & _WDT_OFF & _INTRC_OSC_NOCLKOUT & _CP_OFF & _LVP_OFF & _BODEN_OFF & _MCLRE_OFF
+
+//Set clock frequency
+#pragma CLOCK_FREQ	4000000
+
+/*********************************************************************************************
+  oneWireBusReset()
+  First part of the reset routine - drive the bus low for 500us
+*********************************************************************************************/
+void oneWireBusReset() {
+
+    char isPresent;
+    oneWireTris = 1; // start with high
+01FE  1683  	BSF STATUS, RP0
+01FF  1303  	BCF STATUS, RP1
+0200  1705  	BSF gbl_trisa,6
+
+    isPresent = 0;
+0201  1283  	BCF STATUS, RP0
+0202  01D4  	CLRF oneWireBus_00015_1_isPresent
+
+    // Send the reset pulse - drive low for 500us
+    oneWireBus = 0;      
+0203  1305  	BCF gbl_porta,6
+
+    oneWireTris = 0;
+0204  1683  	BSF STATUS, RP0
+0205  1305  	BCF gbl_trisa,6
+
+    delay_10us(50);
+0206  3032  	MOVLW 0x32
+0207  1283  	BCF STATUS, RP0
+0208  00D9  	MOVWF delay_10us_00000_arg_del
+0209  201A  	CALL delay_10us_00000
+
+    // Release line and wait 70us for PD Pulse
+    oneWireTris = 1;
+020A  1683  	BSF STATUS, RP0
+020B  1705  	BSF gbl_trisa,6
+
+    delay_10us(7);
+020C  3007  	MOVLW 0x07
+020D  1283  	BCF STATUS, RP0
+020E  00D9  	MOVWF delay_10us_00000_arg_del
+020F  201A  	CALL delay_10us_00000
+
+    // Now sample, if there is a sensor on the bus, the line should be low
+    if (oneWireBus) {
+0210  1B05  	BTFSC gbl_porta,6
+
+        oneWireIsPresent = 0; // no devices
+0211  01C8  	CLRF gbl_oneWireIsPresent
+
+    }
+    delay_10us(50);
+0212  3032  	MOVLW 0x32
+0213  00D9  	MOVWF delay_10us_00000_arg_del
+0214  201A  	CALL delay_10us_00000
+
+}
+0215  0008  	RETURN
+
+
+/*********************************************************************************************
+  oneWireTxByte(char data)
+  Transmits a single byte from the bus
+*********************************************************************************************/
+void oneWireTxByte(char cData) {
+
+    char cTemp = 1;
+00DA  3001  	MOVLW 0x01
+00DB  00D7  	MOVWF oneWireTxB_00016_1_cTemp
+
+    // Loop through the eight bits in the byte
+    for (char i = 0; i < 8; i++) {
+00DC  01D8  	CLRF oneWireTxB_00016_2_i
+00DD        label17
+00DD  3008  	MOVLW 0x08
+00DE  0258  	SUBWF oneWireTxB_00016_2_i, W
+00DF  1803  	BTFSC STATUS,C
+00F4  0AD8  	INCF oneWireTxB_00016_2_i, F
+00F5  28DD  	GOTO	label17
+
+        // Send the LSB first
+
+        // Drive the line low initially for 3us
+        oneWireTris = 0;
+00E1  1683  	BSF STATUS, RP0
+00E2  1305  	BCF gbl_trisa,6
+
+        oneWireBus = 0;
+00E3  1283  	BCF STATUS, RP0
+00E4  1305  	BCF gbl_porta,6
+
+
+        // Delay not needed for 4MHz PIC
+        //delay_us(3); // Delay 3us
+        
+        if (cData & cTemp) {
+00E5  0857  	MOVF oneWireTxB_00016_1_cTemp, W
+00E6  0556  	ANDWF oneWireTxB_00016_arg_cData, W
+00E7  1903  	BTFSC STATUS,Z
+00E8  28EB  	GOTO	label18
+
+            oneWireTris = 1; // Release the bus
+00E9  1683  	BSF STATUS, RP0
+00EA  1705  	BSF gbl_trisa,6
+
+        }
+        
+        delay_10us(5); // Delay 60us - 50us works fine with code delays
+00EB  3005  	MOVLW 0x05
+00EC  1283  	BCF STATUS, RP0
+00ED  00D9  	MOVWF delay_10us_00000_arg_del
+00EE  201A  	CALL delay_10us_00000
+
+        oneWireTris = 1; // Release the bus
+00EF  1683  	BSF STATUS, RP0
+00F0  1705  	BSF gbl_trisa,6
+
+        
+        // move the test bit
+        cTemp <<= 1;
+00F1  1003  	BCF STATUS,C
+00F2  1283  	BCF STATUS, RP0
+00F3  0DD7  	RLF oneWireTxB_00016_1_cTemp, F
+
+    }
+}
+00E0  0008  	RETURN
+
+
+/*********************************************************************************************
+  oneWireTxBytes(char data, char data2)
+  Transmits a 2 bytes from the bus
+*********************************************************************************************/
+void oneWireTxBytes(char cData, char cData2) {
+
+    // Reset first - done in main
+    //oneWireBusReset();
+    // Send first byte
+    oneWireTxByte(cData);
+0115  0854  	MOVF oneWireTxB_00017_arg_cData, W
+0116  00D6  	MOVWF oneWireTxB_00016_arg_cData
+0117  20DA  	CALL oneWireTxB_00016
+
+    // Send second byte
+    oneWireTxByte(cData2);
+0118  0855  	MOVF oneWireTxB_00017_arg_cData2, W
+0119  00D6  	MOVWF oneWireTxB_00016_arg_cData
+011A  20DA  	CALL oneWireTxB_00016
+
+}
+011B  0008  	RETURN
+
+
+/*********************************************************************************************
+  oneWireRxByte()
+  Receives a single byte from the bus
+*********************************************************************************************/
+char oneWireRxByte() {
+
+    char cDataIn = 0;
+011C  1283  	BCF STATUS, RP0
+011D  1303  	BCF STATUS, RP1
+011E  01D4  	CLRF oneWireRxB_00018_1_cDataIn
+
+    // Loop through the eight bits in the byte
+    for(char i = 0; i < 8; i++) {
+011F  01D5  	CLRF oneWireRxB_00018_2_i
+0120        label20
+0120  3008  	MOVLW 0x08
+0121  0255  	SUBWF oneWireRxB_00018_2_i, W
+0122  1803  	BTFSC STATUS,C
+0123  2937  	GOTO	label21
+0135  0AD5  	INCF oneWireRxB_00018_2_i, F
+0136  2920  	GOTO	label20
+0137        label21
+
+        // Bring bus low for 15us
+        oneWireTris = 0;
+0124  1683  	BSF STATUS, RP0
+0125  1305  	BCF gbl_trisa,6
+
+        oneWireBus = 0;
+0126  1283  	BCF STATUS, RP0
+0127  1305  	BCF gbl_porta,6
+
+
+        // Delay not needed for 4MHz PIC
+        //delay_us(15); // Delay 15us
+
+        // Release bus for 6us, this is enough time for the slave to respond
+        oneWireTris = 1;
+0128  1683  	BSF STATUS, RP0
+0129  1705  	BSF gbl_trisa,6
+
+        delay_us(6); // Delay 6us
+012A  3006  	MOVLW 0x06
+012B  1283  	BCF STATUS, RP0
+012C  00D9  	MOVWF delay_us_00000_arg_del
+012D  2010  	CALL delay_us_00000
+
+        
+        // Shift data already received left
+        cDataIn >>= 1;
+012E  1003  	BCF STATUS,C
+012F  0CD4  	RRF oneWireRxB_00018_1_cDataIn, F
+
+        // Check the value of the onewire bus - set the MSB of cDataIn if so
+        if (oneWireBus)
+0130  1B05  	BTFSC gbl_porta,6
+
+            cDataIn.7 = 1;
+0131  17D4  	BSF oneWireRxB_00018_1_cDataIn,7
+
+
+        // To finish time slot
+        delay_10us(6); // 60us
+0132  3006  	MOVLW 0x06
+0133  00D9  	MOVWF delay_10us_00000_arg_del
+0134  201A  	CALL delay_10us_00000
+
+    } 
+    
+    return cDataIn;
+0137  0854  	MOVF oneWireRxB_00018_1_cDataIn, W
+0138  00D5  	MOVWF CompTempVarRet548
+
+}
+0139  0008  	RETURN
+
+
+/*********************************************************************************************
+ ds3231Write(char ds3231Reg, char bWrite)
+ Write one byte
+*********************************************************************************************/
+void ds3231Write(char ds3231Reg, char bWrite) {
+
+	i2c_start();
+00F6  20A5  	CALL i2c_START_00000
+
+	i2c_write(ds3231_addr); // address + write
+00F7  30D0  	MOVLW 0xD0
+00F8  00D6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+00F9  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(ds3231Reg); // start at address
+00FA  0854  	MOVF ds3231Writ_0001E_arg_ds3231Reg, W
+00FB  00D6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+00FC  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(bWrite); // start at address
+00FD  0855  	MOVF ds3231Writ_0001E_arg_bWrite, W
+00FE  00D6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+00FF  2024  	CALL i2c_WRITE_00000
+
+	i2c_stop();
+0100  2075  	CALL i2c_STOP_00000
+
+}
+0101  0008  	RETURN
+
+
+/*********************************************************************************************
+ ds3231Init()
+ Initialise the DS3231
+*********************************************************************************************/
+void ds3231Init() {
+
+	/* control register 0Eh
+    bit7 EOSC   Enable Oscillator (1 if oscillator must be stopped when on battery)
+    bit6 BBSQW  Battery Backed Square Wave
+    bit5 CONV   Convert temperature (1 forces a conversion NOW)
+    bit4 RS2    Rate select - frequency of square wave output
+    bit3 RS1    Rate select
+    bit2 INTCN  Interrupt control (1 for use of the alarms and to disable square wave)
+    bit1 A2IE   Alarm2 interrupt enable (1 to enable)
+    bit0 A1IE   Alarm1 interrupt enable (1 to enable)
+    */
+	ds3231Write(0x0E, 0x80);
+0163  300E  	MOVLW 0x0E
+0164  1283  	BCF STATUS, RP0
+0165  1303  	BCF STATUS, RP1
+0166  00D4  	MOVWF ds3231Writ_0001E_arg_ds3231Reg
+0167  3080  	MOVLW 0x80
+0168  00D5  	MOVWF ds3231Writ_0001E_arg_bWrite
+0169  20F6  	CALL ds3231Writ_0001E
+
+	/* Status Register 0Fh
+    bit7 OSF     Oscillator Stop Flag
+    bit3 EN32kHz Enable 32kHz Output
+    bit2 BSY     Busy
+    bit1 A2F     Alarm 2 Flag
+    bit0 A1F     Alarm 1 Flag
+    */
+	ds3231Write(0x0F, 0x80);
+016A  300F  	MOVLW 0x0F
+016B  00D4  	MOVWF ds3231Writ_0001E_arg_ds3231Reg
+016C  3080  	MOVLW 0x80
+016D  00D5  	MOVWF ds3231Writ_0001E_arg_bWrite
+016E  20F6  	CALL ds3231Writ_0001E
+
+}
+016F  0008  	RETURN
+
+
+/*********************************************************************************************
+ ds3231Start()
+ Start the DS3231
+*********************************************************************************************/
+void ds3231Start() {
+	ds3231Write(0x0F, 0x00);
+}
+
+/*********************************************************************************************
+ ds3231Stop()
+ Stop the DS3231
+*********************************************************************************************/
+void ds3231Stop() {
+	ds3231Write(0x0F, 0x80);
+}
+
+/*********************************************************************************************
+ ds3231WriteDate()
+ Write the date to the DS3231
+*********************************************************************************************/
+void ds3231WriteDate() {
+
+	i2c_start();
+014D  20A5  	CALL i2c_START_00000
+
+	i2c_write(ds3231_addr); // address + write
+014E  30D0  	MOVLW 0xD0
+014F  00D6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+0150  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(0); // start at address 0
+0151  01D6  	CLRF i2c_WRITE_00000_arg_i2c_data
+0152  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(0); // seconds
+0153  01D6  	CLRF i2c_WRITE_00000_arg_i2c_data
+0154  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(0); // minutes
+0155  01D6  	CLRF i2c_WRITE_00000_arg_i2c_data
+0156  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(0); // hours
+0157  01D6  	CLRF i2c_WRITE_00000_arg_i2c_data
+0158  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(1); // day
+0159  3001  	MOVLW 0x01
+015A  00D6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+015B  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(1); // month + century
+015C  3001  	MOVLW 0x01
+015D  00D6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+015E  2024  	CALL i2c_WRITE_00000
+
+	i2c_write(0); // year - 0
+015F  01D6  	CLRF i2c_WRITE_00000_arg_i2c_data
+0160  2024  	CALL i2c_WRITE_00000
+
+	i2c_stop();
+0161  2075  	CALL i2c_STOP_00000
+
+}
+0162  0008  	RETURN
+
+
+/*********************************************************************************************
+ tm1638ByteWrite(char bWrite)
+ Write one byte
+*********************************************************************************************/
+void tm1638ByteWrite(char bWrite) {
+
+    for (char i = 0; i < 8; i++) {
+0102  01D7  	CLRF tm1638Byte_00019_2_i
+0103        label19
+0103  3008  	MOVLW 0x08
+0104  0257  	SUBWF tm1638Byte_00019_2_i, W
+0105  1803  	BTFSC STATUS,C
+0113  0AD7  	INCF tm1638Byte_00019_2_i, F
+0114  2903  	GOTO	label19
+
+        tm1638dio = (bWrite & 0x01);
+0107  3001  	MOVLW 0x01
+0108  0556  	ANDWF tm1638Byte_00019_arg_bWrite, W
+0109  00D8  	MOVWF CompTempVar549
+010A  1858  	BTFSC CompTempVar549,0
+010B  1485  	BSF gbl_porta,1
+010C  1C58  	BTFSS CompTempVar549,0
+010D  1085  	BCF gbl_porta,1
+
+        tm1638clk = 0;
+010E  1005  	BCF gbl_porta,0
+
+        bWrite = (bWrite >> 1);
+010F  08D6  	MOVF tm1638Byte_00019_arg_bWrite, F
+0110  1003  	BCF STATUS,C
+0111  0CD6  	RRF tm1638Byte_00019_arg_bWrite, F
+
+        tm1638clk = 1;
+0112  1405  	BSF gbl_porta,0
+
+    }
+}
+0106  0008  	RETURN
+
+
+/*********************************************************************************************
+ tm1638UpdateDisplay()
+ Publish the tm1638Data and tm1638LEDs arrays to the display
+*********************************************************************************************/
+void tm1638UpdateDisplay() {
+
+    // Write 0x40 [01000000] to indicate command to display data - [Write data to display register]
+    tm1638strobe = 0;
+0199  1283  	BCF STATUS, RP0
+019A  1303  	BCF STATUS, RP1
+019B  1385  	BCF gbl_porta,7
+
+    tm1638ByteWrite(tm1638ByteSetData);
+019C  084F  	MOVF gbl_tm1638ByteSetData, W
+019D  00D6  	MOVWF tm1638Byte_00019_arg_bWrite
+019E  2102  	CALL tm1638Byte_00019
+
+    tm1638strobe = 1;
+019F  1785  	BSF gbl_porta,7
+
+    
+    tm1638strobe = 0;
+01A0  1385  	BCF gbl_porta,7
+
+    // Specify the display address 0xC0 [11000000] then write out all 8 bytes
+    tm1638ByteWrite(tm1638ByteSetAddr);
+01A1  0851  	MOVF gbl_tm1638ByteSetAddr, W
+01A2  00D6  	MOVWF tm1638Byte_00019_arg_bWrite
+01A3  2102  	CALL tm1638Byte_00019
+
+    for (char i = 0; i < tm1638MaxDigits; i++) {
+01A4  01D4  	CLRF tm1638Upda_0001A_2_i
+01A5        label25
+01A5  084C  	MOVF gbl_tm1638MaxDigits, W
+01A6  0254  	SUBWF tm1638Upda_0001A_2_i, W
+01A7  1803  	BTFSC STATUS,C
+01A8  29BB  	GOTO	label26
+01B9  0AD4  	INCF tm1638Upda_0001A_2_i, F
+01BA  29A5  	GOTO	label25
+01BB        label26
+
+        tm1638ByteWrite(tm1638Data[i]);
+01A9  1383  	BCF	STATUS,IRP
+01AA  302A  	MOVLW LOW(gbl_tm1638Data+D'0')
+01AB  0084  	MOVWF FSR
+01AC  0854  	MOVF tm1638Upda_0001A_2_i, W
+01AD  0784  	ADDWF FSR, F
+01AE  0800  	MOVF INDF, W
+01AF  00D6  	MOVWF tm1638Byte_00019_arg_bWrite
+01B0  2102  	CALL tm1638Byte_00019
+
+        tm1638ByteWrite(tm1638LEDs[i]);
+01B1  1383  	BCF	STATUS,IRP
+01B2  3032  	MOVLW LOW(gbl_tm1638LEDs+D'0')
+01B3  0084  	MOVWF FSR
+01B4  0854  	MOVF tm1638Upda_0001A_2_i, W
+01B5  0784  	ADDWF FSR, F
+01B6  0800  	MOVF INDF, W
+01B7  00D6  	MOVWF tm1638Byte_00019_arg_bWrite
+01B8  2102  	CALL tm1638Byte_00019
+
+    }
+    tm1638strobe = 1;
+01BB  1785  	BSF gbl_porta,7
+
+}
+01BC  0008  	RETURN
+
+
+/*********************************************************************************************
+ tm1638ReadKeys()
+ Reads the keys status into tm1638Keys
+*********************************************************************************************/
+void tm1638ReadKeys() {
+
+    // Write 0x42 [01000010] to indicate command to read data
+    tm1638strobe = 0;
+01BD  1283  	BCF STATUS, RP0
+01BE  1303  	BCF STATUS, RP1
+01BF  1385  	BCF gbl_porta,7
+
+    tm1638ByteWrite(tm1638ByteReadData);
+01C0  0850  	MOVF gbl_tm1638ByteReadData, W
+01C1  00D6  	MOVWF tm1638Byte_00019_arg_bWrite
+01C2  2102  	CALL tm1638Byte_00019
+
+    
+    tm1638dioTris = 1; // Set data pin to input
+01C3  1683  	BSF STATUS, RP0
+01C4  1485  	BSF gbl_trisa,1
+
+    char tm1638KeysTemp = 32;
+01C5  3020  	MOVLW 0x20
+01C6  1283  	BCF STATUS, RP0
+01C7  00D4  	MOVWF tm1638Read_0001B_1_tm1638K_0001C
+
+    // Read 4 bytes
+    for (char i = 0; i < 32; i++) {
+01C8  01D5  	CLRF tm1638Read_0001B_2_i
+01C9        label27
+01C9  3020  	MOVLW 0x20
+01CA  0255  	SUBWF tm1638Read_0001B_2_i, W
+01CB  1803  	BTFSC STATUS,C
+01CC  29DA  	GOTO	label29
+01D8  0AD5  	INCF tm1638Read_0001B_2_i, F
+01D9  29C9  	GOTO	label27
+01DA        label29
+
+        tm1638KeysTemp--;
+01CD  03D4  	DECF tm1638Read_0001B_1_tm1638K_0001C, F
+
+        tm1638clk = 0;
+01CE  1005  	BCF gbl_porta,0
+
+        delay_us(1);
+01CF  3001  	MOVLW 0x01
+01D0  00D9  	MOVWF delay_us_00000_arg_del
+01D1  2010  	CALL delay_us_00000
+
+        if(tm1638dio)
+01D2  1C85  	BTFSS gbl_porta,1
+01D3  29D7  	GOTO	label28
+01D7        label28
+
+            tm1638KeysTemp = (tm1638KeysTemp << 1);
+01D4  08D4  	MOVF tm1638Read_0001B_1_tm1638K_0001C, F
+01D5  1003  	BCF STATUS,C
+01D6  0DD4  	RLF tm1638Read_0001B_1_tm1638K_0001C, F
+
+        tm1638clk = 1;
+01D7  1405  	BSF gbl_porta,0
+
+    }
+    tm1638dioTris = 0; // Set data pin to output
+01DA  1683  	BSF STATUS, RP0
+01DB  1085  	BCF gbl_trisa,1
+
+    tm1638strobe = 1;
+01DC  1283  	BCF STATUS, RP0
+01DD  1785  	BSF gbl_porta,7
+
+
+    tm1638Keys = tm1638KeysTemp;
+01DE  0854  	MOVF tm1638Read_0001B_1_tm1638K_0001C, W
+01DF  00D3  	MOVWF gbl_tm1638Keys
+
+}
+01E0  0008  	RETURN
+
+
+/*********************************************************************************************
+  Function called once only to initialise variables and
+  setup the PIC registers
+*********************************************************************************************/
+void initialise() {
+
+    pcon.OSCF = 1; // 4MHz internal osc
+0216  1683  	BSF STATUS, RP0
+0217  1303  	BCF STATUS, RP1
+0218  158E  	BSF gbl_pcon,3
+
+
+    // Configure port A
+    /*
+    RA7     OUT TM1638 STB
+    RA6     IN/OUT DS18B20
+    RA5     
+    RA4     ICSP VPP
+    RA3     IN/OUT DS3231M I2C SDA
+    RA2     IN/OUT DS3231M I2C CLK
+    RA1     IN/OUT TM1638 DIO
+    RA0     OUT TM1638 CLK
+    */
+    trisa = 0x0C;
+0219  300C  	MOVLW 0x0C
+021A  0085  	MOVWF gbl_trisa
+
+    porta = 0x00; // 
+021B  1283  	BCF STATUS, RP0
+021C  0185  	CLRF gbl_porta
+
+    
+    // Configure port B
+    /*      
+    RB7     ICSP PGD
+    RB6     ICSP PGC
+    RB5     OUT WHITE LIGHT PWM
+    RB4     OUT BLUE LIGHT PWM
+    RB3     OUT FANS
+    RB2     OUT HEATER
+    RB1     
+    RB0     IN INT DS3231M
+    */
+    trisb = 0x00; // all outputs
+021D  1683  	BSF STATUS, RP0
+021E  0186  	CLRF gbl_trisb
+
+    portb = 0x00; // all off by default
+021F  1283  	BCF STATUS, RP0
+0220  0186  	CLRF gbl_portb
+
+
+    option_reg = 0;
+0221  1683  	BSF STATUS, RP0
+0222  0181  	CLRF gbl_option_reg
+
+    option_reg.NOT_RBPU = 1; // disable port b pull ups
+0223  1781  	BSF gbl_option_reg,7
+
+
+    // ADC setup
+    cmcon = 7; // disable all comparators so port a is usable as digital io
+0224  3007  	MOVLW 0x07
+0225  1283  	BCF STATUS, RP0
+0226  009F  	MOVWF gbl_cmcon
+
+
+
+    // Setup timer 0, used for PWM
+    // https://labprojectsbd.com/2021/03/31/pwm-pulse-generation-using-pic12f675-micro-controller/
+    // Timer calculator: http://eng-serve.com/pic/pic_timer.html
+    // Timer0 Registers Prescaler= 16 - TMR0 Preset = 0 - Freq = 244.14 Hz - Period = 0.004096 seconds
+    //option_reg.T0CS = 0; // bit 5  TMR0 Clock Source Select bit...0 = Internal Clock (CLKO) 1 = Transition on T0CKI pin
+    //option_reg.T0SE = 0; // bit 4 TMR0 Source Edge Select bit 0 = low/high 1 = high/low
+    //option_reg.PSA = 0; // bit 3  Prescaler Assignment bit...0 = Prescaler is assigned to the Timer0
+    //option_reg.PS2 = 0; // bits 2-0  PS2:PS0: Prescaler Rate Select bits
+    /*option_reg.PS1 = 1;
+    option_reg.PS0 = 1;
+    tmr0 = 0; // preset for timer register
+    intcon.T0IF = 0; // Clear timer 1 interrupt flag bit
+    intcon.T0IE = 1; // Timer 1 interrupt enabled*/
+
+    // Setup timer 1, used to periodically ask for a temperature reading, and receive it after sending - 262ms
+    // Timer calculator: http://eng-serve.com/pic/pic_timer.html
+    // Timer 1 setup - interrupt every 262ms seconds 4MHz
+    /*t1con = 0;
+    t1con.T1CKPS1 = 1;   // bits 5-4  Prescaler Rate Select bits
+    //t1con.T1CKPS0 = 0;   // bit 4
+    //t1con.T1OSCEN = 0;   // bit 3 Timer1 Oscillator Enable Control bit 1 = off - this should be cleared so we can use RB7 and RB6 as outputs
+    t1con.NOT_T1SYNC = 1;    // bit 2 Timer1 External Clock Input Synchronization Control bit...1 = Do not synchronize external clock input
+    //t1con.TMR1CS = 0;    // bit 1 Timer1 Clock Source Select bit...0 = Internal clock (FOSC/4)
+    t1con.TMR1ON = 1;    // bit 0 enables timer
+    pie1.TMR1IE = 1; // Timer 1 interrupt enable
+    pir1.TMR1IF = 0; // Clear timer 1 interrupt flag bit*/
+    
+    // No task at initialisation
+    cTask = 0;
+0227  01CB  	CLRF gbl_cTask
+
+    
+    // Enable interrupts
+    //intcon.GIE = 1;
+    //intcon.PEIE = 1;
+
+	i2c_init(1); 
+0228  3001  	MOVLW 0x01
+0229  00D4  	MOVWF i2c_INIT_00000_arg_i2c_divisor
+022A  213A  	CALL i2c_INIT_00000
+
+	ds3231WriteDate();
+022B  214D  	CALL ds3231Writ_00020
+
+	ds3231Init();
+022C  2163  	CALL ds3231Init_00000
+
+
+}
+022D  0008  	RETURN
+
+
+
+/*********************************************************************************************
+  interrupt()
+  Interrupt handler
+*********************************************************************************************/
+void interrupt() {
+
+    // Handle timer1 interrupt - delay counter
+    if (pir1.TMR1IF && pie1.TMR1IE) {
+0323  1283  	BCF STATUS, RP0
+0324  1303  	BCF STATUS, RP1
+0325  1C0C  	BTFSS gbl_pir1,0
+0326  2B37  	GOTO	label45
+0327  1683  	BSF STATUS, RP0
+0328  1C0C  	BTFSS gbl_pie1,0
+0329  2B37  	GOTO	label45
+0337        label45
+
+        // timer 1 will interrupt every 262ms with a 1:4 prescaler at 4MHz
+        // We'll ask for the temperatute every 30 seconds
+        // Into 30 seconds, 262ms goes 114 times (roughly)
+        if (iTimer1Count == TIMER_1_INTERVAL) {
+032A  1283  	BCF STATUS, RP0
+032B  084A  	MOVF gbl_iTimer1Count, W
+032C  3A72  	XORLW 0x72
+032D  1903  	BTFSC STATUS,Z
+
+            // If the number of tasks to perform is less than the limit,
+            // then add this task to the task array
+            cTask.TASK_TIMER1_START = 1;
+032E  15CB  	BSF gbl_cTask,3
+
+        }
+        // just over 750ms after asking for temperature, it should be ready, so get the reading
+        // 0.75 seconds is three more ticks above TIMER_1_INTERVAL
+        if (iTimer1Count >= TIMER_1_INTERVAL + 3) {
+032F  3075  	MOVLW 0x75
+0330  024A  	SUBWF gbl_iTimer1Count, W
+0331  1C03  	BTFSS STATUS,C
+0332  2B35  	GOTO	label44
+0335        label44
+
+            iTimer1Count = 0;
+0333  01CA  	CLRF gbl_iTimer1Count
+
+            // If the number of tasks to perform is less than the limit,
+            // then add this task to the task array
+            cTask.TASK_TIMER1_READ = 1;
+0334  164B  	BSF gbl_cTask,4
+
+        }
+        // Count the number of times this timer overflowed
+        iTimer1Count++;
+0335  0ACA  	INCF gbl_iTimer1Count, F
+
+        // Clear interrupt flag
+        pir1.TMR1IF = 0; 
+0336  100C  	BCF gbl_pir1,0
+
+    }
+}
+0337  1283  	BCF STATUS, RP0
+0338  0E3C  	SWAPF Int1BContext+D'2', W
+0339  0084  	MOVWF FSR
+033A  0E3B  	SWAPF Int1BContext+D'1', W
+033B  008A  	MOVWF PCLATH
+033C  0E3A  	SWAPF Int1BContext, W
+033D  0083  	MOVWF STATUS
+033E  0EFF  	SWAPF Int1Context, F
+033F  0E7F  	SWAPF Int1Context, W
+0340  0009  	RETFIE
+
+
+/*********************************************************************************************
+  displayTemp()
+  Used to split the 16 bit integer returned from the ds18b20 into parts for display
+  cTempH - upper 8 bits
+  cTempL - lower 8 bits
+*********************************************************************************************/
+void convertTemp() {
+
+    // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
+    
+    signed int iTemp = (cTempH << 8) | cTempL;
+022E  1283  	BCF STATUS, RP0
+022F  1303  	BCF STATUS, RP1
+0230  01D4  	CLRF convertTem_00021_1_iTemp
+0231  083D  	MOVF gbl_cTempH, W
+0232  00D5  	MOVWF convertTem_00021_1_iTemp+D'1'
+0233  083E  	MOVF gbl_cTempL, W
+0234  04D4  	IORWF convertTem_00021_1_iTemp, F
+
+    
+    // Celcius
+    char isMinus = (iTemp < 0);
+0235  01D6  	CLRF convertTem_00021_1_isMinus
+0236  1BD5  	BTFSC convertTem_00021_1_iTemp+D'1',7
+0237  0AD6  	INCF convertTem_00021_1_isMinus, F
+
+    if (isMinus) {
+0238  08D6  	MOVF convertTem_00021_1_isMinus, F
+0239  1903  	BTFSC STATUS,Z
+023A  2A40  	GOTO	label30
+
+        iTemp = ~iTemp + 1;
+023B  09D4  	COMF convertTem_00021_1_iTemp, F
+023C  09D5  	COMF convertTem_00021_1_iTemp+D'1', F
+023D  0AD4  	INCF convertTem_00021_1_iTemp, F
+023E  1903  	BTFSC STATUS,Z
+023F  0AD5  	INCF convertTem_00021_1_iTemp+D'1', F
+0240        label30
+
+    }
+    // this gets celcius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
+    int iValue = (6 * iTemp) + (iTemp / 4);
+0240  3006  	MOVLW 0x06
+0241  00DF  	MOVWF __mul_16s__0000F_arg_a
+0242  01E0  	CLRF __mul_16s__0000F_arg_a+D'1'
+0243  0854  	MOVF convertTem_00021_1_iTemp, W
+0244  00E1  	MOVWF __mul_16s__0000F_arg_b
+0245  0855  	MOVF convertTem_00021_1_iTemp+D'1', W
+0246  00E2  	MOVWF __mul_16s__0000F_arg_b+D'1'
+0247  2170  	CALL __mul_16s__0000F
+0248  0866  	MOVF CompTempVarRet386, W
+0249  00D7  	MOVWF convertTem_00021_1_iValue
+024A  0867  	MOVF CompTempVarRet386+D'1', W
+024B  00DA  	MOVWF CompTempVar567
+024C  0854  	MOVF convertTem_00021_1_iTemp, W
+024D  00D9  	MOVWF CompTempVar564
+024E  0855  	MOVF convertTem_00021_1_iTemp+D'1', W
+024F  00D8  	MOVWF convertTem_00021_1_iValue+D'1'
+0250  0D55  	RLF convertTem_00021_1_iTemp+D'1', W
+0251  0CD8  	RRF convertTem_00021_1_iValue+D'1', F
+0252  0CD9  	RRF CompTempVar564, F
+0253  0D55  	RLF convertTem_00021_1_iTemp+D'1', W
+0254  0CD8  	RRF convertTem_00021_1_iValue+D'1', F
+0255  0CD9  	RRF CompTempVar564, F
+0256  0859  	MOVF CompTempVar564, W
+0257  07D7  	ADDWF convertTem_00021_1_iValue, F
+0258  085A  	MOVF CompTempVar567, W
+0259  1803  	BTFSC STATUS,C
+025A  0AD8  	INCF convertTem_00021_1_iValue+D'1', F
+025B  07D8  	ADDWF convertTem_00021_1_iValue+D'1', F
+
+
+    // Split the temperature reading into digits
+    
+    // simple way, but more program memory needed for PIC12 or PIC16 (more than 100 words more)
+    //char cDig3 = iValue / 1000;
+    //char cDig2 = (iValue / 100) % 10;
+    //char cDig1 = (iValue / 10) % 10;
+    //char cDig0 = iValue % 10;
+    
+    // less program memory needed - may be slower executing
+    // https://electronics.stackexchange.com/questions/158563/how-to-split-a-floating-point-number-into-individual-digits
+    char cDig3 = 0;
+025C  01DB  	CLRF convertTem_00021_1_cDig3
+
+    char cDig2 = 0;
+025D  01DC  	CLRF convertTem_00021_1_cDig2
+
+    char cDig1 = 0;
+025E  01DD  	CLRF convertTem_00021_1_cDig1
+
+    char cDig0 = 0;
+025F  01DE  	CLRF convertTem_00021_1_cDig0
+
+    
+    // incrementing variables for each digit
+
+    // determine to thousands digit
+    while (iValue >= 1000) {
+0260        label31
+0260  3003  	MOVLW 0x03
+0261  0258  	SUBWF convertTem_00021_1_iValue+D'1', W
+0262  1D03  	BTFSS STATUS,Z
+0263  2A66  	GOTO	label32
+0264  30E8  	MOVLW 0xE8
+0265  0257  	SUBWF convertTem_00021_1_iValue, W
+0266        label32
+0266  1C03  	BTFSS STATUS,C
+0267  2A72  	GOTO	label33
+0268  1BD8  	BTFSC convertTem_00021_1_iValue+D'1',7
+0269  2A72  	GOTO	label33
+0271  2A60  	GOTO	label31
+0272        label33
+
+        iValue = iValue - 1000;
+026A  30E8  	MOVLW 0xE8
+026B  02D7  	SUBWF convertTem_00021_1_iValue, F
+026C  3003  	MOVLW 0x03
+026D  1C03  	BTFSS STATUS,C
+026E  3004  	MOVLW 0x04
+026F  02D8  	SUBWF convertTem_00021_1_iValue+D'1', F
+
+        // each time we take off 1000, the digit is incremented
+        cDig3++;
+0270  0ADB  	INCF convertTem_00021_1_cDig3, F
+
+    }
+
+    // determine to hundreds digit
+    while (iValue >= 100) {
+0272  0858  	MOVF convertTem_00021_1_iValue+D'1', W
+0273  3A80  	XORLW 0x80
+0274  00DF  	MOVWF CompTempVar576
+0275  3080  	MOVLW 0x80
+0276  025F  	SUBWF CompTempVar576, W
+0277  1D03  	BTFSS STATUS,Z
+0278  2A7B  	GOTO	label34
+0279  3064  	MOVLW 0x64
+027A  0257  	SUBWF convertTem_00021_1_iValue, W
+027B        label34
+027B  1C03  	BTFSS STATUS,C
+027C  2A84  	GOTO	label35
+0283  2A72  	GOTO	label33
+0284        label35
+
+        iValue = iValue - 100;
+027D  3064  	MOVLW 0x64
+027E  02D7  	SUBWF convertTem_00021_1_iValue, F
+027F  08D8  	MOVF convertTem_00021_1_iValue+D'1', F
+0280  1C03  	BTFSS STATUS,C
+0281  03D8  	DECF convertTem_00021_1_iValue+D'1', F
+
+        // each time we take off 100, the digit is incremented
+        cDig2++;
+0282  0ADC  	INCF convertTem_00021_1_cDig2, F
+
+    }
+
+    // determine to tens digit
+    while (iValue >= 10) {
+0284  0858  	MOVF convertTem_00021_1_iValue+D'1', W
+0285  3A80  	XORLW 0x80
+0286  00DF  	MOVWF CompTempVar579
+0287  3080  	MOVLW 0x80
+0288  025F  	SUBWF CompTempVar579, W
+0289  1D03  	BTFSS STATUS,Z
+028A  2A8D  	GOTO	label36
+028B  300A  	MOVLW 0x0A
+028C  0257  	SUBWF convertTem_00021_1_iValue, W
+028D        label36
+028D  1C03  	BTFSS STATUS,C
+028E  2A96  	GOTO	label37
+0295  2A84  	GOTO	label35
+0296        label37
+
+        iValue = iValue - 10;
+028F  300A  	MOVLW 0x0A
+0290  02D7  	SUBWF convertTem_00021_1_iValue, F
+0291  08D8  	MOVF convertTem_00021_1_iValue+D'1', F
+0292  1C03  	BTFSS STATUS,C
+0293  03D8  	DECF convertTem_00021_1_iValue+D'1', F
+
+        // each time we take off 10, the left most digit is incremented
+        cDig1++;
+0294  0ADD  	INCF convertTem_00021_1_cDig1, F
+
+    }
+
+    // the last digit is what's left on iValue
+    cDig0 = iValue;
+0296  0857  	MOVF convertTem_00021_1_iValue, W
+0297  00DE  	MOVWF convertTem_00021_1_cDig0
+
+
+    // translate the numbers to digit values
+    tm1638Data[0] = tm1638DisplayNumtoSeg[cDig3];
+0298  1383  	BCF	STATUS,IRP
+0299  3020  	MOVLW LOW(gbl_tm1638DisplayNumtoSeg+D'0')
+029A  0084  	MOVWF FSR
+029B  085B  	MOVF convertTem_00021_1_cDig3, W
+029C  0784  	ADDWF FSR, F
+029D  0800  	MOVF INDF, W
+029E  00AA  	MOVWF gbl_tm1638Data
+
+    tm1638Data[1] = tm1638DisplayNumtoSeg[cDig2] + tm1638Dot;
+029F  3020  	MOVLW LOW(gbl_tm1638DisplayNumtoSeg+D'0')
+02A0  0084  	MOVWF FSR
+02A1  085C  	MOVF convertTem_00021_1_cDig2, W
+02A2  0784  	ADDWF FSR, F
+02A3  084D  	MOVF gbl_tm1638Dot, W
+02A4  0700  	ADDWF INDF, W
+02A5  00AB  	MOVWF gbl_tm1638Data+D'1'
+
+    tm1638Data[2] = tm1638DisplayNumtoSeg[cDig1];
+02A6  3020  	MOVLW LOW(gbl_tm1638DisplayNumtoSeg+D'0')
+02A7  0084  	MOVWF FSR
+02A8  085D  	MOVF convertTem_00021_1_cDig1, W
+02A9  0784  	ADDWF FSR, F
+02AA  0800  	MOVF INDF, W
+02AB  00AC  	MOVWF gbl_tm1638Data+D'2'
+
+    tm1638Data[3] = tm1638DisplayNumtoSeg[cDig0];
+02AC  3020  	MOVLW LOW(gbl_tm1638DisplayNumtoSeg+D'0')
+02AD  0084  	MOVWF FSR
+02AE  085E  	MOVF convertTem_00021_1_cDig0, W
+02AF  0784  	ADDWF FSR, F
+02B0  0800  	MOVF INDF, W
+02B1  00AD  	MOVWF gbl_tm1638Data+D'3'
+
+
+    // left fill zeroes with blanks up to the digit before the decimal place
+    if (cDig3 == 0) {
+02B2  08DB  	MOVF convertTem_00021_1_cDig3, F
+02B3  1903  	BTFSC STATUS,Z
+
+        tm1638Data[0] = 0;
+02B4  01AA  	CLRF gbl_tm1638Data
+
+    }
+
+    if (isMinus) {
+02B5  08D6  	MOVF convertTem_00021_1_isMinus, F
+02B6  1903  	BTFSC STATUS,Z
+
+        // If minus and value less than or equal -10 (checked as >1000), shift the digits right
+        if (iValue >= 1000) {
+02B8  3003  	MOVLW 0x03
+02B9  0258  	SUBWF convertTem_00021_1_iValue+D'1', W
+02BA  1D03  	BTFSS STATUS,Z
+02BB  2ABE  	GOTO	label38
+02BC  30E8  	MOVLW 0xE8
+02BD  0257  	SUBWF convertTem_00021_1_iValue, W
+02BE        label38
+02BE  1C03  	BTFSS STATUS,C
+02BF  2AC8  	GOTO	label39
+02C0  1BD8  	BTFSC convertTem_00021_1_iValue+D'1',7
+02C1  2AC8  	GOTO	label39
+02C8        label39
+
+            tm1638Data[1] = tm1638Data[0];
+02C2  082A  	MOVF gbl_tm1638Data, W
+02C3  00AB  	MOVWF gbl_tm1638Data+D'1'
+
+            tm1638Data[2] = tm1638Data[1];
+02C4  082B  	MOVF gbl_tm1638Data+D'1', W
+02C5  00AC  	MOVWF gbl_tm1638Data+D'2'
+
+            tm1638Data[3] = tm1638Data[2];
+02C6  082C  	MOVF gbl_tm1638Data+D'2', W
+02C7  00AD  	MOVWF gbl_tm1638Data+D'3'
+
+        }
+        // If minus, overwrite left most digit with minus sign
+        tm1638Data[0] = 0x40;
+02C8  3040  	MOVLW 0x40
+02C9  00AA  	MOVWF gbl_tm1638Data
+
+    }
+}
+02B7  0008  	RETURN
+02CA  0008  	RETURN
+
+
+/*********************************************************************************************
+  startTemp()
+  Sends the Convert T [44h] function command to the ds18b20
+*********************************************************************************************/
+void startTemp() {
+
+    // CC indicates to skip rom - addressing all devices (there is only one)
+    // 44 is the convert function
+    oneWireTxBytes(0xCC, 0x44);
+01E1  30CC  	MOVLW 0xCC
+01E2  1283  	BCF STATUS, RP0
+01E3  1303  	BCF STATUS, RP1
+01E4  00D4  	MOVWF oneWireTxB_00017_arg_cData
+01E5  3044  	MOVLW 0x44
+01E6  00D5  	MOVWF oneWireTxB_00017_arg_cData2
+01E7  2115  	CALL oneWireTxB_00017
+
+}
+01E8  0008  	RETURN
+
+
+/*********************************************************************************************
+  startTemp()
+  Sends the Read Scratchpad [BEh] function command to the ds18b20
+*********************************************************************************************/
+void readTemp() {
+
+    // CC indicates to skip rom - addressing all devices (there is only one)
+    // BE indicates to read scratchpad
+    oneWireTxBytes(0xCC, 0xBE);
+01E9  30CC  	MOVLW 0xCC
+01EA  1283  	BCF STATUS, RP0
+01EB  1303  	BCF STATUS, RP1
+01EC  00D4  	MOVWF oneWireTxB_00017_arg_cData
+01ED  30BE  	MOVLW 0xBE
+01EE  00D5  	MOVWF oneWireTxB_00017_arg_cData2
+01EF  2115  	CALL oneWireTxB_00017
+
+    // Now get the temperature from the scratchpad
+    // This is in the first two bytes - so get those only and ignore the rest
+    cTempL = oneWireRxByte();
+01F0  211C  	CALL oneWireRxB_00018
+01F1  0855  	MOVF CompTempVarRet548, W
+01F2  00BE  	MOVWF gbl_cTempL
+
+    cTempH = oneWireRxByte();
+01F3  211C  	CALL oneWireRxB_00018
+01F4  0855  	MOVF CompTempVarRet548, W
+01F5  00BD  	MOVWF gbl_cTempH
+
+}
+01F6  0008  	RETURN
+
+
+void processKeys() {
+
+    switch (tm1638Keys) {
+        case 1:
+01F7  1283  	BCF STATUS, RP0
+01F8  1303  	BCF STATUS, RP1
+01F9  0853  	MOVF gbl_tm1638Keys, W
+01FA  3A01  	XORLW 0x01
+01FB  1D03  	BTFSS STATUS,Z
+
+            break;
+    }
+}
+01FC  0008  	RETURN
+01FD  0008  	RETURN
+
+
+void main() {
+
+    initialise();
+02CB  2216  	CALL initialise_00000
+
+    //convertTemp();
+    tm1638UpdateDisplay();
+02CC  2199  	CALL tm1638Upda_0001A
+
+
+    // Endless loop
+    while(1) {
+02CD        label40
+
+        // Task scheduler
+        // If there are tasks to be performed, find out the
+        // most recent task from the array and execute it
+        while (cTask > 0) {
+02CD  084B  	MOVF gbl_cTask, W
+02CE  3C00  	SUBLW 0x00
+02CF  1803  	BTFSC STATUS,C
+02D0  2ACD  	GOTO	label40
+02E1  2ACD  	GOTO	label40
+
+            if (cTask.TASK_TIMER1_START) {
+02D1  1DCB  	BTFSS gbl_cTask,3
+02D2  2AD6  	GOTO	label41
+02D6        label41
+
+                // Timer 1 has finished counting to 30 seconds, ask to convert
+                oneWireBusReset();
+02D3  21FE  	CALL oneWireBus_00015
+
+                startTemp(); 
+02D4  21E1  	CALL startTemp_00000
+
+                cTask.TASK_TIMER1_START = 0;
+02D5  11CB  	BCF gbl_cTask,3
+
+            }
+            if (cTask.TASK_TIMER1_READ) {
+02D6  1E4B  	BTFSS gbl_cTask,4
+02D7  2ADD  	GOTO	label42
+02DD        label42
+
+                // Timer 1 has finished counting a further 750ms, read the converted temperature
+                oneWireBusReset();
+02D8  21FE  	CALL oneWireBus_00015
+
+                readTemp(); 
+02D9  21E9  	CALL readTemp_00000
+
+                // store it in the array, next display refresh will pick it up
+                convertTemp();
+02DA  222E  	CALL convertTem_00021
+
+                // Display on tm1638
+                tm1638UpdateDisplay();
+02DB  2199  	CALL tm1638Upda_0001A
+
+                cTask.TASK_TIMER1_READ = 0;
+02DC  124B  	BCF gbl_cTask,4
+
+            }
+            tm1638ReadKeys();
+02DD  21BD  	CALL tm1638Read_0001B
+
+            if (tm1638Keys != 0) {
+02DE  08D3  	MOVF gbl_tm1638Keys, F
+02DF  1D03  	BTFSS STATUS,Z
+
+                processKeys();
+02E0  21F7  	CALL processKey_0001D
+
+            }
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+// I2C Communications Library for I2C MASTER
+////////////////////////////////////////////////////////////////////////////
+// Author(s): Andrew Smallridge
+// Date 15 November 2004
+//
+// Copyright(C) 2004-2006 Andrew Smallridge
+// Copyright(C) 2004-2010 Pavel Baranov
+// Copyright(C) 2004-2010 David Hobday
+// Existing constants predefined for i2c hardware driver and i2s software
+// emulation for the PIC 18F2xx and 18F4xx processors. For hardware support
+// on other PICs the constants must be mapped to the corresponding register
+// map of the target device
+////////////////////////////////////////////////////////////////////////////
+
+/*
+////////////////////////////////////////////////////////////////////////////
+//	The following three sections should be copied to the user's program:
+//		i2c master hardware / software mode definition
+//		i2c software implementation template arguments and variables
+// 		i2c hardwareware implementation template arguments
+////////////////////////////////////////////////////////////////////////////
+//
+//
+////////////////////////////////////////////////////////////////////////////
+// i2c master hardware / software mode definition
+//
+// For i2c hardware support comment out the #define use_ic2_SW line
+////////////////////////////////////////////////////////////////////////////
+//#define use_i2c_SW
+
+#if defined use_i2c_SW
+////////////////////////////////////////////////////////////////////////////
+// i2c software implementation template arguments and variables
+////////////////////////////////////////////////////////////////////////////
+#define i2c_ARGS	3, PORTC, TRISC, 4, PORTC, TRISC, e_SSPCON1, e_SSPCON2, \
+					e_SSPSTAT, e_SSPBUF, e_SSPIF_BIT, e_SSPIF_PIR,			\
+					e_BCLIF_BIT, e_BCLIF_PIR, 7, e_SSPADD, (i2c_reset_wdt | i2c_SMP)
+
+// RAM used by the software i2c driver to emulate the equivalent i2c hardware registers					
+unsigned short swi2c_SSPCON1@0x40;	// define location for the emulated SSPCON1
+unsigned short swi2c_SSPCON2@0x41;	// define location for the emulated SSPCON2
+unsigned short swi2c_SSPSTAT@0x42;	// define location for the emulated SSPSTAT
+unsigned short swi2c_SSPBUF@0x43;	// define location for the emulated SSPBUF
+unsigned short swi2c_SSPIF_PIR@0x44;// define location for the emulated SSPIF_PIR
+unsigned short swi2c_BCLIF_PIR@0x45;// define location for the emulated BCLIF_PIR
+unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
+
+// variables cannot be passed as template arguments. The following constants map to
+// the PIC registers and software emalated i2c RAM locations. These constants are
+// then used by the templated functions. When changing the address of an emulated
+// register the corresponding constant mapping must also be changed.
+#define e_SSPCON1	0x40
+#define e_SSPCON2	0x41
+#define e_SSPSTAT	0x42
+#define e_SSPADD	0x43
+#define e_SSPBUF	0x44
+#define e_SSPIF_PIR	0x45
+#define e_BCLIF_PIR	0x46
+#define e_SSPIF_BIT	3
+#define e_BCLIF_BIT	3					
+
+#else
+////////////////////////////////////////////////////////////////////////////
+// i2c hardwareware implementation template arguments
+////////////////////////////////////////////////////////////////////////////
+#define i2c_ARGS	3, PORTC, TRISC, 4, PORTC, TRISC, e_SSPCON1, e_SSPCON2, \
+					e_SSPSTAT, e_SSPBUF, e_SSPIF_BIT, e_SSPIF_PIR,			\
+					e_BCLIF_BIT, e_BCLIF_PIR, 7, e_SSPADD, (i2c_reset_wdt | i2c_SMP |i2c_HW)
+
+// variables cannot be passed as template arguments. The following constants map to
+// the PIC registers and PIC's i2c register locations. These constants are
+// then used by the templated functions. 
+#define PORTC		0x0f82
+#define TRISC		0x0f94
+#define e_SSPCON1	0xfc6
+#define e_SSPCON2	0xfc5
+#define e_SSPSTAT	0xfc7
+#define e_SSPADD	0xfc8
+#define e_SSPBUF	0xfc9
+#define e_SSPIF_PIR	0xf9e
+#define e_BCLIF_PIR	0xfa1
+#define e_SSPIF_BIT	3
+#define e_BCLIF_BIT	3
+
+#endif
+
+*/
+
+
+////////////////////////////////////////////////////////////////////////////
+// Define the common i2c template structure
+////////////////////////////////////////////////////////////////////////////
+#define _I2C_TEMPL	template <unsigned char T_SCL_BIT, unsigned short T_SCL_PORT,	\
+					unsigned short T_SCL_TRIS, unsigned char T_SDA_BIT, 			\
+					unsigned short T_SDA_PORT, unsigned short T_SDA_TRIS,			\
+					unsigned short T_i2c_SSPCON1, unsigned short T_i2c_SSPCON2, 	\
+					unsigned short T_i2c_SSPSTAT, unsigned short T_i2c_SSPBUF, 		\
+					unsigned char T_i2c_SSPIF_BIT, unsigned short T_i2c_SSPIF_PIR,	\
+					unsigned char T_i2c_BCLIF_BIT, unsigned short T_i2c_BCLIF_PIR,	\
+					unsigned char T_i2c_SMP_BIT, unsigned short T_i2c_SSPADD, 		\
+					unsigned char T_MODE>
+
+////////////////////////////////////////////////////////////////////////////
+// Define the common i2c template parameters
+////////////////////////////////////////////////////////////////////////////
+#define _I2C_TEMPL_ARGS	T_SCL_BIT, T_SCL_PORT, T_SCL_TRIS, T_SDA_BIT, 			\
+						T_SDA_PORT, T_SDA_TRIS, T_i2c_SSPCON1, T_i2c_SSPCON2, 	\
+						T_i2c_SSPSTAT, T_i2c_SSPBUF, T_i2c_SSPIF_BIT, 			\
+						T_i2c_SSPIF_PIR, T_i2c_BCLIF_BIT, T_i2c_BCLIF_PIR,		\
+						T_i2c_SMP_BIT, T_i2c_SSPADD, T_MODE
+
+////////////////////////////////////////////////////////////////////////////
+// Helpers that hide template arguments
+////////////////////////////////////////////////////////////////////////////
+#define i2c_init	i2c_INIT<i2c_ARGS>
+#define i2c_start	i2c_START<i2c_ARGS>
+#define i2c_restart	i2c_RESTART<i2c_ARGS>
+#define i2c_stop	i2c_STOP<i2c_ARGS>
+#define i2c_read	i2c_READ<i2c_ARGS>
+#define i2c_write	i2c_WRITE<i2c_ARGS>
+
+
+////////////////////////////////////////////////////////////////////////////
+// I2C Control Status Bits - Emulates the PIC18F hardware I2C implementation
+////////////////////////////////////////////////////////////////////////////
+// define I2C i2C_SSPCON1 control bits
+#define	i2c_WCOL	7
+#define	i2c_SSPOV	6
+#define	i2c_SSPEN	5
+#define	i2c_CKP		4
+#define	i2c_SSPM3	3
+#define	i2c_SSPM2	2
+#define	i2c_SSPM1	1
+#define	i2c_SSPM0	0
+
+// define I2C SSPCON2 control bits
+#define	i2c_GCEN 	7
+#define	i2c_ACKSTAT	6
+#define	i2c_ACKDT	5
+#define	i2c_ACKEN	4
+#define	i2c_RCEN	3
+#define	i2c_PEN		2
+#define	i2c_RSEN	1
+#define	i2c_SEN		0
+
+// define I2C SSPSTAT status bits
+#define	i2c_DA		5
+#define	i2c_P		4
+#define	i2c_S		3
+#define	i2c_RW		2
+#define	i2c_UA		1
+#define	i2c_BF		0
+
+
+////////////////////////////////////////////////////////////////////////////
+// I2C Control Flag Bits
+////////////////////////////////////////////////////////////////////////////
+// define I2C Mode bits
+#define	i2c_HW			0x01
+#define	i2c_400KHz		0x02	// 100KHz or 400KHz I2C clock (set = 400KHz)
+#define	i2c_reset_wdt	0x04
+#define i2c_SMP			0x80	
+
+
+////////////////////////////////////////////////////////////////////////////
+// I2C software constants
+////////////////////////////////////////////////////////////////////////////
+#define	dly 10	// number of 1us delay increments
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Generates the I2C Bus Start Condition
+////////////////////////////////////////////////////////////////////////////
+_I2C_TEMPL 
+void i2c_START(void)
+
+{
+	// Initiate the I2C START condition
+	volatile bit l_scl@T_SCL_PORT.T_SCL_BIT, l_sda@T_SDA_PORT.T_SDA_BIT;
+	volatile bit l_scl_tris@T_SCL_TRIS.T_SCL_BIT, l_sda_tris@T_SDA_TRIS.T_SDA_BIT;
+	volatile bit l_sspif@T_i2c_SSPIF_PIR.T_i2c_SSPIF_BIT, l_bclif@T_i2c_BCLIF_PIR.T_i2c_BCLIF_BIT;
+	volatile bit l_rw@T_i2c_SSPSTAT.i2c_RW, l_s@T_i2c_SSPSTAT.i2c_S, l_sen@T_i2c_SSPCON2.i2c_SEN;
+	volatile bit l_rcen@T_i2c_SSPCON2.i2c_RCEN, l_pen@T_i2c_SSPCON2.i2c_PEN;
+	volatile bit l_rsen@T_i2c_SSPCON2.i2c_RSEN, l_acken@T_i2c_SSPCON2.i2c_ACKEN;
+		
+	delay_us(dly);
+00A5  300A  	MOVLW 0x0A
+00A6  1283  	BCF STATUS, RP0
+00A7  1303  	BCF STATUS, RP1
+00A8  00D9  	MOVWF delay_us_00000_arg_del
+00A9  2010  	CALL delay_us_00000
+
+	l_bclif = 0; // initialise the collision flag for this command
+00AA  11C6  	BCF i2c_START_00000_1_l_bclif,3
+
+	l_sspif = 0;
+00AB  11C5  	BCF i2c_START_00000_1_l_sspif,3
+
+		
+	if (T_MODE & i2c_HW)
+	{
+		//	Hardware I2C implementation
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw)
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+			
+		l_sen = 1; // initiate START condition	
+
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw || !l_sspif)
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+	}
+	else
+	{
+		//	Software I2C implementation			
+		l_sen = 1; // initiate START condition
+00AC  1441  	BSF i2c_START_00000_1_l_sen,0
+
+		l_scl_tris = 1; // ensure the SCL line is high
+00AD  1683  	BSF STATUS, RP0
+00AE  1505  	BSF i2c_START_00000_1_l_scl_tris,2
+
+		l_sda_tris = 1; // ensure the SDA line is high	
+00AF  1585  	BSF i2c_START_00000_1_l_sda_tris,3
+
+		l_scl = 0; // prepare to set SCL line low
+00B0  1283  	BCF STATUS, RP0
+00B1  1105  	BCF i2c_START_00000_1_l_scl,2
+
+		l_sda = 0; // prepare to set SDA line low
+00B2  1185  	BCF i2c_START_00000_1_l_sda,3
+
+		
+		if (l_scl && l_sda)
+00B3  1D05  	BTFSS i2c_START_00000_1_l_scl,2
+00B4  28D2  	GOTO	label16
+00B5  1D85  	BTFSS i2c_START_00000_1_l_sda,3
+00B6  28D2  	GOTO	label16
+00D2        label16
+
+		{
+			// good sign - no collision detected
+			delay_us(dly);
+00B7  300A  	MOVLW 0x0A
+00B8  00D9  	MOVWF delay_us_00000_arg_del
+00B9  2010  	CALL delay_us_00000
+
+			
+			if (!l_scl) // ensure the clock is still high
+00BA  1905  	BTFSC i2c_START_00000_1_l_scl,2
+00BB  28C0  	GOTO	label15
+00C0        label15
+
+			{
+				l_bclif = 1;
+00BC  15C6  	BSF i2c_START_00000_1_l_bclif,3
+
+				l_s = 1;
+00BD  15C2  	BSF i2c_START_00000_1_l_s,3
+
+				l_sen = 0;
+00BE  1041  	BCF i2c_START_00000_1_l_sen,0
+
+				return;
+			}
+					
+			l_sda = 0; // prepare to set SDA line low
+00C0  1185  	BCF i2c_START_00000_1_l_sda,3
+
+			l_sda_tris = 0; // SDA to output (driven low)
+00C1  1683  	BSF STATUS, RP0
+00C2  1185  	BCF i2c_START_00000_1_l_sda_tris,3
+
+
+			delay_us(dly);					
+00C3  300A  	MOVLW 0x0A
+00C4  1283  	BCF STATUS, RP0
+00C5  00D9  	MOVWF delay_us_00000_arg_del
+00C6  2010  	CALL delay_us_00000
+
+			l_scl = 0; // prepare to set SCL line low
+00C7  1105  	BCF i2c_START_00000_1_l_scl,2
+
+			l_scl_tris = 0; // SCL to output (driven low)
+00C8  1683  	BSF STATUS, RP0
+00C9  1105  	BCF i2c_START_00000_1_l_scl_tris,2
+
+
+			delay_us(dly);					
+00CA  300A  	MOVLW 0x0A
+00CB  1283  	BCF STATUS, RP0
+00CC  00D9  	MOVWF delay_us_00000_arg_del
+00CD  2010  	CALL delay_us_00000
+
+			l_s = 1; // set 'S' bit flag (start bit detected)
+00CE  15C2  	BSF i2c_START_00000_1_l_s,3
+
+			l_sen = 0; // clear flag
+00CF  1041  	BCF i2c_START_00000_1_l_sen,0
+
+			l_sspif = 1; // flag end of start condition interrupt	
+00D0  15C5  	BSF i2c_START_00000_1_l_sspif,3
+
+		}
+		else
+		{
+			// here is SDA or SCL are low at the start - indicates a bus collision
+			l_bclif = 1;
+00D2  15C6  	BSF i2c_START_00000_1_l_bclif,3
+
+			l_s = 1; // set 'S' bit flag (start bit detected)
+00D3  15C2  	BSF i2c_START_00000_1_l_s,3
+
+			l_sen = 0;
+00D4  1041  	BCF i2c_START_00000_1_l_sen,0
+
+			l_rsen = 0;
+00D5  10C1  	BCF i2c_START_00000_1_l_rsen,1
+
+			l_pen = 0;
+00D6  1141  	BCF i2c_START_00000_1_l_pen,2
+
+			l_rcen = 0;								
+00D7  11C1  	BCF i2c_START_00000_1_l_rcen,3
+
+			l_acken = 0;			
+00D8  1241  	BCF i2c_START_00000_1_l_acken,4
+
+		}
+	}
+}
+00BF  0008  	RETURN
+00D1  0008  	RETURN
+00D9  0008  	RETURN
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Generates the I2C Bus Restart Condition
+////////////////////////////////////////////////////////////////////////////
+_I2C_TEMPL
+void i2c_RESTART(void)
+{
+	// Initiate the I2C RESTART condition
+	volatile bit l_scl@T_SCL_PORT.T_SCL_BIT, l_sda@T_SDA_PORT.T_SDA_BIT;
+	volatile bit l_scl_tris@T_SCL_TRIS.T_SCL_BIT, l_sda_tris@T_SDA_TRIS.T_SDA_BIT;
+	volatile bit l_sspif@T_i2c_SSPIF_PIR.T_i2c_SSPIF_BIT, l_bclif@T_i2c_BCLIF_PIR.T_i2c_BCLIF_BIT;
+	volatile bit l_rw@T_i2c_SSPSTAT.i2c_RW, l_s@T_i2c_SSPSTAT.i2c_S; 
+	volatile bit l_rcen@T_i2c_SSPCON2.i2c_RCEN, l_pen@T_i2c_SSPCON2.i2c_PEN, l_sen@T_i2c_SSPCON2.i2c_SEN;
+	volatile bit l_rsen@T_i2c_SSPCON2.i2c_RSEN, l_acken@T_i2c_SSPCON2.i2c_ACKEN;
+			
+	delay_us(dly);
+	l_bclif = 0; // initialise the collision flag for this command
+	l_sspif = 0;
+
+	if (T_MODE & i2c_HW)
+	{
+		//	Hardware I2C implementation	
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw)	
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+					
+		l_rsen = 1; // initiate RESTART condition
+	
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw || !l_sspif)			
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+	}
+	else
+	{
+		//	Software I2C implementation	
+		l_rsen = 1;
+		l_scl = 0;
+		l_sda = 0;
+		
+		if (!l_scl)
+		{
+			// good sign - no other I2C activity in progress
+			l_sda_tris = 1; // float SDA line high	(should already be in this condition)	
+			delay_us(dly);
+		
+			// about to float the clock line
+			// ensure the data line is still high
+			if (!l_sda)
+			{
+				// problem - SDA is low, a bus collision has occurred				
+				l_bclif = 1; // set the bus collision flag	
+				l_s = 0; // clear 'S' bit flag
+				l_rsen = 0;
+				l_scl_tris = 1; // float SCL line (high)	
+				return;
+			}
+												
+			l_scl_tris = 1; // float SCL line (high)
+
+			// wait until any clock stretching has finished
+			while (!l_scl)
+				if (T_MODE & i2c_reset_wdt)
+					clear_wdt();	
+			delay_us(dly);
+			
+			// here we are about to drive SDA low
+			// first ensure SCL is still high
+			if (!l_scl)
+			{
+				// problem - SCL is low, a bus collision has occurred
+				l_bclif = 1; // set the bus collision flag
+				l_s = 0; // clear 'S' bit flag
+				l_rsen = 0;
+				l_sda_tris = 1; // float SDA line (high)
+				return;
+			}
+				
+			l_sda_tris = 0; // drive SDA low
+			l_s = 1; // set 'S' bit flag (start bit detected)
+
+			delay_us(dly);
+			l_scl_tris = 0; // drive SCL low
+			l_rsen = 0;
+			l_pen = 0;
+			l_sen = 0;			
+			l_rcen = 0;								
+			l_acken = 0;			
+			l_sspif = 1; // flag end of start condition interrupt
+		}
+		else
+		{
+			// SCL is high at the start
+			// some other I2C activity in progress		
+			l_rsen = 0; // clear flag
+			// exit without further action
+		}
+	}
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Generates the I2C Bus Stop Condition
+////////////////////////////////////////////////////////////////////////////
+_I2C_TEMPL
+void i2c_STOP(void)
+
+{ 
+	volatile bit l_scl@T_SCL_PORT.T_SCL_BIT, l_sda@T_SDA_PORT.T_SDA_BIT;
+	volatile bit l_scl_tris@T_SCL_TRIS.T_SCL_BIT, l_sda_tris@T_SDA_TRIS.T_SDA_BIT;
+	volatile bit l_sspif@T_i2c_SSPIF_PIR.T_i2c_SSPIF_BIT, l_bclif@T_i2c_BCLIF_PIR.T_i2c_BCLIF_BIT;
+	volatile bit l_rw@T_i2c_SSPSTAT.i2c_RW, l_s@T_i2c_SSPSTAT.i2c_S, l_p@T_i2c_SSPSTAT.i2c_P; 
+	volatile bit l_rcen@T_i2c_SSPCON2.i2c_RCEN, l_pen@T_i2c_SSPCON2.i2c_PEN, l_sen@T_i2c_SSPCON2.i2c_SEN;
+	volatile bit l_rsen@T_i2c_SSPCON2.i2c_RSEN, l_acken@T_i2c_SSPCON2.i2c_ACKEN;
+
+	l_bclif = 0; // initialise the collision flag for this command
+0075  1283  	BCF STATUS, RP0
+0076  1303  	BCF STATUS, RP1
+0077  11C6  	BCF i2c_STOP_00000_1_l_bclif,3
+
+	l_sspif = 0;
+0078  11C5  	BCF i2c_STOP_00000_1_l_sspif,3
+
+
+	if (T_MODE & i2c_HW)
+	{
+		//	Hardware I2C implementation	
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw)	
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+					
+		l_pen = 1; // initiate STOP condition on the I2C bus	
+	
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw || !l_sspif)			
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();		
+		
+	}
+	else
+	{
+		//	Software I2C implementation
+		l_pen = 1; // initiate STOP condition on the I2C bus
+0079  1541  	BSF i2c_STOP_00000_1_l_pen,2
+
+		delay_us(dly);
+007A  300A  	MOVLW 0x0A
+007B  00D9  	MOVWF delay_us_00000_arg_del
+007C  2010  	CALL delay_us_00000
+
+		
+		l_scl = 0; // prepare to set SCL line low
+007D  1105  	BCF i2c_STOP_00000_1_l_scl,2
+
+		l_sda = 0; // prepare to set SDA line low
+007E  1185  	BCF i2c_STOP_00000_1_l_sda,3
+
+		l_scl_tris = 0; // drive SCL line low (should already be low)
+007F  1683  	BSF STATUS, RP0
+0080  1105  	BCF i2c_STOP_00000_1_l_scl_tris,2
+
+		l_sda_tris = 0; // drive SDA line low
+0081  1185  	BCF i2c_STOP_00000_1_l_sda_tris,3
+
+
+		delay_us(dly);		
+0082  300A  	MOVLW 0x0A
+0083  1283  	BCF STATUS, RP0
+0084  00D9  	MOVWF delay_us_00000_arg_del
+0085  2010  	CALL delay_us_00000
+
+		l_scl_tris = 1; // float SCL line (high)
+0086  1683  	BSF STATUS, RP0
+0087  1505  	BSF i2c_STOP_00000_1_l_scl_tris,2
+
+		
+		// wait until any clock stretching has finished
+		while (!l_scl)
+0088        label11
+0088  1283  	BCF STATUS, RP0
+0089  1905  	BTFSC i2c_STOP_00000_1_l_scl,2
+008A  288D  	GOTO	label12
+008C  2888  	GOTO	label11
+008D        label12
+
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+008B  0064  	CLRWDT
+
+						
+		delay_us(dly);
+008D  300A  	MOVLW 0x0A
+008E  00D9  	MOVWF delay_us_00000_arg_del
+008F  2010  	CALL delay_us_00000
+
+		l_sda_tris = 1; // float SDA line
+0090  1683  	BSF STATUS, RP0
+0091  1585  	BSF i2c_STOP_00000_1_l_sda_tris,3
+
+		delay_us(dly);		
+0092  300A  	MOVLW 0x0A
+0093  1283  	BCF STATUS, RP0
+0094  00D9  	MOVWF delay_us_00000_arg_del
+0095  2010  	CALL delay_us_00000
+
+		
+		// here the SDA line should be high - if not a collision has occurred				
+		if (!l_sda || !l_scl)
+0096  1D85  	BTFSS i2c_STOP_00000_1_l_sda,3
+0097  289A  	GOTO	label13
+0098  1905  	BTFSC i2c_STOP_00000_1_l_scl,2
+0099  289E  	GOTO	label14
+009A        label13
+009E        label14
+
+		{
+			// problem - SDA or SCL is low, a bus collision has occurred
+			l_bclif = 1; // set the bus collision flag	
+009A  15C6  	BSF i2c_STOP_00000_1_l_bclif,3
+
+			l_s = 0; // clear 'S' bit flag
+009B  11C2  	BCF i2c_STOP_00000_1_l_s,3
+
+			l_pen = 0; // clear flag
+009C  1141  	BCF i2c_STOP_00000_1_l_pen,2
+
+		}
+		else
+		{		
+			l_p = 1;
+009E  1642  	BSF i2c_STOP_00000_1_l_p,4
+
+			l_pen = 0;
+009F  1141  	BCF i2c_STOP_00000_1_l_pen,2
+
+			l_sen = 0;
+00A0  1041  	BCF i2c_STOP_00000_1_l_sen,0
+
+			l_rsen = 0;			
+00A1  10C1  	BCF i2c_STOP_00000_1_l_rsen,1
+
+			l_rcen = 0;								
+00A2  11C1  	BCF i2c_STOP_00000_1_l_rcen,3
+
+			l_acken = 0;
+00A3  1241  	BCF i2c_STOP_00000_1_l_acken,4
+
+		}
+	}
+}
+009D  0008  	RETURN
+00A4  0008  	RETURN
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Generates the I2C Bus Write Condition
+////////////////////////////////////////////////////////////////////////////
+_I2C_TEMPL
+unsigned char i2c_WRITE(unsigned char i2c_data)
+
+{
+	volatile unsigned char i2c_SSPBUF@T_i2c_SSPBUF;	
+	volatile bit l_scl@T_SCL_PORT.T_SCL_BIT, l_sda@T_SDA_PORT.T_SDA_BIT;
+	volatile bit l_scl_tris@T_SCL_TRIS.T_SCL_BIT, l_sda_tris@T_SDA_TRIS.T_SDA_BIT;
+	volatile bit l_bf@T_i2c_SSPSTAT.i2c_BF, l_ackdt@T_i2c_SSPCON2.i2c_ACKDT;
+	volatile bit l_sspif@T_i2c_SSPIF_PIR.T_i2c_SSPIF_BIT, l_bclif@T_i2c_BCLIF_PIR.T_i2c_BCLIF_BIT;
+	volatile bit l_rw@T_i2c_SSPSTAT.i2c_RW,l_wcol@T_i2c_SSPCON1.i2c_WCOL;
+	volatile bit l_rcen@T_i2c_SSPCON2.i2c_RCEN, l_pen@T_i2c_SSPCON2.i2c_PEN, l_sen@T_i2c_SSPCON2.i2c_SEN;
+	volatile bit l_rsen@T_i2c_SSPCON2.i2c_RSEN, l_acken@T_i2c_SSPCON2.i2c_ACKEN;
+	
+	char BitMask;
+	bit local_ack;
+
+	l_bclif = 0; // initialise the collision flag for this command
+0024  11C6  	BCF i2c_WRITE_00000_1_l_bclif,3
+
+	l_sspif = 0; // clear the operation completed
+0025  11C5  	BCF i2c_WRITE_00000_1_l_sspif,3
+
+
+	if (T_MODE & i2c_HW)
+	{
+		//	Hardware I2C implementation
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw)
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+				
+		l_wcol = 0; // clear write collision flag	
+		i2c_SSPBUF = i2c_data;
+
+		// test if a write collision occurred
+		if (l_wcol)
+			return (1); // error exit	
+
+		// wait until MSSP Tx register is empty
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw || !l_sspif)	
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+								
+		return (0); // successful exit
+	}
+
+	// here for i2c software driver
+	l_wcol = 0; // clear write collision flag	
+0026  13C0  	BCF i2c_WRITE_00000_1_l_wcol,7
+
+	i2c_SSPBUF = i2c_data;
+0027  0856  	MOVF i2c_WRITE_00000_arg_i2c_data, W
+0028  00C4  	MOVWF i2c_WRITE_00000_1_i2c_SSPBUF
+
+	
+	l_scl = 0; // prepare to set SCL line low
+0029  1105  	BCF i2c_WRITE_00000_1_l_scl,2
+
+	l_sda = 0; // prepare to set SDA line low
+002A  1185  	BCF i2c_WRITE_00000_1_l_sda,3
+
+	l_rw = 0; // signal we are doing a write
+002B  1142  	BCF i2c_WRITE_00000_1_l_rw,2
+
+
+	for (BitMask = 0x80; BitMask; BitMask>>=1)
+002C  3080  	MOVLW 0x80
+002D  00D7  	MOVWF i2c_WRITE_00000_1_BitMask
+002E        label3
+002E  08D7  	MOVF i2c_WRITE_00000_1_BitMask, F
+002F  1903  	BTFSC STATUS,Z
+0030  2851  	GOTO	label8
+004E  1003  	BCF STATUS,C
+004F  0CD7  	RRF i2c_WRITE_00000_1_BitMask, F
+0050  282E  	GOTO	label3
+0051        label8
+
+	{
+		if (i2c_data & BitMask)
+0031  0857  	MOVF i2c_WRITE_00000_1_BitMask, W
+0032  0556  	ANDWF i2c_WRITE_00000_arg_i2c_data, W
+0033  1903  	BTFSC STATUS,Z
+0034  2838  	GOTO	label4
+0038        label4
+
+			l_sda_tris = 1; // float SDA high	
+0035  1683  	BSF STATUS, RP0
+0036  1585  	BSF i2c_WRITE_00000_1_l_sda_tris,3
+
+		else
+0037  283A  	GOTO	label5
+003A        label5
+
+			l_sda_tris = 0; // drive SDA low
+0038  1683  	BSF STATUS, RP0
+0039  1185  	BCF i2c_WRITE_00000_1_l_sda_tris,3
+
+		delay_us(dly);
+003A  300A  	MOVLW 0x0A
+003B  1283  	BCF STATUS, RP0
+003C  00D9  	MOVWF delay_us_00000_arg_del
+003D  2010  	CALL delay_us_00000
+
+
+		l_scl_tris = 1; // float SCL high
+003E  1683  	BSF STATUS, RP0
+003F  1505  	BSF i2c_WRITE_00000_1_l_scl_tris,2
+
+
+		// wait until any clock stretching has finished
+		while (!l_scl)
+0040        label6
+0040  1283  	BCF STATUS, RP0
+0041  1905  	BTFSC i2c_WRITE_00000_1_l_scl,2
+0042  2845  	GOTO	label7
+0044  2840  	GOTO	label6
+0045        label7
+
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();		
+0043  0064  	CLRWDT
+
+		delay_us(dly);
+0045  300A  	MOVLW 0x0A
+0046  00D9  	MOVWF delay_us_00000_arg_del
+0047  2010  	CALL delay_us_00000
+
+	
+		l_scl_tris = 0; // drive SCL low	
+0048  1683  	BSF STATUS, RP0
+0049  1105  	BCF i2c_WRITE_00000_1_l_scl_tris,2
+
+		delay_us(dly);
+004A  300A  	MOVLW 0x0A
+004B  1283  	BCF STATUS, RP0
+004C  00D9  	MOVWF delay_us_00000_arg_del
+004D  2010  	CALL delay_us_00000
+
+	}
+	// serialized out the data
+	// now get the status		
+	// set SSPIF
+	l_sspif = 1;
+0051  15C5  	BSF i2c_WRITE_00000_1_l_sspif,3
+
+	l_acken = 1;
+0052  1641  	BSF i2c_WRITE_00000_1_l_acken,4
+
+	l_ackdt = 0;
+0053  12C1  	BCF i2c_WRITE_00000_1_l_ackdt,5
+
+	l_sda_tris = 1; // float SDA high
+0054  1683  	BSF STATUS, RP0
+0055  1585  	BSF i2c_WRITE_00000_1_l_sda_tris,3
+
+	
+	delay_us(dly);
+0056  300A  	MOVLW 0x0A
+0057  1283  	BCF STATUS, RP0
+0058  00D9  	MOVWF delay_us_00000_arg_del
+0059  2010  	CALL delay_us_00000
+
+	
+	l_scl_tris = 1; // float SCL high
+005A  1683  	BSF STATUS, RP0
+005B  1505  	BSF i2c_WRITE_00000_1_l_scl_tris,2
+
+	
+	// wait until any clock stretching has finished
+	while (!l_scl)
+005C        label9
+005C  1283  	BCF STATUS, RP0
+005D  1905  	BTFSC i2c_WRITE_00000_1_l_scl,2
+005E  2861  	GOTO	label10
+0060  285C  	GOTO	label9
+0061        label10
+
+		if (T_MODE & i2c_reset_wdt)
+			clear_wdt();	
+005F  0064  	CLRWDT
+
+	delay_us(dly);
+0061  300A  	MOVLW 0x0A
+0062  00D9  	MOVWF delay_us_00000_arg_del
+0063  2010  	CALL delay_us_00000
+
+
+	// get the status bit
+	local_ack = l_sda;
+0064  1058  	BCF i2c_WRITE_00000_1_local_ack,0
+0065  1985  	BTFSC i2c_WRITE_00000_1_l_sda,3
+0066  1458  	BSF i2c_WRITE_00000_1_local_ack,0
+
+	delay_us(dly);
+0067  300A  	MOVLW 0x0A
+0068  00D9  	MOVWF delay_us_00000_arg_del
+0069  2010  	CALL delay_us_00000
+
+
+	l_scl_tris = 0; // drive SCL low	
+006A  1683  	BSF STATUS, RP0
+006B  1105  	BCF i2c_WRITE_00000_1_l_scl_tris,2
+
+	l_acken = 0;
+006C  1283  	BCF STATUS, RP0
+006D  1241  	BCF i2c_WRITE_00000_1_l_acken,4
+
+	delay_us(dly);
+006E  300A  	MOVLW 0x0A
+006F  00D9  	MOVWF delay_us_00000_arg_del
+0070  2010  	CALL delay_us_00000
+
+	return(local_ack);
+0071  01D9  	CLRF CompTempVarRet558
+0072  1858  	BTFSC i2c_WRITE_00000_1_local_ack,0
+0073  0AD9  	INCF CompTempVarRet558, F
+
+}
+0074  0008  	RETURN
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Generates the I2C Bus Read Condition
+////////////////////////////////////////////////////////////////////////////
+_I2C_TEMPL
+unsigned char i2c_READ(char ack_status)
+{
+	volatile unsigned char i2c_SSPBUF@T_i2c_SSPBUF;
+	volatile bit l_scl@T_SCL_PORT.T_SCL_BIT, l_sda@T_SDA_PORT.T_SDA_BIT;
+	volatile bit l_scl_tris@T_SCL_TRIS.T_SCL_BIT, l_sda_tris@T_SDA_TRIS.T_SDA_BIT;
+	volatile bit l_bf@T_i2c_SSPSTAT.i2c_BF, l_ackdt@T_i2c_SSPCON2.i2c_ACKDT;
+	volatile bit l_sspif@T_i2c_SSPIF_PIR.T_i2c_SSPIF_BIT, l_bclif@T_i2c_BCLIF_PIR.T_i2c_BCLIF_BIT;
+	volatile bit l_rw@T_i2c_SSPSTAT.i2c_RW,l_wcol@T_i2c_SSPCON1.i2c_WCOL;
+	volatile bit l_rcen@T_i2c_SSPCON2.i2c_RCEN, l_pen@T_i2c_SSPCON2.i2c_PEN, l_sen@T_i2c_SSPCON2.i2c_SEN;
+	volatile bit l_rsen@T_i2c_SSPCON2.i2c_RSEN, l_acken@T_i2c_SSPCON2.i2c_ACKEN;
+		
+	char BitMask;
+	char i2c_data;
+	bit local_ack;
+
+	l_bclif = 0; // initialise the collision flag for this command
+	l_sspif = 0; // clear the operation completed
+	l_wcol = 0; // clear write collision flag	
+
+	if (T_MODE & i2c_HW)
+	{
+		//	Hardware I2C implementation
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw)
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+
+		// enable master for 1 byte reception	
+		l_rcen = 1;
+
+		// wait until byte received
+		while(!l_sspif || !l_bf)
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+
+		// read the byte from the Rx register
+		i2c_data = i2c_SSPBUF;			
+			
+		// wait until the bus is idle		
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw)
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();
+
+		if (ack_status)
+			l_ackdt = 1; // preset ack bit
+		else
+			l_ackdt = 0; // preset ack bit
+
+		l_sspif = 0;
+		l_acken = 1; // acknowledge sequence enable
+
+		while (l_acken || l_rcen || l_pen || l_rsen || l_sen || l_rw || !l_sspif)			
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();								
+	}
+	else
+	{
+		// here for i2c software driver
+		l_rcen = 1;
+		l_ackdt = ack_status;
+		l_rw = 1;
+		l_scl = 0; // prepare to set SCL line low
+		l_sda = 0; // prepare to set SDA line low	
+
+		// prepare to serialize in the byte
+		l_sda_tris = 1; // float SDA
+		delay_us(dly);
+		i2c_data = 0;
+		for (BitMask = 0x80; BitMask; BitMask>>=1)
+		{
+			l_scl_tris = 1; // float SCL high
+			// wait until any clock stretching has finished
+			while (!l_scl)
+				if (T_MODE & i2c_reset_wdt)
+					clear_wdt();		
+			delay_us(dly);
+
+			// read the current bit
+			l_sda_tris = 1; // float SDA
+			if (l_sda)
+				i2c_data |= BitMask;
+			l_scl_tris = 0; // drive SCL low
+			delay_us(dly);
+		}
+		// flag receive complete			
+		l_sspif = 1;
+		l_rcen = 0;
+		
+		// set the ACK state
+		if (ack_status)	
+			l_sda_tris = 1; // float SDA high
+		else
+			l_sda_tris = 0; // drive SDA low
+		delay_us(dly);
+
+		l_scl_tris = 1; // float SCL high
+
+		// wait until any clock stretching has finished
+		while (!l_scl)
+			if (T_MODE & i2c_reset_wdt)
+				clear_wdt();		
+	
+		l_sspif = 0; // clear SSPIF
+		delay_us(dly);
+	
+		l_scl_tris = 0; // drive SCL low		
+		l_sspif = 1;
+		delay_us(dly);
+	}
+	return(i2c_data);
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Generates the I2C Bus Initialization
+////////////////////////////////////////////////////////////////////////////
+_I2C_TEMPL
+void i2c_INIT(unsigned char i2c_divisor)
+
+{
+	volatile unsigned char i2c_SSPADD@T_i2c_SSPADD, i2c_SSPSTAT@T_i2c_SSPSTAT;
+	volatile unsigned char i2c_SSPCON1@T_i2c_SSPCON1,i2c_SSPCON2@T_i2c_SSPCON2;
+
+	volatile bit l_scl@T_SCL_PORT.T_SCL_BIT, l_sda@T_SDA_PORT.T_SDA_BIT;
+	volatile bit l_scl_tris@T_SCL_TRIS.T_SCL_BIT, l_sda_tris@T_SDA_TRIS.T_SDA_BIT;
+	volatile bit l_sspif@T_i2c_SSPIF_PIR.T_i2c_SSPIF_BIT, l_bclif@T_i2c_BCLIF_PIR.T_i2c_BCLIF_BIT;
+	volatile bit l_sspen@T_i2c_SSPCON1.i2c_SSPEN, l_smp@T_i2c_SSPSTAT.T_i2c_SMP_BIT;
+
+	l_sda_tris = 1;
+013A  1683  	BSF STATUS, RP0
+013B  1585  	BSF i2c_INIT_00000_1_l_sda_tris,3
+
+	l_scl_tris = 1;
+013C  1505  	BSF i2c_INIT_00000_1_l_scl_tris,2
+
+	
+	i2c_SSPCON1 = 0x00; // initialise the I2C control register (mirrors HW SSPCON1)	
+013D  1283  	BCF STATUS, RP0
+013E  01C0  	CLRF i2c_INIT_00000_1_i2c_SSPCON1
+
+	i2c_SSPADD = i2c_divisor; // get the I2C baud rate divisor
+013F  0854  	MOVF i2c_INIT_00000_arg_i2c_divisor, W
+0140  00C3  	MOVWF i2c_INIT_00000_1_i2c_SSPADD
+
+	i2c_SSPCON1 = 0x08; // initialise the I2C control register (mirrors HW SSPCON1)	
+0141  3008  	MOVLW 0x08
+0142  00C0  	MOVWF i2c_INIT_00000_1_i2c_SSPCON1
+
+	i2c_SSPCON2 = 0x00; // initialise the I2C control register (mirrors HW SSPCON2)	
+0143  01C1  	CLRF i2c_INIT_00000_1_i2c_SSPCON2
+
+	
+	i2c_SSPSTAT = 0x00; // initialise the I2C status register (mirrors HW SSPSTAT)
+0144  01C2  	CLRF i2c_INIT_00000_1_i2c_SSPSTAT
+
+	
+	if (T_MODE & i2c_SMP)
+		l_smp = 1;
+0145  17C2  	BSF i2c_INIT_00000_1_l_smp,7
+
+
+	l_sspif = 0; // initialise the I2C SSP interrupt status
+0146  11C5  	BCF i2c_INIT_00000_1_l_sspif,3
+
+	l_bclif = 0; // initialise the I2C BCL interrupt status
+0147  11C6  	BCF i2c_INIT_00000_1_l_bclif,3
+
+	l_sda = 0;
+0148  1185  	BCF i2c_INIT_00000_1_l_sda,3
+
+	l_scl = 0;
+0149  1105  	BCF i2c_INIT_00000_1_l_scl,2
+
+	l_sspen = 1; // enable I2C
+014A  16C0  	BSF i2c_INIT_00000_1_l_sspen,5
+
+	
+	i2c_STOP<_I2C_TEMPL_ARGS>();
+014B  2075  	CALL i2c_STOP_00000
+
+}
+014C  0008  	RETURN
+
+
+
+
+
+
+
+////////////////////////////////////////
+// Code with no source :-)
+////////////////////////////////////////
+0000  2AE2  	GOTO	_startup
+
+0004  00FF  	MOVWF Int1Context
+0005  0E03  	SWAPF STATUS, W
+0006  1283  	BCF STATUS, RP0
+0007  1303  	BCF STATUS, RP1
+0008  00BA  	MOVWF Int1BContext
+0009  0E0A  	SWAPF PCLATH, W
+000A  00BB  	MOVWF Int1BContext+D'1'
+000B  0E04  	SWAPF FSR, W
+000C  00BC  	MOVWF Int1BContext+D'2'
+000D  118A  	BCF PCLATH,3
+000E  120A  	BCF PCLATH,4
+000F  2B23  	GOTO	interrupt
+0010        delay_us_00000
+0010        ; { delay_us ; function begin
+0010  3003  	MOVLW 0x03
+0011  07D9  	ADDWF delay_us_00000_arg_del, F
+0012  0CD9  	RRF delay_us_00000_arg_del, F
+0013  0CD9  	RRF delay_us_00000_arg_del, F
+0014  307F  	MOVLW 0x7F
+0015  05D9  	ANDWF delay_us_00000_arg_del, F
+0016        label1
+0016  0000  	NOP
+0017  0BD9  	DECFSZ delay_us_00000_arg_del, F
+0018  2816  	GOTO	label1
+0019  0008  	RETURN
+001A        ; } delay_us function end
+
+001A        delay_10us_00000
+001A        ; { delay_10us ; function begin
+001A        label2
+001A  0000  	NOP
+001B  0000  	NOP
+001C  0000  	NOP
+001D  0000  	NOP
+001E  0000  	NOP
+001F  0000  	NOP
+0020  0000  	NOP
+0021  0BD9  	DECFSZ delay_10us_00000_arg_del, F
+0022  281A  	GOTO	label2
+0023  0008  	RETURN
+0024        ; } delay_10us function end
+
+
+
+
+
+
+
+
+
+
+
+
+
+0170        __mul_16s__0000F
+0170        ; { __mul_16s_16s__16 ; function begin
+0170  01E3  	CLRF __mul_16s__0000F_1_i
+0171  01E6  	CLRF CompTempVarRet386
+0172  01E7  	CLRF CompTempVarRet386+D'1'
+0173  085F  	MOVF __mul_16s__0000F_arg_a, W
+0174  00E4  	MOVWF __mul_16s__0000F_1_t
+0175  0860  	MOVF __mul_16s__0000F_arg_a+D'1', W
+0176  00E5  	MOVWF __mul_16s__0000F_1_t+D'1'
+0177  1FE2  	BTFSS __mul_16s__0000F_arg_b+D'1',7
+0178  297F  	GOTO	label22
+0179  17E3  	BSF __mul_16s__0000F_1_i,7
+017A  09E1  	COMF __mul_16s__0000F_arg_b, F
+017B  09E2  	COMF __mul_16s__0000F_arg_b+D'1', F
+017C  0AE1  	INCF __mul_16s__0000F_arg_b, F
+017D  1903  	BTFSC gbl_status,2
+017E  0AE2  	INCF __mul_16s__0000F_arg_b+D'1', F
+017F        label22
+017F  1A63  	BTFSC __mul_16s__0000F_1_i,4
+0180  2991  	GOTO	label24
+0181  1C61  	BTFSS __mul_16s__0000F_arg_b,0
+0182  2989  	GOTO	label23
+0183  0864  	MOVF __mul_16s__0000F_1_t, W
+0184  07E6  	ADDWF CompTempVarRet386, F
+0185  0865  	MOVF __mul_16s__0000F_1_t+D'1', W
+0186  1803  	BTFSC gbl_status,0
+0187  0F65  	INCFSZ __mul_16s__0000F_1_t+D'1', W
+0188  07E7  	ADDWF CompTempVarRet386+D'1', F
+0189        label23
+0189  1003  	BCF gbl_status,0
+018A  0CE2  	RRF __mul_16s__0000F_arg_b+D'1', F
+018B  0CE1  	RRF __mul_16s__0000F_arg_b, F
+018C  1003  	BCF gbl_status,0
+018D  0DE4  	RLF __mul_16s__0000F_1_t, F
+018E  0DE5  	RLF __mul_16s__0000F_1_t+D'1', F
+018F  0AE3  	INCF __mul_16s__0000F_1_i, F
+0190  297F  	GOTO	label22
+0191        label24
+0191  1FE3  	BTFSS __mul_16s__0000F_1_i,7
+0192  0008  	RETURN
+0193  09E6  	COMF CompTempVarRet386, F
+0194  09E7  	COMF CompTempVarRet386+D'1', F
+0195  0AE6  	INCF CompTempVarRet386, F
+0196  1903  	BTFSC gbl_status,2
+0197  0AE7  	INCF CompTempVarRet386+D'1', F
+0198  0008  	RETURN
+0199        ; } __mul_16s_16s__16 function end
+
+
+
+
+
+
+
+
+
+
+
+
+
+02E2        _startup
+
+0320  118A  	BCF PCLATH,3
+0321  120A  	BCF PCLATH,4
+0322  2ACB  	GOTO	main
+
+2007  3F18  	DW 0x3F18
