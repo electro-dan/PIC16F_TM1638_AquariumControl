@@ -10,9 +10,10 @@
 #define tm1638clk (porta.0)
 #define tm1638dioTris (trisa.1)
 #define tm1638strobe (porta.7)
-// refresh interval - time in ms divided by 262. Max value is 252.
-#define TIMER_1_INTERVAL 114
 
+// This means timer 1 will overflow when 1 cycle completes, generating the interrupt
+#define TMR1HV 0xFF
+#define TMR1LV 0xFF
 
 // i2c options
 #define use_i2c_SW
@@ -40,6 +41,15 @@ unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
 
 #define ds3231_addr 0xD0
 
+// Time and date variables
+char gBcdSeconds = 0; // 0 to 59
+char gBcdMinute = 0; // 0 to 59
+char gBcdHour = 0; // 0 to 23 or 1 to 12. Also contains 12/24 setting at bit 6. If 12 hour, AM/PM uses bit 5
+char gDayOfWeek = 1; // 1 to 7
+char gBcdDayOfMonth = 1; // 1 to 31
+char gBcdMonth = 1; // 1 to 12 + century at bit 7
+char gBcdYear = 0x23; // Init to 2023
+
 // Hold the upper and lower bytes from the ds18b20
 char cTempH = 0;
 char cTempL = 0;
@@ -52,9 +62,14 @@ void oneWireTxByte(char data);
 void oneWireTxBytes(char data, char data2);
 char oneWireRxByte();
 
-// Used for counting timer 1 overflows. 
-// Initialise it close to interval so temp refresh on power on is near instant
-char iTimer1Count = TIMER_1_INTERVAL - 4; 
+void ds3231Write(char ds3231Reg, char bWrite);
+void ds3231Init();
+void ds3231Start();
+void ds3231Stop();
+void ds3231WriteDateTime();
+void ds3231ReadDateTime();
+
+
 char cTask = 0; // Used for task scheduler
 
 // Used to output the segments from numbers

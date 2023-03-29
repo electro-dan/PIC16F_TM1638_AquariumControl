@@ -14,20 +14,20 @@ __HEAP_BLOCK0_END_OFFSET         EQU	0x0000007E
 __HEAP_BLOCK1_BANK               EQU	0x00000002
 __HEAP_BLOCK1_START_OFFSET       EQU	0x00000020
 __HEAP_BLOCK1_END_OFFSET         EQU	0x0000004F
-; Heap block 2, size:8 (0x00000068 - 0x0000006F)
+; Heap block 2, size:0 (0x00000000 - 0x00000000)
 __HEAP_BLOCK2_BANK               EQU	0x00000000
-__HEAP_BLOCK2_START_OFFSET       EQU	0x00000068
-__HEAP_BLOCK2_END_OFFSET         EQU	0x0000006F
+__HEAP_BLOCK2_START_OFFSET       EQU	0x00000000
+__HEAP_BLOCK2_END_OFFSET         EQU	0x00000000
 ; Heap block 3, size:0 (0x00000000 - 0x00000000)
 __HEAP_BLOCK3_BANK               EQU	0x00000000
 __HEAP_BLOCK3_START_OFFSET       EQU	0x00000000
 __HEAP_BLOCK3_END_OFFSET         EQU	0x00000000
 gbl_status                       EQU	0x00000003 ; bytes:1
-__mul_16s__0000F_arg_a           EQU	0x0000005F ; bytes:2
-__mul_16s__0000F_arg_b           EQU	0x00000061 ; bytes:2
-CompTempVarRet386                EQU	0x00000066 ; bytes:2
-__mul_16s__0000F_1_i             EQU	0x00000063 ; bytes:1
-__mul_16s__0000F_1_t             EQU	0x00000064 ; bytes:2
+__mul_16s__0000F_arg_a           EQU	0x00000065 ; bytes:2
+__mul_16s__0000F_arg_b           EQU	0x00000067 ; bytes:2
+CompTempVarRet386                EQU	0x0000006C ; bytes:2
+__mul_16s__0000F_1_i             EQU	0x00000069 ; bytes:1
+__mul_16s__0000F_1_t             EQU	0x0000006A ; bytes:2
 gbl_indf                         EQU	0x00000000 ; bytes:1
 gbl_tmr0                         EQU	0x00000001 ; bytes:1
 gbl_pcl                          EQU	0x00000002 ; bytes:1
@@ -69,41 +69,48 @@ gbl_swi2c_SSPBUF                 EQU	0x00000043 ; bytes:2
 gbl_swi2c_SSPIF_PIR              EQU	0x00000044 ; bytes:2
 gbl_swi2c_BCLIF_PIR              EQU	0x00000045 ; bytes:2
 gbl_swi2c_SSPADD                 EQU	0x00000046 ; bytes:2
-gbl_cTempH                       EQU	0x0000003D ; bytes:1
-gbl_cTempL                       EQU	0x0000003E ; bytes:1
-gbl_iDecimalPosition             EQU	0x0000003F ; bytes:1
-gbl_oneWireIsPresent             EQU	0x00000048 ; bytes:1
-gbl_oneWireResetStage            EQU	0x00000049 ; bytes:1
-gbl_iTimer1Count                 EQU	0x0000004A ; bytes:1
-gbl_cTask                        EQU	0x0000004B ; bytes:1
-gbl_tm1638MaxDigits              EQU	0x0000004C ; bytes:1
+gbl_gBcdSeconds                  EQU	0x0000003D ; bytes:1
+gbl_gBcdMinute                   EQU	0x0000003E ; bytes:1
+gbl_gBcdHour                     EQU	0x0000003F ; bytes:1
+gbl_gDayOfWeek                   EQU	0x00000048 ; bytes:1
+gbl_gBcdDayOfMonth               EQU	0x00000049 ; bytes:1
+gbl_gBcdMonth                    EQU	0x0000004A ; bytes:1
+gbl_gBcdYear                     EQU	0x0000004B ; bytes:1
+gbl_cTempH                       EQU	0x0000004C ; bytes:1
+gbl_cTempL                       EQU	0x0000004D ; bytes:1
+gbl_iDecimalPosition             EQU	0x0000004E ; bytes:1
+gbl_oneWireIsPresent             EQU	0x0000004F ; bytes:1
+gbl_oneWireResetStage            EQU	0x00000050 ; bytes:1
+gbl_cTask                        EQU	0x00000051 ; bytes:1
+gbl_tm1638MaxDigits              EQU	0x00000052 ; bytes:1
 gbl_tm1638DisplayNumtoSeg        EQU	0x00000020 ; bytes:10
-gbl_tm1638Dot                    EQU	0x0000004D ; bytes:1
-gbl_tm1638Brightness             EQU	0x0000004E ; bytes:1
-gbl_tm1638ByteSetData            EQU	0x0000004F ; bytes:1
-gbl_tm1638ByteReadData           EQU	0x00000050 ; bytes:1
-gbl_tm1638ByteSetAddr            EQU	0x00000051 ; bytes:1
-gbl_tm1638ByteSetOn              EQU	0x00000052 ; bytes:1
+gbl_tm1638Dot                    EQU	0x00000053 ; bytes:1
+gbl_tm1638Brightness             EQU	0x00000054 ; bytes:1
+gbl_tm1638ByteSetData            EQU	0x00000055 ; bytes:1
+gbl_tm1638ByteReadData           EQU	0x00000056 ; bytes:1
+gbl_tm1638ByteSetAddr            EQU	0x00000057 ; bytes:1
+gbl_tm1638ByteSetOn              EQU	0x00000058 ; bytes:1
 gbl_tm1638Data                   EQU	0x0000002A ; bytes:8
 gbl_tm1638LEDs                   EQU	0x00000032 ; bytes:8
-gbl_tm1638Keys                   EQU	0x00000053 ; bytes:1
-oneWireBus_00015_1_isPresent     EQU	0x00000054 ; bytes:1
-oneWireTxB_00016_arg_cData       EQU	0x00000056 ; bytes:1
-oneWireTxB_00016_1_cTemp         EQU	0x00000057 ; bytes:1
-oneWireTxB_00016_2_i             EQU	0x00000058 ; bytes:1
-oneWireTxB_00017_arg_cData       EQU	0x00000054 ; bytes:1
-oneWireTxB_00017_arg_cData2      EQU	0x00000055 ; bytes:1
-CompTempVarRet548                EQU	0x00000055 ; bytes:1
-oneWireRxB_00018_1_cDataIn       EQU	0x00000054 ; bytes:1
-oneWireRxB_00018_2_i             EQU	0x00000055 ; bytes:1
-tm1638Byte_00019_arg_bWrite      EQU	0x00000056 ; bytes:1
-tm1638Byte_00019_2_i             EQU	0x00000057 ; bytes:1
-CompTempVar549                   EQU	0x00000058 ; bytes:1
-tm1638Upda_0001A_2_i             EQU	0x00000054 ; bytes:1
-tm1638Read_0001B_1_tm1638K_0001C EQU	0x00000054 ; bytes:1
-tm1638Read_0001B_2_i             EQU	0x00000055 ; bytes:1
-ds3231Writ_0001E_arg_ds3231Reg   EQU	0x00000054 ; bytes:1
-ds3231Writ_0001E_arg_bWrite      EQU	0x00000055 ; bytes:1
+gbl_tm1638Keys                   EQU	0x00000059 ; bytes:1
+oneWireBus_00015_1_isPresent     EQU	0x0000005A ; bytes:1
+oneWireTxB_00016_arg_cData       EQU	0x0000005C ; bytes:1
+oneWireTxB_00016_1_cTemp         EQU	0x0000005D ; bytes:1
+oneWireTxB_00016_2_i             EQU	0x0000005E ; bytes:1
+oneWireTxB_00017_arg_cData       EQU	0x0000005A ; bytes:1
+oneWireTxB_00017_arg_cData2      EQU	0x0000005B ; bytes:1
+CompTempVarRet548                EQU	0x0000005B ; bytes:1
+oneWireRxB_00018_1_cDataIn       EQU	0x0000005A ; bytes:1
+oneWireRxB_00018_2_i             EQU	0x0000005B ; bytes:1
+ds3231Writ_00019_arg_ds3231Reg   EQU	0x0000005A ; bytes:1
+ds3231Writ_00019_arg_bWrite      EQU	0x0000005B ; bytes:1
+CompTempVarRet550                EQU	0x0000005D ; bytes:1
+tm1638Byte_0001D_arg_bWrite      EQU	0x0000005C ; bytes:1
+tm1638Byte_0001D_2_i             EQU	0x0000005D ; bytes:1
+CompTempVar551                   EQU	0x0000005E ; bytes:1
+tm1638Upda_0001E_2_i             EQU	0x0000005A ; bytes:1
+tm1638Read_0001F_1_tm1638K_00020 EQU	0x0000005A ; bytes:1
+tm1638Read_0001F_2_i             EQU	0x0000005B ; bytes:1
 i2c_START_00000_1_l_scl          EQU	0x00000005 ; bit:2
 i2c_START_00000_1_l_sda          EQU	0x00000005 ; bit:3
 i2c_START_00000_1_l_scl_tris     EQU	0x00000085 ; bit:2
@@ -117,8 +124,8 @@ i2c_START_00000_1_l_rcen         EQU	0x00000041 ; bit:3
 i2c_START_00000_1_l_pen          EQU	0x00000041 ; bit:2
 i2c_START_00000_1_l_rsen         EQU	0x00000041 ; bit:1
 i2c_START_00000_1_l_acken        EQU	0x00000041 ; bit:4
-i2c_WRITE_00000_arg_i2c_data     EQU	0x00000056 ; bytes:1
-CompTempVarRet558                EQU	0x00000059 ; bytes:1
+i2c_WRITE_00000_arg_i2c_data     EQU	0x0000005C ; bytes:1
+CompTempVarRet549                EQU	0x0000005F ; bytes:1
 i2c_WRITE_00000_1_i2c_SSPBUF     EQU	0x00000044 ; bytes:1
 i2c_WRITE_00000_1_l_scl          EQU	0x00000005 ; bit:2
 i2c_WRITE_00000_1_l_sda          EQU	0x00000005 ; bit:3
@@ -135,8 +142,8 @@ i2c_WRITE_00000_1_l_pen          EQU	0x00000041 ; bit:2
 i2c_WRITE_00000_1_l_sen          EQU	0x00000041 ; bit:0
 i2c_WRITE_00000_1_l_rsen         EQU	0x00000041 ; bit:1
 i2c_WRITE_00000_1_l_acken        EQU	0x00000041 ; bit:4
-i2c_WRITE_00000_1_BitMask        EQU	0x00000057 ; bytes:1
-i2c_WRITE_00000_1_local_ack      EQU	0x00000058 ; bit:0
+i2c_WRITE_00000_1_BitMask        EQU	0x0000005D ; bytes:1
+i2c_WRITE_00000_1_local_ack      EQU	0x0000005E ; bit:0
 i2c_STOP_00000_1_l_scl           EQU	0x00000005 ; bit:2
 i2c_STOP_00000_1_l_sda           EQU	0x00000005 ; bit:3
 i2c_STOP_00000_1_l_scl_tris      EQU	0x00000085 ; bit:2
@@ -151,7 +158,26 @@ i2c_STOP_00000_1_l_pen           EQU	0x00000041 ; bit:2
 i2c_STOP_00000_1_l_sen           EQU	0x00000041 ; bit:0
 i2c_STOP_00000_1_l_rsen          EQU	0x00000041 ; bit:1
 i2c_STOP_00000_1_l_acken         EQU	0x00000041 ; bit:4
-i2c_INIT_00000_arg_i2c_divisor   EQU	0x00000054 ; bytes:1
+i2c_READ_00000_arg_ack_status    EQU	0x0000005A ; bytes:1
+i2c_READ_00000_1_i2c_SSPBUF      EQU	0x00000044 ; bytes:1
+i2c_READ_00000_1_l_scl           EQU	0x00000005 ; bit:2
+i2c_READ_00000_1_l_sda           EQU	0x00000005 ; bit:3
+i2c_READ_00000_1_l_scl_tris      EQU	0x00000085 ; bit:2
+i2c_READ_00000_1_l_sda_tris      EQU	0x00000085 ; bit:3
+i2c_READ_00000_1_l_bf            EQU	0x00000042 ; bit:0
+i2c_READ_00000_1_l_ackdt         EQU	0x00000041 ; bit:5
+i2c_READ_00000_1_l_sspif         EQU	0x00000045 ; bit:3
+i2c_READ_00000_1_l_bclif         EQU	0x00000046 ; bit:3
+i2c_READ_00000_1_l_rw            EQU	0x00000042 ; bit:2
+i2c_READ_00000_1_l_wcol          EQU	0x00000040 ; bit:7
+i2c_READ_00000_1_l_rcen          EQU	0x00000041 ; bit:3
+i2c_READ_00000_1_l_pen           EQU	0x00000041 ; bit:2
+i2c_READ_00000_1_l_sen           EQU	0x00000041 ; bit:0
+i2c_READ_00000_1_l_rsen          EQU	0x00000041 ; bit:1
+i2c_READ_00000_1_l_acken         EQU	0x00000041 ; bit:4
+i2c_READ_00000_1_BitMask         EQU	0x0000005B ; bytes:1
+i2c_READ_00000_1_i2c_data        EQU	0x0000005C ; bytes:1
+i2c_INIT_00000_arg_i2c_divisor   EQU	0x0000005A ; bytes:1
 i2c_INIT_00000_1_i2c_SSPADD      EQU	0x00000043 ; bytes:1
 i2c_INIT_00000_1_i2c_SSPSTAT     EQU	0x00000042 ; bytes:1
 i2c_INIT_00000_1_i2c_SSPCON1     EQU	0x00000040 ; bytes:1
@@ -164,19 +190,19 @@ i2c_INIT_00000_1_l_sspif         EQU	0x00000045 ; bit:3
 i2c_INIT_00000_1_l_bclif         EQU	0x00000046 ; bit:3
 i2c_INIT_00000_1_l_sspen         EQU	0x00000040 ; bit:5
 i2c_INIT_00000_1_l_smp           EQU	0x00000042 ; bit:7
-convertTem_00021_1_iTemp         EQU	0x00000054 ; bytes:2
-convertTem_00021_1_isMinus       EQU	0x00000056 ; bytes:1
-convertTem_00021_1_iValue        EQU	0x00000057 ; bytes:2
-CompTempVar564                   EQU	0x00000059 ; bytes:1
-CompTempVar567                   EQU	0x0000005A ; bytes:1
-convertTem_00021_1_cDig3         EQU	0x0000005B ; bytes:1
-convertTem_00021_1_cDig2         EQU	0x0000005C ; bytes:1
-convertTem_00021_1_cDig1         EQU	0x0000005D ; bytes:1
-convertTem_00021_1_cDig0         EQU	0x0000005E ; bytes:1
-CompTempVar576                   EQU	0x0000005F ; bytes:1
-CompTempVar579                   EQU	0x0000005F ; bytes:1
-delay_us_00000_arg_del           EQU	0x00000059 ; bytes:1
-delay_10us_00000_arg_del         EQU	0x00000059 ; bytes:1
+convertTem_00022_1_iTemp         EQU	0x0000005A ; bytes:2
+convertTem_00022_1_isMinus       EQU	0x0000005C ; bytes:1
+convertTem_00022_1_iValue        EQU	0x0000005D ; bytes:2
+CompTempVar565                   EQU	0x0000005F ; bytes:1
+CompTempVar568                   EQU	0x00000060 ; bytes:1
+convertTem_00022_1_cDig3         EQU	0x00000061 ; bytes:1
+convertTem_00022_1_cDig2         EQU	0x00000062 ; bytes:1
+convertTem_00022_1_cDig1         EQU	0x00000063 ; bytes:1
+convertTem_00022_1_cDig0         EQU	0x00000064 ; bytes:1
+CompTempVar577                   EQU	0x00000065 ; bytes:1
+CompTempVar580                   EQU	0x00000065 ; bytes:1
+delay_us_00000_arg_del           EQU	0x0000005F ; bytes:1
+delay_10us_00000_arg_del         EQU	0x0000005F ; bytes:1
 Int1Context                      EQU	0x0000007F ; bytes:1
 Int1BContext                     EQU	0x0000003A ; bytes:3
 	ORG 0x00000000
@@ -314,9 +340,9 @@ label10
 	MOVLW 0x0A
 	MOVWF delay_us_00000_arg_del
 	CALL delay_us_00000
-	CLRF CompTempVarRet558
+	CLRF CompTempVarRet549
 	BTFSC i2c_WRITE_00000_1_local_ack,0
-	INCF CompTempVarRet558, F
+	INCF CompTempVarRet549, F
 	RETURN
 ; } i2c_WRITE function end
 
@@ -473,16 +499,16 @@ label18
 ; } oneWireTxByte function end
 
 	ORG 0x000000F6
-ds3231Writ_0001E
+ds3231Writ_00019
 ; { ds3231Write ; function begin
 	CALL i2c_START_00000
 	MOVLW 0xD0
 	MOVWF i2c_WRITE_00000_arg_i2c_data
 	CALL i2c_WRITE_00000
-	MOVF ds3231Writ_0001E_arg_ds3231Reg, W
+	MOVF ds3231Writ_00019_arg_ds3231Reg, W
 	MOVWF i2c_WRITE_00000_arg_i2c_data
 	CALL i2c_WRITE_00000
-	MOVF ds3231Writ_0001E_arg_bWrite, W
+	MOVF ds3231Writ_00019_arg_bWrite, W
 	MOVWF i2c_WRITE_00000_arg_i2c_data
 	CALL i2c_WRITE_00000
 	CALL i2c_STOP_00000
@@ -490,27 +516,27 @@ ds3231Writ_0001E
 ; } ds3231Write function end
 
 	ORG 0x00000102
-tm1638Byte_00019
+tm1638Byte_0001D
 ; { tm1638ByteWrite ; function begin
-	CLRF tm1638Byte_00019_2_i
+	CLRF tm1638Byte_0001D_2_i
 label19
 	MOVLW 0x08
-	SUBWF tm1638Byte_00019_2_i, W
+	SUBWF tm1638Byte_0001D_2_i, W
 	BTFSC STATUS,C
 	RETURN
 	MOVLW 0x01
-	ANDWF tm1638Byte_00019_arg_bWrite, W
-	MOVWF CompTempVar549
-	BTFSC CompTempVar549,0
+	ANDWF tm1638Byte_0001D_arg_bWrite, W
+	MOVWF CompTempVar551
+	BTFSC CompTempVar551,0
 	BSF gbl_porta,1
-	BTFSS CompTempVar549,0
+	BTFSS CompTempVar551,0
 	BCF gbl_porta,1
 	BCF gbl_porta,0
-	MOVF tm1638Byte_00019_arg_bWrite, F
+	MOVF tm1638Byte_0001D_arg_bWrite, F
 	BCF STATUS,C
-	RRF tm1638Byte_00019_arg_bWrite, F
+	RRF tm1638Byte_0001D_arg_bWrite, F
 	BSF gbl_porta,0
-	INCF tm1638Byte_00019_2_i, F
+	INCF tm1638Byte_0001D_2_i, F
 	GOTO	label19
 ; } tm1638ByteWrite function end
 
@@ -564,6 +590,104 @@ label21
 ; } oneWireRxByte function end
 
 	ORG 0x0000013A
+i2c_READ_00000
+; { i2c_READ ; function begin
+	BCF i2c_READ_00000_1_l_bclif,3
+	BCF i2c_READ_00000_1_l_sspif,3
+	BCF i2c_READ_00000_1_l_wcol,7
+	BSF i2c_READ_00000_1_l_rcen,3
+	BTFSC i2c_READ_00000_arg_ack_status,0
+	BSF i2c_READ_00000_1_l_ackdt,5
+	BTFSS i2c_READ_00000_arg_ack_status,0
+	BCF i2c_READ_00000_1_l_ackdt,5
+	BSF i2c_READ_00000_1_l_rw,2
+	BCF i2c_READ_00000_1_l_scl,2
+	BCF i2c_READ_00000_1_l_sda,3
+	BSF STATUS, RP0
+	BSF i2c_READ_00000_1_l_sda_tris,3
+	MOVLW 0x0A
+	BCF STATUS, RP0
+	MOVWF delay_us_00000_arg_del
+	CALL delay_us_00000
+	CLRF i2c_READ_00000_1_i2c_data
+	MOVLW 0x80
+	MOVWF i2c_READ_00000_1_BitMask
+label22
+	MOVF i2c_READ_00000_1_BitMask, F
+	BTFSC STATUS,Z
+	GOTO	label26
+	BSF STATUS, RP0
+	BSF i2c_READ_00000_1_l_scl_tris,2
+label23
+	BCF STATUS, RP0
+	BTFSC i2c_READ_00000_1_l_scl,2
+	GOTO	label24
+	CLRWDT
+	GOTO	label23
+label24
+	MOVLW 0x0A
+	MOVWF delay_us_00000_arg_del
+	CALL delay_us_00000
+	BSF STATUS, RP0
+	BSF i2c_READ_00000_1_l_sda_tris,3
+	BCF STATUS, RP0
+	BTFSS i2c_READ_00000_1_l_sda,3
+	GOTO	label25
+	MOVF i2c_READ_00000_1_BitMask, W
+	IORWF i2c_READ_00000_1_i2c_data, F
+label25
+	BSF STATUS, RP0
+	BCF i2c_READ_00000_1_l_scl_tris,2
+	MOVLW 0x0A
+	BCF STATUS, RP0
+	MOVWF delay_us_00000_arg_del
+	CALL delay_us_00000
+	BCF STATUS,C
+	RRF i2c_READ_00000_1_BitMask, F
+	GOTO	label22
+label26
+	BSF i2c_READ_00000_1_l_sspif,3
+	BCF i2c_READ_00000_1_l_rcen,3
+	MOVF i2c_READ_00000_arg_ack_status, F
+	BTFSC STATUS,Z
+	GOTO	label27
+	BSF STATUS, RP0
+	BSF i2c_READ_00000_1_l_sda_tris,3
+	GOTO	label28
+label27
+	BSF STATUS, RP0
+	BCF i2c_READ_00000_1_l_sda_tris,3
+label28
+	MOVLW 0x0A
+	BCF STATUS, RP0
+	MOVWF delay_us_00000_arg_del
+	CALL delay_us_00000
+	BSF STATUS, RP0
+	BSF i2c_READ_00000_1_l_scl_tris,2
+label29
+	BCF STATUS, RP0
+	BTFSC i2c_READ_00000_1_l_scl,2
+	GOTO	label30
+	CLRWDT
+	GOTO	label29
+label30
+	BCF i2c_READ_00000_1_l_sspif,3
+	MOVLW 0x0A
+	MOVWF delay_us_00000_arg_del
+	CALL delay_us_00000
+	BSF STATUS, RP0
+	BCF i2c_READ_00000_1_l_scl_tris,2
+	BCF STATUS, RP0
+	BSF i2c_READ_00000_1_l_sspif,3
+	MOVLW 0x0A
+	MOVWF delay_us_00000_arg_del
+	CALL delay_us_00000
+	MOVF i2c_READ_00000_1_i2c_data, W
+	MOVWF CompTempVarRet550
+	RETURN
+; } i2c_READ function end
+
+	ORG 0x0000018E
 i2c_INIT_00000
 ; { i2c_INIT ; function begin
 	BSF STATUS, RP0
@@ -587,9 +711,9 @@ i2c_INIT_00000
 	RETURN
 ; } i2c_INIT function end
 
-	ORG 0x0000014D
-ds3231Writ_00020
-; { ds3231WriteDate ; function begin
+	ORG 0x000001A1
+ds3231Writ_0001B
+; { ds3231WriteDateTime ; function begin
 	CALL i2c_START_00000
 	MOVLW 0xD0
 	MOVWF i2c_WRITE_00000_arg_i2c_data
@@ -598,41 +722,47 @@ ds3231Writ_00020
 	CALL i2c_WRITE_00000
 	CLRF i2c_WRITE_00000_arg_i2c_data
 	CALL i2c_WRITE_00000
-	CLRF i2c_WRITE_00000_arg_i2c_data
-	CALL i2c_WRITE_00000
-	CLRF i2c_WRITE_00000_arg_i2c_data
-	CALL i2c_WRITE_00000
-	MOVLW 0x01
+	MOVF gbl_gBcdMinute, W
 	MOVWF i2c_WRITE_00000_arg_i2c_data
 	CALL i2c_WRITE_00000
-	MOVLW 0x01
+	MOVF gbl_gBcdHour, W
 	MOVWF i2c_WRITE_00000_arg_i2c_data
 	CALL i2c_WRITE_00000
-	CLRF i2c_WRITE_00000_arg_i2c_data
+	MOVF gbl_gDayOfWeek, W
+	MOVWF i2c_WRITE_00000_arg_i2c_data
+	CALL i2c_WRITE_00000
+	MOVF gbl_gBcdDayOfMonth, W
+	MOVWF i2c_WRITE_00000_arg_i2c_data
+	CALL i2c_WRITE_00000
+	MOVF gbl_gBcdMonth, W
+	MOVWF i2c_WRITE_00000_arg_i2c_data
+	CALL i2c_WRITE_00000
+	MOVF gbl_gBcdYear, W
+	MOVWF i2c_WRITE_00000_arg_i2c_data
 	CALL i2c_WRITE_00000
 	CALL i2c_STOP_00000
 	RETURN
-; } ds3231WriteDate function end
+; } ds3231WriteDateTime function end
 
-	ORG 0x00000163
+	ORG 0x000001BD
 ds3231Init_00000
 ; { ds3231Init ; function begin
 	MOVLW 0x0E
 	BCF STATUS, RP0
 	BCF STATUS, RP1
-	MOVWF ds3231Writ_0001E_arg_ds3231Reg
+	MOVWF ds3231Writ_00019_arg_ds3231Reg
 	MOVLW 0x80
-	MOVWF ds3231Writ_0001E_arg_bWrite
-	CALL ds3231Writ_0001E
+	MOVWF ds3231Writ_00019_arg_bWrite
+	CALL ds3231Writ_00019
 	MOVLW 0x0F
-	MOVWF ds3231Writ_0001E_arg_ds3231Reg
+	MOVWF ds3231Writ_00019_arg_ds3231Reg
 	MOVLW 0x80
-	MOVWF ds3231Writ_0001E_arg_bWrite
-	CALL ds3231Writ_0001E
+	MOVWF ds3231Writ_00019_arg_bWrite
+	CALL ds3231Writ_00019
 	RETURN
 ; } ds3231Init function end
 
-	ORG 0x00000170
+	ORG 0x000001CA
 __mul_16s__0000F
 ; { __mul_16s_16s__16 ; function begin
 	CLRF __mul_16s__0000F_1_i
@@ -643,25 +773,25 @@ __mul_16s__0000F
 	MOVF __mul_16s__0000F_arg_a+D'1', W
 	MOVWF __mul_16s__0000F_1_t+D'1'
 	BTFSS __mul_16s__0000F_arg_b+D'1',7
-	GOTO	label22
+	GOTO	label31
 	BSF __mul_16s__0000F_1_i,7
 	COMF __mul_16s__0000F_arg_b, F
 	COMF __mul_16s__0000F_arg_b+D'1', F
 	INCF __mul_16s__0000F_arg_b, F
 	BTFSC gbl_status,2
 	INCF __mul_16s__0000F_arg_b+D'1', F
-label22
+label31
 	BTFSC __mul_16s__0000F_1_i,4
-	GOTO	label24
+	GOTO	label33
 	BTFSS __mul_16s__0000F_arg_b,0
-	GOTO	label23
+	GOTO	label32
 	MOVF __mul_16s__0000F_1_t, W
 	ADDWF CompTempVarRet386, F
 	MOVF __mul_16s__0000F_1_t+D'1', W
 	BTFSC gbl_status,0
 	INCFSZ __mul_16s__0000F_1_t+D'1', W
 	ADDWF CompTempVarRet386+D'1', F
-label23
+label32
 	BCF gbl_status,0
 	RRF __mul_16s__0000F_arg_b+D'1', F
 	RRF __mul_16s__0000F_arg_b, F
@@ -669,8 +799,8 @@ label23
 	RLF __mul_16s__0000F_1_t, F
 	RLF __mul_16s__0000F_1_t+D'1', F
 	INCF __mul_16s__0000F_1_i, F
-	GOTO	label22
-label24
+	GOTO	label31
+label33
 	BTFSS __mul_16s__0000F_1_i,7
 	RETURN
 	COMF CompTempVarRet386, F
@@ -681,94 +811,94 @@ label24
 	RETURN
 ; } __mul_16s_16s__16 function end
 
-	ORG 0x00000199
-tm1638Upda_0001A
+	ORG 0x000001F3
+tm1638Upda_0001E
 ; { tm1638UpdateDisplay ; function begin
 	BCF STATUS, RP0
 	BCF STATUS, RP1
 	BCF gbl_porta,7
 	MOVF gbl_tm1638ByteSetData, W
-	MOVWF tm1638Byte_00019_arg_bWrite
-	CALL tm1638Byte_00019
+	MOVWF tm1638Byte_0001D_arg_bWrite
+	CALL tm1638Byte_0001D
 	BSF gbl_porta,7
 	BCF gbl_porta,7
 	MOVF gbl_tm1638ByteSetAddr, W
-	MOVWF tm1638Byte_00019_arg_bWrite
-	CALL tm1638Byte_00019
-	CLRF tm1638Upda_0001A_2_i
-label25
+	MOVWF tm1638Byte_0001D_arg_bWrite
+	CALL tm1638Byte_0001D
+	CLRF tm1638Upda_0001E_2_i
+label34
 	MOVF gbl_tm1638MaxDigits, W
-	SUBWF tm1638Upda_0001A_2_i, W
+	SUBWF tm1638Upda_0001E_2_i, W
 	BTFSC STATUS,C
-	GOTO	label26
+	GOTO	label35
 	BCF	STATUS,IRP
 	MOVLW LOW(gbl_tm1638Data+D'0')
 	MOVWF FSR
-	MOVF tm1638Upda_0001A_2_i, W
+	MOVF tm1638Upda_0001E_2_i, W
 	ADDWF FSR, F
 	MOVF INDF, W
-	MOVWF tm1638Byte_00019_arg_bWrite
-	CALL tm1638Byte_00019
+	MOVWF tm1638Byte_0001D_arg_bWrite
+	CALL tm1638Byte_0001D
 	BCF	STATUS,IRP
 	MOVLW LOW(gbl_tm1638LEDs+D'0')
 	MOVWF FSR
-	MOVF tm1638Upda_0001A_2_i, W
+	MOVF tm1638Upda_0001E_2_i, W
 	ADDWF FSR, F
 	MOVF INDF, W
-	MOVWF tm1638Byte_00019_arg_bWrite
-	CALL tm1638Byte_00019
-	INCF tm1638Upda_0001A_2_i, F
-	GOTO	label25
-label26
+	MOVWF tm1638Byte_0001D_arg_bWrite
+	CALL tm1638Byte_0001D
+	INCF tm1638Upda_0001E_2_i, F
+	GOTO	label34
+label35
 	BSF gbl_porta,7
 	RETURN
 ; } tm1638UpdateDisplay function end
 
-	ORG 0x000001BD
-tm1638Read_0001B
+	ORG 0x00000217
+tm1638Read_0001F
 ; { tm1638ReadKeys ; function begin
 	BCF STATUS, RP0
 	BCF STATUS, RP1
 	BCF gbl_porta,7
 	MOVF gbl_tm1638ByteReadData, W
-	MOVWF tm1638Byte_00019_arg_bWrite
-	CALL tm1638Byte_00019
+	MOVWF tm1638Byte_0001D_arg_bWrite
+	CALL tm1638Byte_0001D
 	BSF STATUS, RP0
 	BSF gbl_trisa,1
 	MOVLW 0x20
 	BCF STATUS, RP0
-	MOVWF tm1638Read_0001B_1_tm1638K_0001C
-	CLRF tm1638Read_0001B_2_i
-label27
+	MOVWF tm1638Read_0001F_1_tm1638K_00020
+	CLRF tm1638Read_0001F_2_i
+label36
 	MOVLW 0x20
-	SUBWF tm1638Read_0001B_2_i, W
+	SUBWF tm1638Read_0001F_2_i, W
 	BTFSC STATUS,C
-	GOTO	label29
-	DECF tm1638Read_0001B_1_tm1638K_0001C, F
+	GOTO	label38
+	DECF tm1638Read_0001F_1_tm1638K_00020, F
 	BCF gbl_porta,0
 	MOVLW 0x01
 	MOVWF delay_us_00000_arg_del
 	CALL delay_us_00000
 	BTFSS gbl_porta,1
-	GOTO	label28
-	MOVF tm1638Read_0001B_1_tm1638K_0001C, F
+	GOTO	label37
+	MOVF tm1638Read_0001F_1_tm1638K_00020, F
 	BCF STATUS,C
-	RLF tm1638Read_0001B_1_tm1638K_0001C, F
-label28
+	RLF tm1638Read_0001F_1_tm1638K_00020, F
+label37
 	BSF gbl_porta,0
-	INCF tm1638Read_0001B_2_i, F
-	GOTO	label27
-label29
+	INCF tm1638Read_0001F_2_i, F
+	GOTO	label36
+label38
 	BSF STATUS, RP0
 	BCF gbl_trisa,1
 	BCF STATUS, RP0
 	BSF gbl_porta,7
-	MOVF tm1638Read_0001B_1_tm1638K_0001C, W
+	MOVF tm1638Read_0001F_1_tm1638K_00020, W
 	MOVWF gbl_tm1638Keys
 	RETURN
 ; } tm1638ReadKeys function end
 
-	ORG 0x000001E1
+	ORG 0x0000023B
 startTemp_00000
 ; { startTemp ; function begin
 	MOVLW 0xCC
@@ -781,7 +911,7 @@ startTemp_00000
 	RETURN
 ; } startTemp function end
 
-	ORG 0x000001E9
+	ORG 0x00000243
 readTemp_00000
 ; { readTemp ; function begin
 	MOVLW 0xCC
@@ -800,8 +930,8 @@ readTemp_00000
 	RETURN
 ; } readTemp function end
 
-	ORG 0x000001F7
-processKey_0001D
+	ORG 0x00000251
+processKey_00021
 ; { processKeys ; function begin
 	BCF STATUS, RP0
 	BCF STATUS, RP1
@@ -812,7 +942,7 @@ processKey_0001D
 	RETURN
 ; } processKeys function end
 
-	ORG 0x000001FE
+	ORG 0x00000258
 oneWireBus_00015
 ; { oneWireBusReset ; function begin
 	BSF STATUS, RP0
@@ -841,7 +971,7 @@ oneWireBus_00015
 	RETURN
 ; } oneWireBusReset function end
 
-	ORG 0x00000216
+	ORG 0x00000270
 initialise_00000
 ; { initialise ; function begin
 	BSF STATUS, RP0
@@ -861,230 +991,313 @@ initialise_00000
 	MOVLW 0x07
 	BCF STATUS, RP0
 	MOVWF gbl_cmcon
+	CLRF gbl_t1con
+	BSF gbl_t1con,5
+	BSF gbl_t1con,2
+	BSF gbl_t1con,0
+	BSF STATUS, RP0
+	BSF gbl_pie1,0
+	BCF STATUS, RP0
+	BCF gbl_pir1,0
 	CLRF gbl_cTask
+	BSF gbl_intcon,7
+	BSF gbl_intcon,6
 	MOVLW 0x01
 	MOVWF i2c_INIT_00000_arg_i2c_divisor
 	CALL i2c_INIT_00000
-	CALL ds3231Writ_00020
+	CALL ds3231Writ_0001B
 	CALL ds3231Init_00000
 	RETURN
 ; } initialise function end
 
-	ORG 0x0000022E
-convertTem_00021
+	ORG 0x00000292
+ds3231Read_0001C
+; { ds3231ReadDateTime ; function begin
+	CALL i2c_START_00000
+	MOVLW 0xD0
+	MOVWF i2c_WRITE_00000_arg_i2c_data
+	CALL i2c_WRITE_00000
+	CLRF i2c_WRITE_00000_arg_i2c_data
+	CALL i2c_WRITE_00000
+	CALL i2c_STOP_00000
+	CALL i2c_START_00000
+	MOVLW 0xD1
+	MOVWF i2c_WRITE_00000_arg_i2c_data
+	CALL i2c_WRITE_00000
+	CLRF i2c_READ_00000_arg_ack_status
+	CALL i2c_READ_00000
+	MOVF CompTempVarRet550, W
+	MOVWF gbl_gBcdSeconds
+	CLRF i2c_READ_00000_arg_ack_status
+	CALL i2c_READ_00000
+	MOVF CompTempVarRet550, W
+	MOVWF gbl_gBcdMinute
+	CLRF i2c_READ_00000_arg_ack_status
+	CALL i2c_READ_00000
+	MOVF CompTempVarRet550, W
+	MOVWF gbl_gBcdHour
+	CLRF i2c_READ_00000_arg_ack_status
+	CALL i2c_READ_00000
+	MOVF CompTempVarRet550, W
+	MOVWF gbl_gDayOfWeek
+	CLRF i2c_READ_00000_arg_ack_status
+	CALL i2c_READ_00000
+	MOVF CompTempVarRet550, W
+	MOVWF gbl_gBcdDayOfMonth
+	CLRF i2c_READ_00000_arg_ack_status
+	CALL i2c_READ_00000
+	MOVF CompTempVarRet550, W
+	MOVWF gbl_gBcdMonth
+	MOVLW 0x01
+	MOVWF i2c_READ_00000_arg_ack_status
+	CALL i2c_READ_00000
+	MOVF CompTempVarRet550, W
+	MOVWF gbl_gBcdYear
+	CALL i2c_STOP_00000
+	RETURN
+; } ds3231ReadDateTime function end
+
+	ORG 0x000002BC
+convertTem_00022
 ; { convertTemp ; function begin
 	BCF STATUS, RP0
 	BCF STATUS, RP1
-	CLRF convertTem_00021_1_iTemp
+	CLRF convertTem_00022_1_iTemp
 	MOVF gbl_cTempH, W
-	MOVWF convertTem_00021_1_iTemp+D'1'
+	MOVWF convertTem_00022_1_iTemp+D'1'
 	MOVF gbl_cTempL, W
-	IORWF convertTem_00021_1_iTemp, F
-	CLRF convertTem_00021_1_isMinus
-	BTFSC convertTem_00021_1_iTemp+D'1',7
-	INCF convertTem_00021_1_isMinus, F
-	MOVF convertTem_00021_1_isMinus, F
+	IORWF convertTem_00022_1_iTemp, F
+	CLRF convertTem_00022_1_isMinus
+	BTFSC convertTem_00022_1_iTemp+D'1',7
+	INCF convertTem_00022_1_isMinus, F
+	MOVF convertTem_00022_1_isMinus, F
 	BTFSC STATUS,Z
-	GOTO	label30
-	COMF convertTem_00021_1_iTemp, F
-	COMF convertTem_00021_1_iTemp+D'1', F
-	INCF convertTem_00021_1_iTemp, F
+	GOTO	label39
+	COMF convertTem_00022_1_iTemp, F
+	COMF convertTem_00022_1_iTemp+D'1', F
+	INCF convertTem_00022_1_iTemp, F
 	BTFSC STATUS,Z
-	INCF convertTem_00021_1_iTemp+D'1', F
-label30
+	INCF convertTem_00022_1_iTemp+D'1', F
+label39
 	MOVLW 0x06
 	MOVWF __mul_16s__0000F_arg_a
 	CLRF __mul_16s__0000F_arg_a+D'1'
-	MOVF convertTem_00021_1_iTemp, W
+	MOVF convertTem_00022_1_iTemp, W
 	MOVWF __mul_16s__0000F_arg_b
-	MOVF convertTem_00021_1_iTemp+D'1', W
+	MOVF convertTem_00022_1_iTemp+D'1', W
 	MOVWF __mul_16s__0000F_arg_b+D'1'
 	CALL __mul_16s__0000F
 	MOVF CompTempVarRet386, W
-	MOVWF convertTem_00021_1_iValue
+	MOVWF convertTem_00022_1_iValue
 	MOVF CompTempVarRet386+D'1', W
-	MOVWF CompTempVar567
-	MOVF convertTem_00021_1_iTemp, W
-	MOVWF CompTempVar564
-	MOVF convertTem_00021_1_iTemp+D'1', W
-	MOVWF convertTem_00021_1_iValue+D'1'
-	RLF convertTem_00021_1_iTemp+D'1', W
-	RRF convertTem_00021_1_iValue+D'1', F
-	RRF CompTempVar564, F
-	RLF convertTem_00021_1_iTemp+D'1', W
-	RRF convertTem_00021_1_iValue+D'1', F
-	RRF CompTempVar564, F
-	MOVF CompTempVar564, W
-	ADDWF convertTem_00021_1_iValue, F
-	MOVF CompTempVar567, W
+	MOVWF CompTempVar568
+	MOVF convertTem_00022_1_iTemp, W
+	MOVWF CompTempVar565
+	MOVF convertTem_00022_1_iTemp+D'1', W
+	MOVWF convertTem_00022_1_iValue+D'1'
+	RLF convertTem_00022_1_iTemp+D'1', W
+	RRF convertTem_00022_1_iValue+D'1', F
+	RRF CompTempVar565, F
+	RLF convertTem_00022_1_iTemp+D'1', W
+	RRF convertTem_00022_1_iValue+D'1', F
+	RRF CompTempVar565, F
+	MOVF CompTempVar565, W
+	ADDWF convertTem_00022_1_iValue, F
+	MOVF CompTempVar568, W
 	BTFSC STATUS,C
-	INCF convertTem_00021_1_iValue+D'1', F
-	ADDWF convertTem_00021_1_iValue+D'1', F
-	CLRF convertTem_00021_1_cDig3
-	CLRF convertTem_00021_1_cDig2
-	CLRF convertTem_00021_1_cDig1
-	CLRF convertTem_00021_1_cDig0
-label31
+	INCF convertTem_00022_1_iValue+D'1', F
+	ADDWF convertTem_00022_1_iValue+D'1', F
+	CLRF convertTem_00022_1_cDig3
+	CLRF convertTem_00022_1_cDig2
+	CLRF convertTem_00022_1_cDig1
+	CLRF convertTem_00022_1_cDig0
+label40
 	MOVLW 0x03
-	SUBWF convertTem_00021_1_iValue+D'1', W
+	SUBWF convertTem_00022_1_iValue+D'1', W
 	BTFSS STATUS,Z
-	GOTO	label32
+	GOTO	label41
 	MOVLW 0xE8
-	SUBWF convertTem_00021_1_iValue, W
-label32
+	SUBWF convertTem_00022_1_iValue, W
+label41
 	BTFSS STATUS,C
-	GOTO	label33
-	BTFSC convertTem_00021_1_iValue+D'1',7
-	GOTO	label33
+	GOTO	label42
+	BTFSC convertTem_00022_1_iValue+D'1',7
+	GOTO	label42
 	MOVLW 0xE8
-	SUBWF convertTem_00021_1_iValue, F
+	SUBWF convertTem_00022_1_iValue, F
 	MOVLW 0x03
 	BTFSS STATUS,C
 	MOVLW 0x04
-	SUBWF convertTem_00021_1_iValue+D'1', F
-	INCF convertTem_00021_1_cDig3, F
-	GOTO	label31
-label33
-	MOVF convertTem_00021_1_iValue+D'1', W
+	SUBWF convertTem_00022_1_iValue+D'1', F
+	INCF convertTem_00022_1_cDig3, F
+	GOTO	label40
+label42
+	MOVF convertTem_00022_1_iValue+D'1', W
 	XORLW 0x80
-	MOVWF CompTempVar576
+	MOVWF CompTempVar577
 	MOVLW 0x80
-	SUBWF CompTempVar576, W
+	SUBWF CompTempVar577, W
 	BTFSS STATUS,Z
-	GOTO	label34
+	GOTO	label43
 	MOVLW 0x64
-	SUBWF convertTem_00021_1_iValue, W
-label34
+	SUBWF convertTem_00022_1_iValue, W
+label43
 	BTFSS STATUS,C
-	GOTO	label35
+	GOTO	label44
 	MOVLW 0x64
-	SUBWF convertTem_00021_1_iValue, F
-	MOVF convertTem_00021_1_iValue+D'1', F
+	SUBWF convertTem_00022_1_iValue, F
+	MOVF convertTem_00022_1_iValue+D'1', F
 	BTFSS STATUS,C
-	DECF convertTem_00021_1_iValue+D'1', F
-	INCF convertTem_00021_1_cDig2, F
-	GOTO	label33
-label35
-	MOVF convertTem_00021_1_iValue+D'1', W
+	DECF convertTem_00022_1_iValue+D'1', F
+	INCF convertTem_00022_1_cDig2, F
+	GOTO	label42
+label44
+	MOVF convertTem_00022_1_iValue+D'1', W
 	XORLW 0x80
-	MOVWF CompTempVar579
+	MOVWF CompTempVar580
 	MOVLW 0x80
-	SUBWF CompTempVar579, W
+	SUBWF CompTempVar580, W
 	BTFSS STATUS,Z
-	GOTO	label36
+	GOTO	label45
 	MOVLW 0x0A
-	SUBWF convertTem_00021_1_iValue, W
-label36
+	SUBWF convertTem_00022_1_iValue, W
+label45
 	BTFSS STATUS,C
-	GOTO	label37
+	GOTO	label46
 	MOVLW 0x0A
-	SUBWF convertTem_00021_1_iValue, F
-	MOVF convertTem_00021_1_iValue+D'1', F
+	SUBWF convertTem_00022_1_iValue, F
+	MOVF convertTem_00022_1_iValue+D'1', F
 	BTFSS STATUS,C
-	DECF convertTem_00021_1_iValue+D'1', F
-	INCF convertTem_00021_1_cDig1, F
-	GOTO	label35
-label37
-	MOVF convertTem_00021_1_iValue, W
-	MOVWF convertTem_00021_1_cDig0
+	DECF convertTem_00022_1_iValue+D'1', F
+	INCF convertTem_00022_1_cDig1, F
+	GOTO	label44
+label46
+	MOVF convertTem_00022_1_iValue, W
+	MOVWF convertTem_00022_1_cDig0
 	BCF	STATUS,IRP
 	MOVLW LOW(gbl_tm1638DisplayNumtoSeg+D'0')
 	MOVWF FSR
-	MOVF convertTem_00021_1_cDig3, W
+	MOVF convertTem_00022_1_cDig3, W
 	ADDWF FSR, F
 	MOVF INDF, W
 	MOVWF gbl_tm1638Data
 	MOVLW LOW(gbl_tm1638DisplayNumtoSeg+D'0')
 	MOVWF FSR
-	MOVF convertTem_00021_1_cDig2, W
+	MOVF convertTem_00022_1_cDig2, W
 	ADDWF FSR, F
 	MOVF gbl_tm1638Dot, W
 	ADDWF INDF, W
 	MOVWF gbl_tm1638Data+D'1'
 	MOVLW LOW(gbl_tm1638DisplayNumtoSeg+D'0')
 	MOVWF FSR
-	MOVF convertTem_00021_1_cDig1, W
+	MOVF convertTem_00022_1_cDig1, W
 	ADDWF FSR, F
 	MOVF INDF, W
 	MOVWF gbl_tm1638Data+D'2'
 	MOVLW LOW(gbl_tm1638DisplayNumtoSeg+D'0')
 	MOVWF FSR
-	MOVF convertTem_00021_1_cDig0, W
+	MOVF convertTem_00022_1_cDig0, W
 	ADDWF FSR, F
 	MOVF INDF, W
 	MOVWF gbl_tm1638Data+D'3'
-	MOVF convertTem_00021_1_cDig3, F
+	MOVF convertTem_00022_1_cDig3, F
 	BTFSC STATUS,Z
 	CLRF gbl_tm1638Data
-	MOVF convertTem_00021_1_isMinus, F
+	MOVF convertTem_00022_1_isMinus, F
 	BTFSC STATUS,Z
 	RETURN
 	MOVLW 0x03
-	SUBWF convertTem_00021_1_iValue+D'1', W
+	SUBWF convertTem_00022_1_iValue+D'1', W
 	BTFSS STATUS,Z
-	GOTO	label38
+	GOTO	label47
 	MOVLW 0xE8
-	SUBWF convertTem_00021_1_iValue, W
-label38
+	SUBWF convertTem_00022_1_iValue, W
+label47
 	BTFSS STATUS,C
-	GOTO	label39
-	BTFSC convertTem_00021_1_iValue+D'1',7
-	GOTO	label39
+	GOTO	label48
+	BTFSC convertTem_00022_1_iValue+D'1',7
+	GOTO	label48
 	MOVF gbl_tm1638Data, W
 	MOVWF gbl_tm1638Data+D'1'
 	MOVF gbl_tm1638Data+D'1', W
 	MOVWF gbl_tm1638Data+D'2'
 	MOVF gbl_tm1638Data+D'2', W
 	MOVWF gbl_tm1638Data+D'3'
-label39
+label48
 	MOVLW 0x40
 	MOVWF gbl_tm1638Data
 	RETURN
 ; } convertTemp function end
 
-	ORG 0x000002CB
+	ORG 0x00000359
 main
 ; { main ; function begin
 	CALL initialise_00000
-	CALL tm1638Upda_0001A
-label40
+	CALL tm1638Upda_0001E
+label49
 	MOVF gbl_cTask, W
 	SUBLW 0x00
 	BTFSC STATUS,C
-	GOTO	label40
-	BTFSS gbl_cTask,3
-	GOTO	label41
+	GOTO	label49
+	BTFSS gbl_cTask,2
+	GOTO	label54
+	CALL ds3231Read_0001C
+	MOVF gbl_gBcdSeconds, W
+	XORLW 0x29
+	BTFSC STATUS,Z
+	GOTO	label50
+	MOVF gbl_gBcdSeconds, W
+	XORLW 0x59
+	BTFSS STATUS,Z
+	GOTO	label51
+label50
 	CALL oneWireBus_00015
 	CALL startTemp_00000
-	BCF gbl_cTask,3
-label41
-	BTFSS gbl_cTask,4
-	GOTO	label42
+	GOTO	label53
+label51
+	MOVF gbl_gBcdSeconds, F
+	BTFSC STATUS,Z
+	GOTO	label52
+	MOVF gbl_gBcdSeconds, W
+	XORLW 0x30
+	BTFSS STATUS,Z
+	GOTO	label53
+label52
 	CALL oneWireBus_00015
 	CALL readTemp_00000
-	CALL convertTem_00021
-	CALL tm1638Upda_0001A
-	BCF gbl_cTask,4
-label42
-	CALL tm1638Read_0001B
+	CALL convertTem_00022
+label53
+	CALL tm1638Upda_0001E
+	BCF gbl_cTask,2
+label54
+	CALL tm1638Read_0001F
 	MOVF gbl_tm1638Keys, F
 	BTFSS STATUS,Z
-	CALL processKey_0001D
-	GOTO	label40
+	CALL processKey_00021
+	GOTO	label49
 ; } main function end
 
-	ORG 0x000002E2
+	ORG 0x0000037E
 _startup
 	BCF STATUS, RP0
 	BCF STATUS, RP1
+	CLRF gbl_gBcdSeconds
+	CLRF gbl_gBcdMinute
+	CLRF gbl_gBcdHour
+	MOVLW 0x01
+	MOVWF gbl_gDayOfWeek
+	MOVLW 0x01
+	MOVWF gbl_gBcdDayOfMonth
+	MOVLW 0x01
+	MOVWF gbl_gBcdMonth
+	MOVLW 0x23
+	MOVWF gbl_gBcdYear
 	CLRF gbl_cTempH
 	CLRF gbl_cTempL
 	MOVLW 0x02
 	MOVWF gbl_iDecimalPosition
 	CLRF gbl_oneWireIsPresent
 	CLRF gbl_oneWireResetStage
-	MOVLW 0x6E
-	MOVWF gbl_iTimer1Count
 	CLRF gbl_cTask
 	MOVLW 0x08
 	MOVWF gbl_tm1638MaxDigits
@@ -1140,31 +1353,23 @@ _startup
 	BCF PCLATH,3
 	BCF PCLATH,4
 	GOTO	main
-	ORG 0x00000323
+	ORG 0x000003C8
 interrupt
 ; { interrupt ; function begin
 	BCF STATUS, RP0
 	BCF STATUS, RP1
 	BTFSS gbl_pir1,0
-	GOTO	label45
+	GOTO	label56
 	BSF STATUS, RP0
 	BTFSS gbl_pie1,0
-	GOTO	label45
+	GOTO	label56
+	MOVLW 0xFF
 	BCF STATUS, RP0
-	MOVF gbl_iTimer1Count, W
-	XORLW 0x72
-	BTFSC STATUS,Z
-	BSF gbl_cTask,3
-	MOVLW 0x75
-	SUBWF gbl_iTimer1Count, W
-	BTFSS STATUS,C
-	GOTO	label44
-	CLRF gbl_iTimer1Count
-	BSF gbl_cTask,4
-label44
-	INCF gbl_iTimer1Count, F
+	MOVWF gbl_tmr1h
+	MOVWF gbl_tmr1l
 	BCF gbl_pir1,0
-label45
+	BSF gbl_cTask,2
+label56
 	BCF STATUS, RP0
 	SWAPF Int1BContext+D'2', W
 	MOVWF FSR

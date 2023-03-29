@@ -159,19 +159,42 @@ void ds3231Stop() {
 }
 
 /*********************************************************************************************
- ds3231WriteDate()
+ ds3231WriteDateTime()
  Write the date to the DS3231
 *********************************************************************************************/
-void ds3231WriteDate() {
+void ds3231WriteDateTime() {
 	i2c_start();
 	i2c_write(ds3231_addr); // address + write
 	i2c_write(0); // start at address 0
 	i2c_write(0); // seconds
-	i2c_write(0); // minutes
-	i2c_write(0); // hours
-	i2c_write(1); // day
-	i2c_write(1); // month + century
-	i2c_write(0); // year - 0
+	i2c_write(gBcdMinute); // minutes
+	i2c_write(gBcdHour); // hours
+	i2c_write(gDayOfWeek); // day of week
+	i2c_write(gBcdDayOfMonth); // day of month
+	i2c_write(gBcdMonth); // month + century
+	i2c_write(gBcdYear); // year
+	i2c_stop();
+}
+
+/*********************************************************************************************
+ ds3231ReadDateTime()
+ Write the date to the DS3231
+*********************************************************************************************/
+void ds3231ReadDateTime() {
+	i2c_start();
+	i2c_write(ds3231_addr); // address + read
+	i2c_write(0); // start at address 0
+	i2c_stop();
+	
+	i2c_start();
+	i2c_write(ds3231_addr + 1); // address + read
+	gBcdSeconds = i2c_read(0); // ack
+	gBcdMinute = i2c_read(0); // ack
+	gBcdHour = i2c_read(0); // ack
+	gDayOfWeek = i2c_read(0); // ack
+	gBcdDayOfMonth = i2c_read(0); // ack
+	gBcdMonth = i2c_read(0); // ack
+	gBcdYear = i2c_read(1); // nack
 	i2c_stop();
 }
 
@@ -293,7 +316,7 @@ void initialise() {
     // Setup timer 1, used to periodically ask for a temperature reading, and receive it after sending - 262ms
     // Timer calculator: http://eng-serve.com/pic/pic_timer.html
     // Timer 1 setup - interrupt every 262ms seconds 4MHz
-    /*t1con = 0;
+    t1con = 0;
     t1con.T1CKPS1 = 1;   // bits 5-4  Prescaler Rate Select bits
     //t1con.T1CKPS0 = 0;   // bit 4
     //t1con.T1OSCEN = 0;   // bit 3 Timer1 Oscillator Enable Control bit 1 = off - this should be cleared so we can use RB7 and RB6 as outputs
@@ -301,17 +324,17 @@ void initialise() {
     //t1con.TMR1CS = 0;    // bit 1 Timer1 Clock Source Select bit...0 = Internal clock (FOSC/4)
     t1con.TMR1ON = 1;    // bit 0 enables timer
     pie1.TMR1IE = 1; // Timer 1 interrupt enable
-    pir1.TMR1IF = 0; // Clear timer 1 interrupt flag bit*/
+    pir1.TMR1IF = 0; // Clear timer 1 interrupt flag bit
     
     // No task at initialisation
     cTask = 0;
     
     // Enable interrupts
-    //intcon.GIE = 1;
-    //intcon.PEIE = 1;
+    intcon.GIE = 1;
+    intcon.PEIE = 1;
 
 	i2c_init(1); 
-	ds3231WriteDate();
+	ds3231WriteDateTime();
 	ds3231Init();
 
 }
@@ -322,28 +345,13 @@ void initialise() {
   Interrupt handler
 *********************************************************************************************/
 void interrupt() {
-    // Handle timer1 interrupt - delay counter
+    // Handle timer1 interrupt - delay counter from DS3231
     if (pir1.TMR1IF && pie1.TMR1IE) {
-        // timer 1 will interrupt every 262ms with a 1:4 prescaler at 4MHz
-        // We'll ask for the temperatute every 30 seconds
-        // Into 30 seconds, 262ms goes 114 times (roughly)
-        if (iTimer1Count == TIMER_1_INTERVAL) {
-            // If the number of tasks to perform is less than the limit,
-            // then add this task to the task array
-            cTask.TASK_TIMER1_START = 1;
-        }
-        // just over 750ms after asking for temperature, it should be ready, so get the reading
-        // 0.75 seconds is three more ticks above TIMER_1_INTERVAL
-        if (iTimer1Count >= TIMER_1_INTERVAL + 3) {
-            iTimer1Count = 0;
-            // If the number of tasks to perform is less than the limit,
-            // then add this task to the task array
-            cTask.TASK_TIMER1_READ = 1;
-        }
-        // Count the number of times this timer overflowed
-        iTimer1Count++;
-        // Clear interrupt flag
-        pir1.TMR1IF = 0; 
+        tmr1h = TMR1HV;      // preset for timer1 MSB register
+        tmr1l = TMR1LV;      // preset for timer1 LSB register
+
+        pir1.TMR1IF = 0;     // Clear interrupt flag
+        cTask.TASK_TIMER1 = 1;
     }
 }
 
@@ -472,22 +480,25 @@ void main() {
         // If there are tasks to be performed, find out the
         // most recent task from the array and execute it
         while (cTask > 0) {
-            if (cTask.TASK_TIMER1_START) {
-                // Timer 1 has finished counting to 30 seconds, ask to convert
-                oneWireBusReset();
-                startTemp(); 
-                cTask.TASK_TIMER1_START = 0;
-            }
-            if (cTask.TASK_TIMER1_READ) {
-                // Timer 1 has finished counting a further 750ms, read the converted temperature
-                oneWireBusReset();
-                readTemp(); 
-                // store it in the array, next display refresh will pick it up
-                convertTemp();
-                // Display on tm1638
+            if (cTask.TASK_TIMER1) {
+                ds3231ReadDateTime();
+                if ((gBcdSeconds == 0x29) || (gBcdSeconds == 0x59)) {
+                    // Ask to convert for temperature reading at 29 seconds or 59 seconds past the minute
+                    oneWireBusReset();
+                    startTemp();
+                } else if ((gBcdSeconds == 0) || (gBcdSeconds == 0x30)) {
+                    // 1 second later, read the converted temperature
+                    oneWireBusReset();
+                    readTemp(); 
+                    // store it in the array, next display refresh will pick it up
+                    convertTemp();
+                }
+                // Display time and temp or date on TM1638
                 tm1638UpdateDisplay();
-                cTask.TASK_TIMER1_READ = 0;
+                
+                cTask.TASK_TIMER1 = 0;
             }
+            // Poll keys
             tm1638ReadKeys();
             if (tm1638Keys != 0) {
                 processKeys();
