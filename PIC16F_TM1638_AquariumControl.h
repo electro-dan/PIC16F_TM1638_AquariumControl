@@ -4,12 +4,18 @@
 #define TASK_TIMER1 2
 #define TASK_TIMER1_START 3
 #define TASK_TIMER1_READ 4
+#define TASK_TIMER2 5
+
 #define oneWireBus (porta.6)
 #define oneWireTris (trisa.6)
 #define tm1638dio (porta.1)
 #define tm1638clk (porta.0)
 #define tm1638dioTris (trisa.1)
 #define tm1638strobe (porta.7)
+#define WHITE_LED (portb.5)
+#define BLUE_LED (portb.4)
+#define FAN (portb.3)
+#define HEATER (portb.2)
 
 // This means timer 1 will overflow when 1 cycle completes, generating the interrupt
 #define TMR1HV 0xFF
@@ -50,6 +56,11 @@ char gBcdDayOfMonth = 1; // 1 to 31
 char gBcdMonth = 1; // 1 to 12 + century at bit 7
 char gBcdYear = 0x23; // Init to 2023
 
+// Timer variables
+char iTimer2Counts = 0;
+char iFlashDigitOff = 0;
+char iDigitToFlash = 8; // 8 = no digit to flash
+
 // Hold the upper and lower bytes from the ds18b20
 char cTempH = 0;
 char cTempL = 0;
@@ -69,8 +80,17 @@ void ds3231Stop();
 void ds3231WriteDateTime();
 void ds3231ReadDateTime();
 
+int giDS3231ValueBCD = 0;
+char gbDS3231IsMinus = 0;
 
 char cTask = 0; // Used for task scheduler
+bool gbWhiteOn = 0;
+bool gbBlueOn = 0;
+bool gbFanOn = 0;
+bool gbHeaterOn = 0;
+bool gbFlashOff = 0;
+char gcDisplayMode = 0;
+char gcSetMode = 0;
 
 // Used to output the segments from numbers
 char tm1638MaxDigits = 8;
@@ -92,6 +112,8 @@ char tm1638Data[] = {0, 0, 0, 0, 0, 0, 0, 0};
 char tm1638LEDs[] = {0, 0, 0, 0, 0, 0, 0, 0};
 // Copy of the keys
 char tm1638Keys = 0;
+// Copy of translated temperature data
+char tm1638TherData[] = {0, 0, 0, 0};
 
 void tm1638ByteWrite(char bWrite);
 void tm1638UpdateDisplay();

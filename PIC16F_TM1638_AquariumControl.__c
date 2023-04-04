@@ -1,6 +1,6 @@
 [Settings]
 Active Compiler=BoostC
-Target=PIC16F627
+Target=PIC16F628A
 Active Directory=Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\
 Active Config=Debug
 Last Ext=h

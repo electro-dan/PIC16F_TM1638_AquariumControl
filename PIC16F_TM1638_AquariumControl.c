@@ -2,7 +2,7 @@
 #include <i2c_driver.h>
 #include "PIC16F_TM1638_AquariumControl.h"
 
-//Target PIC16F627 configuration word
+//Target PIC16F628A configuration word
 #pragma DATA _CONFIG, _PWRTE_OFF & _WDT_OFF & _INTRC_OSC_NOCLKOUT & _CP_OFF & _LVP_OFF & _BODEN_OFF & _MCLRE_OFF
 
 //Set clock frequency
@@ -216,6 +216,46 @@ void tm1638ByteWrite(char bWrite) {
  Publish the tm1638Data and tm1638LEDs arrays to the display
 *********************************************************************************************/
 void tm1638UpdateDisplay() {
+    
+    if (!gcDisplayMode && !gcSetMode) {
+        // translate DS3231 temperature to digit values
+        tm1638Data[0] = tm1638DisplayNumtoSeg[giDS3231ValueBCD >> 12];
+        tm1638Data[1] = tm1638DisplayNumtoSeg[giDS3231ValueBCD >> 8] + tm1638Dot;
+        tm1638Data[2] = tm1638DisplayNumtoSeg[giDS3231ValueBCD >> 4];
+        tm1638Data[3] = tm1638DisplayNumtoSeg[giDS3231ValueBCD & 0x0F] + tm1638Dot;
+
+        // left fill zeroes with blanks up to the digit before the decimal place
+        if ((giDS3231ValueBCD & 0xF000) == 0) {
+            tm1638Data[0] = 0;
+        }
+
+        if (gbDS3231IsMinus) {
+            // If minus and value less than or equal -10 (checked as >1000), shift the digits right
+            if (giDS3231ValueBCD & 0xF000) {
+                tm1638Data[1] = tm1638Data[0];
+                tm1638Data[2] = tm1638Data[1];
+                tm1638Data[3] = tm1638Data[2] + tm1638Dot;
+            }
+            // If minus, overwrite left most digit with minus sign
+            tm1638Data[0] = 0x40;
+        }
+    } else {
+        // Display date DD.YY.
+        if (gBcdDayOfMonth & 0xF0)
+            tm1638Data[0] = tm1638DisplayNumtoSeg[gBcdDayOfMonth >> 4];
+        else
+            tm1638Data[0] = 0;
+        tm1638Data[1] = tm1638DisplayNumtoSeg[gBcdDayOfMonth & 0x0F] + tm1638Dot;
+        tm1638Data[2] = tm1638DisplayNumtoSeg[(gBcdMonth >> 4) & 0x01];
+        tm1638Data[3] = tm1638DisplayNumtoSeg[gBcdMonth & 0x0F] + tm1638Dot;
+    }
+
+    // HH.MM in last 4 digits of TM1638
+    tm1638Data[4] = tm1638DisplayNumtoSeg[gBcdHour >> 4];
+    tm1638Data[5] = tm1638DisplayNumtoSeg[gBcdHour & 0x0F] + tm1638Dot;
+    tm1638Data[6] = tm1638DisplayNumtoSeg[gBcdMinute >> 4];
+    tm1638Data[7] = tm1638DisplayNumtoSeg[gBcdMinute & 0x0F];
+
     // Write 0x40 [01000000] to indicate command to display data - [Write data to display register]
     tm1638strobe = 0;
     tm1638ByteWrite(tm1638ByteSetData);
@@ -225,7 +265,10 @@ void tm1638UpdateDisplay() {
     // Specify the display address 0xC0 [11000000] then write out all 8 bytes
     tm1638ByteWrite(tm1638ByteSetAddr);
     for (char i = 0; i < tm1638MaxDigits; i++) {
-        tm1638ByteWrite(tm1638Data[i]);
+        if (iFlashDigitOff.0 && (i == iDigitToFlash))
+            tm1638ByteWrite(0);
+        else
+            tm1638ByteWrite(tm1638Data[i]);
         tm1638ByteWrite(tm1638LEDs[i]);
     }
     tm1638strobe = 1;
@@ -281,13 +324,13 @@ void initialise() {
     // Configure port B
     /*      
     RB7     ICSP PGD
-    RB6     ICSP PGC
+    RB6     IN SQW DS3231M + ICSP PGC
     RB5     OUT WHITE LIGHT PWM
     RB4     OUT BLUE LIGHT PWM
     RB3     OUT FANS
     RB2     OUT HEATER
     RB1     
-    RB0     IN INT DS3231M
+    RB0     
     */
     trisb = 0x00; // all outputs
     portb = 0x00; // all off by default
@@ -313,19 +356,28 @@ void initialise() {
     intcon.T0IF = 0; // Clear timer 1 interrupt flag bit
     intcon.T0IE = 1; // Timer 1 interrupt enabled*/
 
-    // Setup timer 1, used to periodically ask for a temperature reading, and receive it after sending - 262ms
-    // Timer calculator: http://eng-serve.com/pic/pic_timer.html
-    // Timer 1 setup - interrupt every 262ms seconds 4MHz
-    t1con = 0;
-    t1con.T1CKPS1 = 1;   // bits 5-4  Prescaler Rate Select bits
-    //t1con.T1CKPS0 = 0;   // bit 4
-    //t1con.T1OSCEN = 0;   // bit 3 Timer1 Oscillator Enable Control bit 1 = off - this should be cleared so we can use RB7 and RB6 as outputs
-    t1con.NOT_T1SYNC = 1;    // bit 2 Timer1 External Clock Input Synchronization Control bit...1 = Do not synchronize external clock input
-    //t1con.TMR1CS = 0;    // bit 1 Timer1 Clock Source Select bit...0 = Internal clock (FOSC/4)
-    t1con.TMR1ON = 1;    // bit 0 enables timer
-    pie1.TMR1IE = 1; // Timer 1 interrupt enable
-    pir1.TMR1IF = 0; // Clear timer 1 interrupt flag bit
+    // Setup timer 1, used to update clock display and periodically ask for a temperature reading
+    // Timer 1 setup - interrupt on DS3231 SQW 1Hz
+    // Timer1 Registers Prescaler= 1 - TMR1 Preset = 65535 - Freq = 1 Hz
+    // Bits 5-4 T1CKPS1:T1CKPS0 = 00: Prescaler Rate Select bits, 00 = 1:1 prescaler
+    // Bit 3 T1OSCEN = 0: Timer1 LP Oscillator Enable Control bit, 0 = off
+    // Bit 2 NOT_T1SYNC = 1: Timer1 External Clock Input Synchronization Control bit, 1 = Do not synchronize external clock input
+    // Bit 1 TMR1CS = 1: Timer1 Clock Source Select bit, 1 = External clock from T1OSO/T1CKI pin (on the rising edge)
+    // Bit 0 TMR1ON = 0: Timer1 On Bit, 0 = off
+    t1con = 0b00000110;
+    tmr1h = TMR1HV;      // preset for timer1 MSB register
+    tmr1l = TMR1LV;      // preset for timer1 LSB register
+    pie1.TMR1IE = 1;     // Timer 1 interrupt
     
+    // Setup timer 2, used for flashing display
+    // Timer calculator: http://eng-serve.com/pic/pic_timer.html
+    //Timer2 Registers Prescaler= 16 - TMR2 PostScaler = 16 - PR2 = 195 - Freq = 20.03 Hz - Period = 0.049920 seconds
+    t2con |= 120; // bits 6-3 Post scaler 1:1 thru 1:16
+    t2con.TMR2ON = 1; // bit 2 turn timer2 on;
+    t2con.T2CKPS1 = 1; // bits 1-0  Prescaler Rate Select bits
+    //t2con.T2CKPS0 = 0;
+    pr2 = 195; // PR2 (Timer2 Match value)
+
     // No task at initialisation
     cTask = 0;
     
@@ -334,7 +386,7 @@ void initialise() {
     intcon.PEIE = 1;
 
 	i2c_init(1); 
-	ds3231WriteDateTime();
+	//ds3231WriteDateTime();
 	ds3231Init();
 
 }
@@ -346,12 +398,24 @@ void initialise() {
 *********************************************************************************************/
 void interrupt() {
     // Handle timer1 interrupt - delay counter from DS3231
-    if (pir1.TMR1IF && pie1.TMR1IE) {
+    if (pir1.TMR1IF) {
         tmr1h = TMR1HV;      // preset for timer1 MSB register
         tmr1l = TMR1LV;      // preset for timer1 LSB register
 
         pir1.TMR1IF = 0;     // Clear interrupt flag
         cTask.TASK_TIMER1 = 1;
+    }
+    
+    // Interrupt on timer2 - flash digit delay
+    if (pir1.TMR2IF) {
+        iTimer2Counts++;
+        if (iTimer2Counts > 9) {
+            iFlashDigitOff++;
+            iTimer2Counts = 0;
+            cTask.TASK_TIMER2 = 1;
+        }
+        // Clear interrupt flag
+        pir1.TMR2IF = 0; 
     }
 }
 
@@ -367,8 +431,8 @@ void convertTemp() {
     signed int iTemp = (cTempH << 8) | cTempL;
     
     // Celcius
-    char isMinus = (iTemp < 0);
-    if (isMinus) {
+    gbDS3231IsMinus = (iTemp < 0);
+    if (gbDS3231IsMinus) {
         iTemp = ~iTemp + 1;
     }
     // this gets celcius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
@@ -384,58 +448,32 @@ void convertTemp() {
     
     // less program memory needed - may be slower executing
     // https://electronics.stackexchange.com/questions/158563/how-to-split-a-floating-point-number-into-individual-digits
-    char cDig3 = 0;
-    char cDig2 = 0;
-    char cDig1 = 0;
-    char cDig0 = 0;
-    
-    // incrementing variables for each digit
+    giDS3231ValueBCD = 0;
 
+    // incrementing variables for each digit
     // determine to thousands digit
     while (iValue >= 1000) {
         iValue = iValue - 1000;
         // each time we take off 1000, the digit is incremented
-        cDig3++;
+        giDS3231ValueBCD += 0x1000;
     }
 
     // determine to hundreds digit
     while (iValue >= 100) {
         iValue = iValue - 100;
         // each time we take off 100, the digit is incremented
-        cDig2++;
+        giDS3231ValueBCD += 0x100;
     }
 
     // determine to tens digit
     while (iValue >= 10) {
         iValue = iValue - 10;
         // each time we take off 10, the left most digit is incremented
-        cDig1++;
+        giDS3231ValueBCD += 0x10;
     }
 
     // the last digit is what's left on iValue
-    cDig0 = iValue;
-
-    // translate the numbers to digit values
-    tm1638Data[0] = tm1638DisplayNumtoSeg[cDig3];
-    tm1638Data[1] = tm1638DisplayNumtoSeg[cDig2] + tm1638Dot;
-    tm1638Data[2] = tm1638DisplayNumtoSeg[cDig1];
-    tm1638Data[3] = tm1638DisplayNumtoSeg[cDig0];
-
-    // left fill zeroes with blanks up to the digit before the decimal place
-    if (cDig3 == 0) {
-        tm1638Data[0] = 0;
-    }
-
-    if (isMinus) {
-        // If minus and value less than or equal -10 (checked as >1000), shift the digits right
-        if (iValue >= 1000) {
-            tm1638Data[1] = tm1638Data[0];
-            tm1638Data[2] = tm1638Data[1];
-            tm1638Data[3] = tm1638Data[2];
-        }
-        // If minus, overwrite left most digit with minus sign
-        tm1638Data[0] = 0x40;
-    }
+    giDS3231ValueBCD += iValue;
 }
 
 /*********************************************************************************************
@@ -465,6 +503,39 @@ void readTemp() {
 void processKeys() {
     switch (tm1638Keys) {
         case 1:
+            // Toggle white light on/off
+            gbWhiteOn = !gbWhiteOn;
+            break;
+        case 2:
+            // Toggle blue light on/off
+            gbBlueOn = !gbBlueOn;
+            break;
+        case 3:
+            // Toggle fan on/off
+            gbFanOn = !gbFanOn;
+            break;
+        case 4:
+            // Display temp C/temp F/date
+            gcDisplayMode++;
+            if (gcDisplayMode > 2)
+                gcDisplayMode = 0;
+            break;
+        case 5:
+            // Set
+            gcSetMode++;
+            if (gcSetMode > 6) {
+                ds3231WriteDateTime();
+                gcSetMode = 0;
+            }
+            break;
+        case 6:
+            // Adjust down
+            break;
+        case 7:
+            // Adjust up
+            break;
+        case 8:
+            // Timer
             break;
     }
 }
@@ -481,22 +552,30 @@ void main() {
         // most recent task from the array and execute it
         while (cTask > 0) {
             if (cTask.TASK_TIMER1) {
-                ds3231ReadDateTime();
-                if ((gBcdSeconds == 0x29) || (gBcdSeconds == 0x59)) {
-                    // Ask to convert for temperature reading at 29 seconds or 59 seconds past the minute
-                    oneWireBusReset();
-                    startTemp();
-                } else if ((gBcdSeconds == 0) || (gBcdSeconds == 0x30)) {
-                    // 1 second later, read the converted temperature
-                    oneWireBusReset();
-                    readTemp(); 
-                    // store it in the array, next display refresh will pick it up
-                    convertTemp();
+                if (gcSetMode == 0) {
+                    ds3231ReadDateTime();
+                    if ((gBcdSeconds == 0x29) || (gBcdSeconds == 0x59)) {
+                        // Ask to convert for temperature reading at 29 seconds or 59 seconds past the minute
+                        oneWireBusReset();
+                        startTemp();
+                    } else if ((gBcdSeconds == 0) || (gBcdSeconds == 0x30)) {
+                        // 1 second later, read the converted temperature
+                        oneWireBusReset();
+                        readTemp(); 
+                        // store it in the array, next display refresh will pick it up
+                        convertTemp();
+                    }
+                    // Display time and temp or date on TM1638
+                    tm1638UpdateDisplay();
                 }
-                // Display time and temp or date on TM1638
-                tm1638UpdateDisplay();
                 
                 cTask.TASK_TIMER1 = 0;
+            }
+            if (cTask.TASK_TIMER2) {
+                // If in set mode, update the display every ~half second to flash a digit
+                if (gcSetMode > 0)
+                    tm1638UpdateDisplay();
+                cTask.TASK_TIMER2 = 0;
             }
             // Poll keys
             tm1638ReadKeys();
