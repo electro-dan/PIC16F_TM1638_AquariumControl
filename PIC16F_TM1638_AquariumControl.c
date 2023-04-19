@@ -8,6 +8,88 @@
 //Set clock frequency
 #pragma CLOCK_FREQ	4000000
 
+/***********************************************************************************
+  EEPROM read and write methods
+************************************************************************************/
+void eepromWriteAll() {
+    char didWrite = 0;
+    // only write value if it is different
+    didWrite += eepromWrite(1, gBcdWhiteOnMinute);
+    didWrite += eepromWrite(2, gBcdWhiteOnHour);
+    didWrite += eepromWrite(3, gBcdWhiteOffMinute);
+    didWrite += eepromWrite(4, gBcdWhiteOffHour);
+    didWrite += eepromWrite(5, gBcdBlueOnMinute);
+    didWrite += eepromWrite(6, gBcdBlueOnHour);
+    didWrite += eepromWrite(7, gBcdBlueOffMinute);
+    didWrite += eepromWrite(8, gBcdBlueOffHour);
+    didWrite += eepromWrite(9, gFanOnTemp);
+    didWrite += eepromWrite(10, gFanOffTemp);
+    didWrite += eepromWrite(11, gHeaterOnTemp);
+    didWrite += eepromWrite(12, gHeaterOffTemp);
+    
+    if (didWrite)
+        eepromWrite(0, 10); // To indicate EEPROM has been saved
+}
+
+char eepromWrite(char address, char data) {
+    char didWrite = 0;
+    if (eepromRead(address) != data) {
+        char intconsave = intcon;
+        
+        // Load address and data
+        eeadr = address;
+        eedata = data;
+    
+        eecon1.WREN = 1; // Enable writes
+        
+        // Required write sequence
+        intcon = 0;
+        eecon2 = 0x55; // Write 55h
+        eecon2 = 0xAA; // Write 0AAh
+        eecon1.WR = 1; // Set WR bit to begin write
+        intcon = intconsave;
+        eecon1.WREN = 0; // Disable writes on write complete (EEIF set)
+        while(!pir1.EEIF); // Wait for the interrupt bit EEIF to be set
+        pir1.EEIF = 0; // Clear EEIF
+        didWrite = 1;
+    }
+    return didWrite;
+}
+
+/******************************************************
+  Function to read the current variables from ROM
+*******************************************************/
+void eepromReadAll() {
+    // Read initial values from EEPROM
+    // Do not read other variables if the EEPROM has not been saved before
+    // as all default will be 0xFF
+    if (eepromRead(0) == 10) {
+        gBcdWhiteOnMinute = eepromRead(1);
+        gBcdWhiteOnHour = eepromRead(2);
+        gBcdWhiteOffMinute = eepromRead(3);
+        gBcdWhiteOffHour = eepromRead(4);
+        gBcdBlueOnMinute = eepromRead(5);
+        gBcdBlueOnHour = eepromRead(6);
+        gBcdBlueOffMinute = eepromRead(7);
+        gBcdBlueOffHour = eepromRead(8);
+        gFanOnTemp = eepromRead(9);
+        gFanOffTemp = eepromRead(10);
+        gHeaterOnTemp = eepromRead(11);
+        gHeaterOffTemp = eepromRead(12);
+    }
+}
+
+char eepromRead(char address) {
+    // Load address
+    eeadr = address;
+
+    // Read, data is available in eedata the next cycle.
+    eecon1.RD = 1;
+    
+    // Return value
+    return eedata;
+}
+    
 /*********************************************************************************************
   oneWireBusReset()
   First part of the reset routine - drive the bus low for 500us
@@ -211,6 +293,19 @@ void tm1638ByteWrite(char bWrite) {
     }
 }
 
+void bcdTo7Seg(char iBcdIn, char iOffsetFromLeft, char iDotPosition) {
+    char s7SegDisplay = 0;
+    char sDigit = iOffsetFromLeft++;
+    for (sDigit; sDigit == iOffsetFromLeft; sDigit--) {
+        s7SegDisplay = tm1638DisplayNumtoSeg[iBcdIn & 0x0F];
+        if (sDigit == iDotPosition)
+            s7SegDisplay += tm1638Dot;
+        tm1638Data[sDigit] = s7SegDisplay;
+        iBcdIn >>= 4;
+    }
+}
+
+
 /*********************************************************************************************
  tm1638UpdateDisplay()
  Publish the tm1638Data and tm1638LEDs arrays to the display
@@ -219,42 +314,70 @@ void tm1638UpdateDisplay() {
     
     if (!gcDisplayMode && !gcSetMode) {
         // translate DS3231 temperature to digit values
-        tm1638Data[0] = tm1638DisplayNumtoSeg[giDS3231ValueBCD >> 12];
-        tm1638Data[1] = tm1638DisplayNumtoSeg[giDS3231ValueBCD >> 8] + tm1638Dot;
-        tm1638Data[2] = tm1638DisplayNumtoSeg[giDS3231ValueBCD >> 4];
-        tm1638Data[3] = tm1638DisplayNumtoSeg[giDS3231ValueBCD & 0x0F] + tm1638Dot;
+        char iDotPosition = 1;
+        if (gbDS3231IsMinus && (giDS3231ValueBCD & 0xF000)) {
+            // If minus and value less than or equal -10 (checked as >1000), shift the digits right
+            giDS3231ValueBCD >>= 4;
+            iDotPosition = 2;
+        }
+        bcdTo7Seg(giDS3231ValueBCD, 2, 3);
+        bcdTo7Seg(giDS3231ValueBCD >> 8, 0, iDotPosition);
 
         // left fill zeroes with blanks up to the digit before the decimal place
-        if ((giDS3231ValueBCD & 0xF000) == 0) {
+        if (tm1638Data[0] == 0x3f)
             tm1638Data[0] = 0;
-        }
-
-        if (gbDS3231IsMinus) {
-            // If minus and value less than or equal -10 (checked as >1000), shift the digits right
-            if (giDS3231ValueBCD & 0xF000) {
-                tm1638Data[1] = tm1638Data[0];
-                tm1638Data[2] = tm1638Data[1];
-                tm1638Data[3] = tm1638Data[2] + tm1638Dot;
-            }
-            // If minus, overwrite left most digit with minus sign
+        // If minus, overwrite left most digit with minus sign
+        if (gbDS3231IsMinus)
             tm1638Data[0] = 0x40;
-        }
     } else {
-        // Display date DD.YY.
-        if (gBcdDayOfMonth & 0xF0)
-            tm1638Data[0] = tm1638DisplayNumtoSeg[gBcdDayOfMonth >> 4];
-        else
+        if (gcSetMode == 1) {
+            iDigitToFlash = 3;
+            // Display year
+            bcdTo7Seg(0x20, 0, 1); // Display 20 in digits 0 and 1 (+dot on 1)
+            bcdTo7Seg(gBcdYear, 2, 3); // Display year in digits 2 and 3 (+dot on 3)
+        } else if (gcSetMode == 4) {
+            iDigitToFlash = 3;
+            // Display day of week
             tm1638Data[0] = 0;
-        tm1638Data[1] = tm1638DisplayNumtoSeg[gBcdDayOfMonth & 0x0F] + tm1638Dot;
-        tm1638Data[2] = tm1638DisplayNumtoSeg[(gBcdMonth >> 4) & 0x01];
-        tm1638Data[3] = tm1638DisplayNumtoSeg[gBcdMonth & 0x0F] + tm1638Dot;
+            tm1638Data[1] = 0;
+            tm1638Data[2] = 0;
+            tm1638Data[3] = tm1638DisplayNumtoSeg[gDayOfWeek] + tm1638Dot;
+        } else {
+            switch (gcSetMode) {
+                case 2:
+                    iDigitToFlash = 3;
+                    break;
+                case 3:
+                    iDigitToFlash = 1;
+                    break;
+                case 5:
+                    iDigitToFlash = 5;
+                    break;
+                case 6:
+                    iDigitToFlash = 7;
+                    break;
+                default:
+                    iDigitToFlash = 8;
+            }
+            // Display date DD.MM
+            bcdTo7Seg(gBcdDayOfMonth, 0, 1); // Display day of month in digits 0 and 1 (+dot on 1)
+            bcdTo7Seg(gBcdMonth, 2, 3); // Display month in digits 2 and 3 (+dot on 3)
+        }
     }
 
     // HH.MM in last 4 digits of TM1638
-    tm1638Data[4] = tm1638DisplayNumtoSeg[gBcdHour >> 4];
-    tm1638Data[5] = tm1638DisplayNumtoSeg[gBcdHour & 0x0F] + tm1638Dot;
-    tm1638Data[6] = tm1638DisplayNumtoSeg[gBcdMinute >> 4];
-    tm1638Data[7] = tm1638DisplayNumtoSeg[gBcdMinute & 0x0F];
+    bcdTo7Seg(gBcdHour, 4, 5); // Display day of month in digits 4 and 5 (dot on 5)
+    bcdTo7Seg(gBcdMinute, 6, 8); // Display month in digits 6 and 7 (no dot)
+
+    // Light LED for set mode
+    for (char i = 2; i < 8; i++) {
+        if (i == (gcSetMode + 2))
+            tm1638LEDs[i] = 1;
+        else
+            tm1638LEDs[i] = 0;
+    }
+    tm1638LEDs[0] = gbHeaterOn;
+    tm1638LEDs[1] = gbFanOn;
 
     // Write 0x40 [01000000] to indicate command to display data - [Write data to display register]
     tm1638strobe = 0;
@@ -385,10 +508,13 @@ void initialise() {
     intcon.GIE = 1;
     intcon.PEIE = 1;
 
-	i2c_init(1); 
-	//ds3231WriteDateTime();
-	ds3231Init();
+    // Read in variables from EEPROM
+    eepromReadAll(); 
 
+	i2c_init(1); 
+	ds3231Init();
+	ds3231WriteDateTime();
+	ds3231Start();
 }
 
 
@@ -419,6 +545,35 @@ void interrupt() {
     }
 }
 
+int binToBcd(int iBin) {
+    int iBcd = 0; // 16-bit BCD value - only supporting up to 9999
+    int iTest = 32768; // Start testing from MSB
+    // Loop through the 16 bits in the two bytes
+    for (char i = 0; i < 16; i++) {
+        // Shift one
+        iBcd <<= 1;
+        // If the bit is set, add one
+        if (iBin & iTest)
+            iBcd++;
+        
+        // Add 3 to any BCD column 5 or greater
+        if ((iBcd & 0x0F) > 0x04)
+            iBcd += 3;
+        if ((iBcd & 0xF0) > 0x49)
+            iBcd += 0x30;
+        if ((iBcd & 0xF00) > 0x499)
+            iBcd += 0x300;
+        if ((iBcd & 0xF000) > 0x4999)
+            iBcd += 0x3000;
+        
+        // move the test bit
+        iTest >>= 1;
+    }
+
+    return iBcd;
+}
+
+
 /*********************************************************************************************
   displayTemp()
   Used to split the 16 bit integer returned from the ds18b20 into parts for display
@@ -441,14 +596,17 @@ void convertTemp() {
     // Split the temperature reading into digits
     
     // simple way, but more program memory needed for PIC12 or PIC16 (more than 100 words more)
-    //char cDig3 = iValue / 1000;
-    //char cDig2 = (iValue / 100) % 10;
-    //char cDig1 = (iValue / 10) % 10;
-    //char cDig0 = iValue % 10;
+    //giDS3231ValueBCD = iValue / 1000;
+    //giDS3231ValueBCD += (iValue / 100) % 10;
+    //giDS3231ValueBCD += (iValue / 10) % 10;
+    //giDS3231ValueBCD += iValue % 10;
+    
+    // Double Dabble
+    giDS3231ValueBCD = binToBcd(iValue);
     
     // less program memory needed - may be slower executing
     // https://electronics.stackexchange.com/questions/158563/how-to-split-a-floating-point-number-into-individual-digits
-    giDS3231ValueBCD = 0;
+    /*giDS3231ValueBCD = 0;
 
     // incrementing variables for each digit
     // determine to thousands digit
@@ -473,7 +631,7 @@ void convertTemp() {
     }
 
     // the last digit is what's left on iValue
-    giDS3231ValueBCD += iValue;
+    giDS3231ValueBCD += iValue;*/
 }
 
 /*********************************************************************************************
@@ -498,6 +656,78 @@ void readTemp() {
     // This is in the first two bytes - so get those only and ignore the rest
     cTempL = oneWireRxByte();
     cTempH = oneWireRxByte();
+}
+
+/*********************************************************************************************
+  char bcdAdjust(char bcd, char bcdMax, char bcdMin, char iAdjustment)
+  Increment or Decrement a BCD variable for sending to the DS3231, within a given range
+*********************************************************************************************/
+char bcdAdjust(char bcd, char bcdMax, char bcdMin, char iAdjustment) {
+    if (iAdjustment == 1) {
+        // Increment
+        // if at maximum, reset to minimum
+        if (bcd == bcdMax)
+            bcd = bcdMin;
+        else if ((bcd & 0x0F) == 9)
+            bcd += 0x10;
+        else
+            bcd++;
+        return bcd;
+    } else {
+        // Decrement
+        // if at minimum, reset to maximum
+        if (bcd == bcdMin)
+            bcd = bcdMax;
+        else if ((bcd & 0x0F) == 0)
+            bcd -= 0x10;
+        else
+            bcd--;
+        return bcd;
+    }
+}
+
+/*********************************************************************************************
+  adjustDateTime(char iAdjustment)
+  Increment or Decrement a BCD variable for sending to the DS3231, within a given range
+*********************************************************************************************/
+void adjustDateTime(char iAdjustment) {
+    switch (gcSetMode) {
+        case 1:
+            // Setting year
+            gBcdYear = bcdAdjust(gBcdYear, 0x99, 0x00, iAdjustment);
+            break;
+        case 2:
+            // Setting month
+            gBcdMonth = bcdAdjust(gBcdMonth, 0x12, 0x01, iAdjustment);
+            break;
+        case 3:
+            // Setting day of month
+            char iMonth = gBcdDayOfMonth;
+            if (iMonth & 0xF0)
+                iMonth += (gBcdDayOfMonth >> 4);
+            iMonth--; // Make 0 to 11 index based
+            char bcdMaxDay = gDaysInMonth[iMonth]; 
+            // If February, adjust max days for leap years
+            if (iMonth == 1) {
+                for (char i = 0; i < 24; i++) {
+                    if (gLeapYears[i] == gBcdYear) {
+                        bcdMaxDay = 0x29;
+                        break;
+                    }
+                }
+            }
+            gBcdDayOfMonth = bcdAdjust(gBcdDayOfMonth, bcdMaxDay, 0x01, iAdjustment);
+            break;
+        case 4:
+            // Setting day of week
+            gDayOfWeek = bcdAdjust(gDayOfWeek, 0x07, 0x01, iAdjustment);
+        case 5:
+            // Setting hour
+            gBcdHour = bcdAdjust(gBcdHour, 0x23, 0x00, iAdjustment);
+        case 6:
+            // Setting minute
+            gBcdMinute = bcdAdjust(gBcdMinute, 0x59, 0x00, iAdjustment);
+    }
 }
 
 void processKeys() {
@@ -530,9 +760,15 @@ void processKeys() {
             break;
         case 6:
             // Adjust down
+            if (gcSetMode > 0) {
+                adjustDateTime(0);
+            }
             break;
         case 7:
             // Adjust up
+            if (gcSetMode > 0) {
+                adjustDateTime(1);
+            }
             break;
         case 8:
             // Timer

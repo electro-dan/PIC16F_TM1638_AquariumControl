@@ -3,14 +3,15 @@ Active Compiler=BoostC
 Target=PIC16F628A
 Active Directory=Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\
 Active Config=Debug
-Last Ext=h
+Last Ext=casm
 Config=1
 [Files]
 PIC16F_TM1638_AquariumControl.c
-Count=2
+Count=3
 PIC16F_TM1638_AquariumControl.h
-File0=PIC16F_TM1638_AquariumControl.c
-File1=PIC16F_TM1638_AquariumControl.h
+File0=Debug\PIC16F_TM1638_AquariumControl.casm
+File1=PIC16F_TM1638_AquariumControl.c
+File2=PIC16F_TM1638_AquariumControl.h
 [Plugins]
 Speed Tester=6B094201040000004E6F6E65
 Led Block=706F727462000000000000000000

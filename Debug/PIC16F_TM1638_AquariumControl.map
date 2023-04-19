@@ -17,32 +17,40 @@ Address  Length   Unique Name      Name
 00000004:0000000C _interruptVector _interruptVector  
 00000010:0000000A delay_us_00000   delay_us(unsigned char)  
 0000001A:0000000A delay_10us_00000 delay_10us(unsigned char)  
-00000024:00000051 i2c_WRITE_00000  i2c_WRITE(unsigned char)  
-00000075:00000030 i2c_STOP_00000   i2c_STOP(void)  
-000000A5:00000035 i2c_START_00000  i2c_START(void)  
-000000DA:0000001C oneWireTxB_00016 oneWireTxByte(unsigned char)  
-000000F6:0000000C ds3231Writ_00019 ds3231Write(unsigned char,unsigned char)  
-00000102:00000013 tm1638Byte_0001D tm1638ByteWrite(unsigned char)  
-00000115:00000007 oneWireTxB_00017 oneWireTxBytes(unsigned char,unsigned char)  
-0000011C:0000001E oneWireRxB_00018 oneWireRxByte(void)  
-0000013A:00000054 i2c_READ_00000   i2c_READ(unsigned char)  
-0000018E:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
-000001A1:0000001C ds3231Writ_0001B ds3231WriteDateTime(void)  
-000001BD:0000000D ds3231Init_00000 ds3231Init(void)  
-000001CA:0000002B __mul_16s__0000F __mul_16s_16s__16(signed short,signed short)  
-000001F5:000000C8 tm1638Upda_0001E tm1638UpdateDisplay(void)  
-000002BD:00000024 tm1638Read_0001F tm1638ReadKeys(void)  
-000002E1:00000008 startTemp_00000  startTemp(void)  
-000002E9:0000000E readTemp_00000   readTemp(void)  
-000002F7:00000042 processKey_00021 processKeys(void)  
-00000339:00000018 oneWireBus_00015 oneWireBusReset(void)  
-00000351:00000029 initialise_00000 initialise(void)  
-0000037A:0000002A ds3231Read_0001C ds3231ReadDateTime(void)  
-000003A4:00000071 convertTem_00022 convertTemp(void)  
-00000415:0000002F main             main(void)  
-00000444:0000005C _startup_00000   _startup(void)  
-000004A0:0000001D interrupt        interrupt(void)  
-000004BD:00000343 *Unused Block 
+00000024:00000053 __rom_get_00000  __rom_get(unsigned char,unsigned char)  
+00000077:00000051 i2c_WRITE_00000  i2c_WRITE(unsigned char)  
+000000C8:00000030 i2c_STOP_00000   i2c_STOP(void)  
+000000F8:00000035 i2c_START_00000  i2c_START(void)  
+0000012D:0000001C oneWireTxB_00014 oneWireTxByte(unsigned char)  
+00000149:00000008 eepromRead_00000 eepromRead(unsigned char)  
+00000151:0000000C ds3231Writ_0001A ds3231Write(unsigned char,unsigned char)  
+0000015D:0000002C bcdAdjust_00000  bcdAdjust(unsigned char,unsigned char,unsigned char,unsigned char)  
+00000189:00000013 tm1638Byte_0001E tm1638ByteWrite(unsigned char)  
+0000019C:00000007 oneWireTxB_00015 oneWireTxBytes(unsigned char,unsigned char)  
+000001A3:0000001E oneWireRxB_00016 oneWireRxByte(void)  
+000001C1:00000054 i2c_READ_00000   i2c_READ(unsigned char)  
+00000215:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
+00000228:00000045 eepromRead_00019 eepromReadAll(void)  
+0000026D:0000001C ds3231Writ_0001C ds3231WriteDateTime(void)  
+00000289:00000007 ds3231Star_0001B ds3231Start(void)  
+00000290:0000000D ds3231Init_00000 ds3231Init(void)  
+0000029D:00000064 binToBcd_00000   binToBcd(signed short)  
+00000301:00000023 bcdTo7Seg_00000  bcdTo7Seg(unsigned char,unsigned char,unsigned char)  
+00000324:00000084 adjustDate_00023 adjustDateTime(unsigned char)  
+000003A8:0000002B __mul_16s__0000F __mul_16s_16s__16(signed short,signed short)  
+000003D3:000000E7 tm1638Upda_00020 tm1638UpdateDisplay(void)  
+000004BA:00000024 tm1638Read_00021 tm1638ReadKeys(void)  
+000004DE:00000008 startTemp_00000  startTemp(void)  
+000004E6:0000000E readTemp_00000   readTemp(void)  
+000004F4:00000051 processKey_00024 processKeys(void)  
+00000545:00000018 oneWireBus_00013 oneWireBusReset(void)  
+0000055D:0000002C initialise_00000 initialise(void)  
+00000589:0000002A ds3231Read_0001D ds3231ReadDateTime(void)  
+000005B3:00000038 convertTem_00025 convertTemp(void)  
+000005EB:0000002F main             main(void)  
+0000061A:0000005A _startup_00000   _startup(void)  
+00000674:0000001D interrupt        interrupt(void)  
+00000691:0000016F *Unused Block 
 
 Register usage
 ==============
@@ -71,11 +79,21 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 00000019:00000008             gbl_txreg                        txreg
 0000001A:00000008             gbl_rcreg                        rcreg
 0000001F:00000008             gbl_cmcon                        cmcon
-00000020:00000050             gbl_tm1638DisplayNumtoSeg        tm1638DisplayNumtoSeg
-0000002A:00000040             gbl_tm1638Data                   tm1638Data
-00000032:00000040             gbl_tm1638LEDs                   tm1638LEDs
-0000003A:00000020             gbl_tm1638TherData               tm1638TherData
-0000003E:00000010             gbl_giDS3231ValueBCD             giDS3231ValueBCD
+00000020:00000040             gbl_tm1638Data                   tm1638Data
+00000028:00000040             gbl_tm1638LEDs                   tm1638LEDs
+00000030:00000018             Int1BContext                     Int1BContext
+00000033:00000010             gbl_giDS3231ValueBCD             giDS3231ValueBCD
+00000035:00000008             gbl_gBcdSeconds                  gBcdSeconds
+00000036:00000008             gbl_gBcdMinute                   gBcdMinute
+00000037:00000008             gbl_gBcdHour                     gBcdHour
+00000038:00000008             gbl_gDayOfWeek                   gDayOfWeek
+00000039:00000008             gbl_gBcdDayOfMonth               gBcdDayOfMonth
+0000003A:00000008             gbl_gBcdMonth                    gBcdMonth
+0000003B:00000008             gbl_gBcdYear                     gBcdYear
+0000003C:00000008             gbl_gDaysInMonth                 gDaysInMonth
+0000003D:00000008             gbl_gLeapYears                   gLeapYears
+0000003E:00000008             gbl_iTimer2Counts                iTimer2Counts
+0000003F:00000008             gbl_iFlashDigitOff               iFlashDigitOff
 00000040:00000001  0b00100000 i2c_INIT_00000_1_l_sspen         l_sspen
 00000041:00000008             i2c_INIT_00000_1_i2c_SSPCON2     i2c_SSPCON2
 00000042:00000001  0b10000000 i2c_INIT_00000_1_l_smp           l_smp
@@ -83,46 +101,59 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 00000044:00000008             i2c_READ_00000_1_i2c_SSPBUF      i2c_SSPBUF
 00000045:00000001  0b00001000 i2c_INIT_00000_1_l_sspif         l_sspif
 00000046:00000001  0b00001000 i2c_INIT_00000_1_l_bclif         l_bclif
-00000048:00000018             Int1BContext                     Int1BContext
-0000004B:00000008             gbl_gBcdSeconds                  gBcdSeconds
-0000004C:00000008             gbl_gBcdMinute                   gBcdMinute
-0000004D:00000008             gbl_gBcdHour                     gBcdHour
-0000004E:00000008             gbl_gDayOfWeek                   gDayOfWeek
-0000004F:00000008             gbl_gBcdDayOfMonth               gBcdDayOfMonth
-00000050:00000008             gbl_gBcdMonth                    gBcdMonth
-00000051:00000008             gbl_gBcdYear                     gBcdYear
-00000052:00000008             gbl_iTimer2Counts                iTimer2Counts
-00000053:00000008             gbl_iFlashDigitOff               iFlashDigitOff
-00000054:00000008             gbl_iDigitToFlash                iDigitToFlash
-00000055:00000008             gbl_cTempH                       cTempH
-00000056:00000008             gbl_cTempL                       cTempL
-00000057:00000008             gbl_iDecimalPosition             iDecimalPosition
-00000058:00000008             gbl_oneWireIsPresent             oneWireIsPresent
-00000059:00000008             gbl_oneWireResetStage            oneWireResetStage
-0000005A:00000008             gbl_gbDS3231IsMinus              gbDS3231IsMinus
-0000005B:00000008             gbl_cTask                        cTask
-0000005C:00000001  0b00010000 gbl_gbFlashOff                   gbFlashOff
-0000005D:00000008             gbl_gcDisplayMode                gcDisplayMode
-0000005E:00000008             gbl_gcSetMode                    gcSetMode
-0000005F:00000008             gbl_tm1638MaxDigits              tm1638MaxDigits
-00000060:00000008             gbl_tm1638Dot                    tm1638Dot
-00000061:00000008             gbl_tm1638Brightness             tm1638Brightness
-00000062:00000008             gbl_tm1638ByteSetData            tm1638ByteSetData
-00000063:00000008             gbl_tm1638ByteReadData           tm1638ByteReadData
-00000064:00000008             gbl_tm1638ByteSetAddr            tm1638ByteSetAddr
-00000065:00000008             gbl_tm1638ByteSetOn              tm1638ByteSetOn
-00000066:00000008             gbl_tm1638Keys                   tm1638Keys
-00000067:00000010             convertTem_00022_1_iTemp         iTemp
-00000068:00000008             i2c_READ_00000_1_BitMask         BitMask
-00000069:00000010             convertTem_00022_1_iValue        iValue
-0000006A:00000008             i2c_WRITE_00000_1_BitMask        BitMask
-0000006B:00000008             CompTempVar611                  
-0000006C:00000008             delay_10us_00000_arg_del         del
-0000006D:00000008             CompTempVar627                  
-0000006F:00000010             __mul_16s__0000F_arg_b           b
-00000071:00000008             __mul_16s__0000F_1_i             i
-00000072:00000010             __mul_16s__0000F_1_t             t
-00000074:00000010             CompTempVarRet386                $ret
+00000048:00000008             gbl_iDigitToFlash                iDigitToFlash
+00000049:00000008             gbl_cTempH                       cTempH
+0000004A:00000008             gbl_cTempL                       cTempL
+0000004B:00000008             gbl_iDecimalPosition             iDecimalPosition
+0000004C:00000008             gbl_gbDS3231IsMinus              gbDS3231IsMinus
+0000004D:00000008             gbl_cTask                        cTask
+0000004E:00000001  0b00010000 gbl_gbFlashOff                   gbFlashOff
+0000004F:00000008             gbl_gcDisplayMode                gcDisplayMode
+00000050:00000008             gbl_gcSetMode                    gcSetMode
+00000051:00000008             gbl_gBcdWhiteOnMinute            gBcdWhiteOnMinute
+00000052:00000008             gbl_gBcdWhiteOnHour              gBcdWhiteOnHour
+00000053:00000008             gbl_gBcdWhiteOffMinute           gBcdWhiteOffMinute
+00000054:00000008             gbl_gBcdWhiteOffHour             gBcdWhiteOffHour
+00000055:00000008             gbl_gBcdBlueOnMinute             gBcdBlueOnMinute
+00000056:00000008             gbl_gBcdBlueOnHour               gBcdBlueOnHour
+00000057:00000008             gbl_gBcdBlueOffMinute            gBcdBlueOffMinute
+00000058:00000008             gbl_gBcdBlueOffHour              gBcdBlueOffHour
+00000059:00000008             gbl_gFanOnTemp                   gFanOnTemp
+0000005A:00000008             gbl_gFanOffTemp                  gFanOffTemp
+0000005B:00000008             gbl_gHeaterOnTemp                gHeaterOnTemp
+0000005C:00000008             gbl_gHeaterOffTemp               gHeaterOffTemp
+0000005D:00000008             gbl_tm1638MaxDigits              tm1638MaxDigits
+0000005E:00000008             gbl_tm1638DisplayNumtoSeg        tm1638DisplayNumtoSeg
+0000005F:00000008             gbl_tm1638Dot                    tm1638Dot
+00000060:00000008             gbl_tm1638Brightness             tm1638Brightness
+00000061:00000008             gbl_tm1638ByteSetData            tm1638ByteSetData
+00000062:00000008             gbl_tm1638ByteReadData           tm1638ByteReadData
+00000063:00000008             gbl_tm1638ByteSetAddr            tm1638ByteSetAddr
+00000064:00000008             gbl_tm1638ByteSetOn              tm1638ByteSetOn
+00000065:00000008             gbl_tm1638Keys                   tm1638Keys
+00000066:00000008             gbl_oneWireIsPresent             oneWireIsPresent
+00000067:00000008             gbl_oneWireResetStage            oneWireResetStage
+00000068:00000010             convertTem_00025_1_iTemp         iTemp
+00000069:00000008             i2c_READ_00000_1_BitMask         BitMask
+0000006A:00000010             convertTem_00025_1_iValue        iValue
+0000006B:00000008             i2c_WRITE_00000_1_BitMask        BitMask
+0000006C:00000008             CompTempVar597                  
+0000006D:00000008             delay_10us_00000_arg_del         del
+0000006E:00000008             bcdAdjust_00000_arg_iAdjustment  iAdjustment
+0000006F:00000008             CompTempVar587                  
+00000070:00000008             __rom_get_00000_arg_objNumb      objNumb
+00000071:00000008             __rom_get_00000_arg_idx          idx
+00000072:00000010             __rom_get_00000_1_romAddr        romAddr
+00000073:00000010             __mul_16s__0000F_1_t             t
+00000074:00000008             binToBcd_00000_2_i               i
+00000075:00000008             CompTempVar577                  
+00000076:00000008             CompTempVar578                  
+00000077:00000008             CompTempVar579                  
+00000078:00000008             CompTempVar580                  
+00000079:00000008             CompTempVar581                  
+0000007A:00000008             CompTempVar582                  
+0000007B:00000008             CompTempVar583                  
+0000007C:00000008             CompTempVar584                  
 0000007F:00000008             Int1Context                      Int1Context
 00000081:00000008             gbl_option_reg                   option_reg
 00000085:00000001  0b00001000 i2c_INIT_00000_1_l_sda_tris      l_sda_tris
@@ -141,6 +172,6 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 
 Memory Usage Report
 ===================
-RAM available:224 bytes, used:87 bytes (38.9%), free:137 bytes (61.1%), 
-Heap size:137 bytes, Heap max single alloc:79 bytes
-ROM available:2048 words, used:1213 words (59.3%), free:835 words (40.7%)
+RAM available:224 bytes, used:94 bytes (42.0%), free:130 bytes (58.0%), 
+Heap size:128 bytes, Heap max single alloc:79 bytes
+ROM available:2048 words, used:1681 words (82.1%), free:367 words (17.9%)

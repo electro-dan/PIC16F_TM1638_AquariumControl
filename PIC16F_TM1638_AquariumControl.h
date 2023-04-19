@@ -54,31 +54,19 @@ char gBcdHour = 0; // 0 to 23 or 1 to 12. Also contains 12/24 setting at bit 6. 
 char gDayOfWeek = 1; // 1 to 7
 char gBcdDayOfMonth = 1; // 1 to 31
 char gBcdMonth = 1; // 1 to 12 + century at bit 7
-char gBcdYear = 0x23; // Init to 2023
+char gBcdYear = 0x23; // Init to 0x23
+rom char *gDaysInMonth = {0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31}; // Days in each month
+rom char *gLeapYears = {0x04, 0x08, 0x12, 0x16, 0x20, 0x24, 0x28, 0x32, 0x36, 0x40, 0x44, 0x48, 0x52, 0x56, 0x60, 0x64, 0x68, 0x72, 0x76, 0x80, 0x84, 0x88, 0x92, 0x96}; // List of leap years
 
 // Timer variables
 char iTimer2Counts = 0;
 char iFlashDigitOff = 0;
 char iDigitToFlash = 8; // 8 = no digit to flash
 
-// Hold the upper and lower bytes from the ds18b20
+// Hold the upper and lower bytes from the ds18b0x
 char cTempH = 0;
 char cTempL = 0;
 char iDecimalPosition = 2;
-
-char oneWireIsPresent = 0;
-char oneWireResetStage = 0;
-void oneWireBusReset();
-void oneWireTxByte(char data);
-void oneWireTxBytes(char data, char data2);
-char oneWireRxByte();
-
-void ds3231Write(char ds3231Reg, char bWrite);
-void ds3231Init();
-void ds3231Start();
-void ds3231Stop();
-void ds3231WriteDateTime();
-void ds3231ReadDateTime();
 
 int giDS3231ValueBCD = 0;
 char gbDS3231IsMinus = 0;
@@ -92,9 +80,25 @@ bool gbFlashOff = 0;
 char gcDisplayMode = 0;
 char gcSetMode = 0;
 
+char gBcdWhiteOnMinute = 0; // 0 to 59
+char gBcdWhiteOnHour = 0; // 0 to 23
+char gBcdWhiteOffMinute = 0; // 0 to 59
+char gBcdWhiteOffHour = 0; // 0 to 23
+
+char gBcdBlueOnMinute = 0; // 0 to 59
+char gBcdBlueOnHour = 0; // 0 to 23
+char gBcdBlueOffMinute = 0; // 0 to 59
+char gBcdBlueOffHour = 0; // 0 to 23
+
+char gFanOnTemp = 28; // Degrees C
+char gFanOffTemp = 27; // Degrees C
+
+char gHeaterOnTemp = 24; // Degrees C
+char gHeaterOffTemp = 25; // Degrees C
+
 // Used to output the segments from numbers
 char tm1638MaxDigits = 8;
-char tm1638DisplayNumtoSeg[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f};
+rom char *tm1638DisplayNumtoSeg = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f};
 char tm1638Dot = 0x80;
 char tm1638Brightness = 7; // 0 to 7
 // 0x40 [01000000] = indicate command to display data
@@ -112,17 +116,42 @@ char tm1638Data[] = {0, 0, 0, 0, 0, 0, 0, 0};
 char tm1638LEDs[] = {0, 0, 0, 0, 0, 0, 0, 0};
 // Copy of the keys
 char tm1638Keys = 0;
-// Copy of translated temperature data
-char tm1638TherData[] = {0, 0, 0, 0};
 
+// DS18B20 functions
+char oneWireIsPresent = 0;
+char oneWireResetStage = 0;
+void oneWireBusReset();
+void oneWireTxByte(char data);
+void oneWireTxBytes(char data, char data2);
+char oneWireRxByte();
+
+// EEPROM functions
+void eepromWriteAll();
+char eepromWrite(char address, char data);
+void eepromReadAll();
+char eepromRead(char address);
+
+// DS3231 functions
+void ds3231Write(char ds3231Reg, char bWrite);
+void ds3231Init();
+void ds3231Start();
+void ds3231Stop();
+void ds3231WriteDateTime();
+void ds3231ReadDateTime();
+
+// TM1638 functions
 void tm1638ByteWrite(char bWrite);
+void bcdTo7Seg(char iBcdIn, char iOffsetFromLeft, char iDotPosition);
 void tm1638UpdateDisplay();
 void tm1638ReadKeys();
 
-void displayTemp();
-void storeTempDigits4(int iValue);
+// General functions
+int binToBcd(int iBin);
 void startTemp();
 void readTemp();
+
+char bcdAdjust(char bcd, char bcdMax, char bcdMin, char iAdjustment);
+void adjustDateTime(char iAdjustment);
 void processKeys();
 
 #endif
