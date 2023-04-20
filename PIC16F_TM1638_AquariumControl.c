@@ -22,10 +22,10 @@ void eepromWriteAll() {
     didWrite += eepromWrite(6, gBcdBlueOnHour);
     didWrite += eepromWrite(7, gBcdBlueOffMinute);
     didWrite += eepromWrite(8, gBcdBlueOffHour);
-    didWrite += eepromWrite(9, gFanOnTemp);
-    didWrite += eepromWrite(10, gFanOffTemp);
-    didWrite += eepromWrite(11, gHeaterOnTemp);
-    didWrite += eepromWrite(12, gHeaterOffTemp);
+    didWrite += eepromWrite(9, gBcdFanOnTemp);
+    didWrite += eepromWrite(10, gBcdFanOffTemp);
+    didWrite += eepromWrite(11, gBcdHeaterOnTemp);
+    didWrite += eepromWrite(12, gBcdHeaterOffTemp);
     
     if (didWrite)
         eepromWrite(0, 10); // To indicate EEPROM has been saved
@@ -72,10 +72,10 @@ void eepromReadAll() {
         gBcdBlueOnHour = eepromRead(6);
         gBcdBlueOffMinute = eepromRead(7);
         gBcdBlueOffHour = eepromRead(8);
-        gFanOnTemp = eepromRead(9);
-        gFanOffTemp = eepromRead(10);
-        gHeaterOnTemp = eepromRead(11);
-        gHeaterOffTemp = eepromRead(12);
+        gBcdFanOnTemp = eepromRead(9);
+        gBcdFanOffTemp = eepromRead(10);
+        gBcdHeaterOnTemp = eepromRead(11);
+        gBcdHeaterOffTemp = eepromRead(12);
     }
 }
 
@@ -293,16 +293,19 @@ void tm1638ByteWrite(char bWrite) {
     }
 }
 
-void bcdTo7Seg(char iBcdIn, char iOffsetFromLeft, char iDotPosition) {
+void bcdTo7Seg(char iBcdIn) {
     char s7SegDisplay = 0;
-    char sDigit = iOffsetFromLeft++;
-    for (sDigit; sDigit == iOffsetFromLeft; sDigit--) {
+    iPrintStartDigit++; // Increment to last digit
+    char sDigit = iPrintStartDigit;
+    // Work backwards
+    for (sDigit; sDigit == iPrintStartDigit - 1; sDigit--) {
         s7SegDisplay = tm1638DisplayNumtoSeg[iBcdIn & 0x0F];
-        if (sDigit == iDotPosition)
+        if (sDigit == iPrintDotDigit)
             s7SegDisplay += tm1638Dot;
         tm1638Data[sDigit] = s7SegDisplay;
         iBcdIn >>= 4;
     }
+    iPrintStartDigit++; // Increment to next digit
 }
 
 
@@ -312,36 +315,136 @@ void bcdTo7Seg(char iBcdIn, char iOffsetFromLeft, char iDotPosition) {
 *********************************************************************************************/
 void tm1638UpdateDisplay() {
     
-    if (!gcDisplayMode && !gcSetMode) {
-        // translate DS3231 temperature to digit values
-        char iDotPosition = 1;
-        if (gbDS3231IsMinus && (giDS3231ValueBCD & 0xF000)) {
-            // If minus and value less than or equal -10 (checked as >1000), shift the digits right
-            giDS3231ValueBCD >>= 4;
-            iDotPosition = 2;
-        }
-        bcdTo7Seg(giDS3231ValueBCD, 2, 3);
-        bcdTo7Seg(giDS3231ValueBCD >> 8, 0, iDotPosition);
-
-        // left fill zeroes with blanks up to the digit before the decimal place
-        if (tm1638Data[0] == 0x3f)
-            tm1638Data[0] = 0;
-        // If minus, overwrite left most digit with minus sign
-        if (gbDS3231IsMinus)
-            tm1638Data[0] = 0x40;
-    } else {
+    // Display current temperature unless set, trigger or alt display mode is active
+    if (gcDisplayMode | gcSetMode | gcTriggerMode) {
         if (gcSetMode == 1) {
             iDigitToFlash = 3;
             // Display year
-            bcdTo7Seg(0x20, 0, 1); // Display 20 in digits 0 and 1 (+dot on 1)
-            bcdTo7Seg(gBcdYear, 2, 3); // Display year in digits 2 and 3 (+dot on 3)
+            // Start printing from digit 0
+            iPrintStartDigit = 0;
+            iPrintDotDigit = 1;
+            bcdTo7Seg(0x20); // Display 20 in digits 0 and 1 (+dot on 1)
+            iPrintDotDigit = 3;
+            bcdTo7Seg(gBcdYear); // Display year in digits 2 and 3 (+dot on 3)
         } else if (gcSetMode == 4) {
             iDigitToFlash = 3;
             // Display day of week
-            tm1638Data[0] = 0;
-            tm1638Data[1] = 0;
-            tm1638Data[2] = 0;
+            tm1638Data[0] = 0x5E; // d
+            tm1638Data[1] = 0x5F; // a
+            tm1638Data[2] = 0x6E; // y
             tm1638Data[3] = tm1638DisplayNumtoSeg[gDayOfWeek] + tm1638Dot;
+        } else if (gcTriggerMode) {
+            iPrintDotDigit = 5;
+            switch (gcTriggerMode) {
+                case 1:
+                    // White LED on hour
+                    tm1638Data[0] = 0x38; // L
+                    tm1638Data[1] = 0x30; // I
+                    tm1638Data[2] = 0x3f; // O
+                    tm1638Data[3] = 0x54; // n
+                    iDigitToFlash = 5;
+                    // Start printing from digit 4
+                    iPrintStartDigit = 4;
+                    bcdTo7Seg(gBcdWhiteOnHour); // Display hour in digits 4 and 5 (dot on 5)
+                    bcdTo7Seg(gBcdWhiteOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 2:
+                    // White LED on minute
+                    iDigitToFlash = 7;
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdWhiteOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 3:
+                    // White LED off hour
+                    tm1638Data[3] = 0x71; // F
+                    iDigitToFlash = 5;
+                    // Start printing from digit 4
+                    iPrintStartDigit = 4;
+                    bcdTo7Seg(gBcdWhiteOffHour); 
+                    bcdTo7Seg(gBcdWhiteOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 4:
+                    // White LED off minute
+                    iDigitToFlash = 7;
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdWhiteOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 5:
+                    // Blue LED on hour
+                    tm1638Data[0] = 0x7C; // b
+                    //tm1638Data[1] = 0x30; // l
+                    //tm1638Data[2] = 0x3f; // O
+                    tm1638Data[3] = 0x54; // n
+                    iDigitToFlash = 5;
+                    // Start printing from digit 4
+                    iPrintStartDigit = 4;
+                    bcdTo7Seg(gBcdBlueOnHour); // Display hour in digits 4 and 5 (dot on 5)
+                    bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 6:
+                    // Blue LED on minute
+                    iDigitToFlash = 7;
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 7:
+                    // Blue LED off hour
+                    tm1638Data[3] = 0x71; // F
+                    iDigitToFlash = 5;
+                    // Start printing from digit 4
+                    iPrintStartDigit = 4;
+                    bcdTo7Seg(gBcdBlueOffHour); // Display hour in digits 4 and 5 (dot on 5)
+                    bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 8:
+                    // Blue LED off minute
+                    iDigitToFlash = 7;
+                    bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 9:
+                    // Fan on temperature
+                    tm1638Data[0] = 0x38; // F
+                    tm1638Data[1] = 0x30; // a
+                    tm1638Data[2] = 0x54; // n
+                    tm1638Data[3] = 0x00; // 
+                    tm1638Data[4] = 0x3f; // O
+                    tm1638Data[5] = 0x54; // n
+                    iDigitToFlash = 7;
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdFanOnTemp); // Display celcius in digits 6 and 7 (no dot)
+                    break;
+                case 10:
+                    // Fan off temperature
+                    tm1638Data[5] = 0x71; // f
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdFanOffTemp); // Display celcius in digits 6 and 7 (no dot)
+                    break;
+                case 11:
+                    // Heater on temperature
+                    tm1638Data[0] = 0x38; // H
+                    tm1638Data[1] = 0x7B; // e
+                    tm1638Data[2] = 0x30; // a
+                    tm1638Data[3] = 0x78; // t
+                    tm1638Data[4] = 0x3f; // O
+                    tm1638Data[5] = 0x54; // n
+                    iDigitToFlash = 7;
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdHeaterOnTemp); // Display celcius in digits 6 and 7 (no dot)
+                    break;
+                case 12:
+                    // Heater off temperature
+                    tm1638Data[5] = 0x71; // f
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdHeaterOffTemp); // Display celcius in digits 6 and 7 (no dot)
+                    break;
+            }
         } else {
             switch (gcSetMode) {
                 case 2:
@@ -360,24 +463,53 @@ void tm1638UpdateDisplay() {
                     iDigitToFlash = 8;
             }
             // Display date DD.MM
-            bcdTo7Seg(gBcdDayOfMonth, 0, 1); // Display day of month in digits 0 and 1 (+dot on 1)
-            bcdTo7Seg(gBcdMonth, 2, 3); // Display month in digits 2 and 3 (+dot on 3)
+            iPrintStartDigit = 0;
+            iPrintDotDigit = 1;
+            bcdTo7Seg(gBcdDayOfMonth); // Display day of month in digits 0 and 1 (+dot on 1)
+            iPrintDotDigit = 3;
+            bcdTo7Seg(gBcdMonth); // Display month in digits 2 and 3 (+dot on 3)
         }
+    } else {
+        // translate DS3231 temperature to digit values
+        iPrintDotDigit = 1;
+        /*
+        No support for -10 or below - aquarium should never get that cold!
+        if (gbDS3231IsMinus && (giDS3231ValueBCD & 0xF000)) {
+            // If minus and value less than or equal -10 (checked as >1000), shift the digits right
+            giDS3231ValueBCD >>= 4;
+            iPrintDotDigit = 2;
+        }*/
+        // Display current temperature in digits 0 to 3 (+dot on 1, or 2 if <=-10)
+        iPrintStartDigit = 0;
+        bcdTo7Seg(giDS3231ValueBCD);
+        bcdTo7Seg(giDS3231ValueBCD >> 8);
+
+        // left fill zeroes with blanks up to the digit before the decimal place
+        if (tm1638Data[0] == 0x3f)
+            tm1638Data[0] = 0;
+        // If minus, overwrite left most digit with minus sign
+        if (gbDS3231IsMinus)
+            tm1638Data[0] = 0x40;
     }
 
     // HH.MM in last 4 digits of TM1638
-    bcdTo7Seg(gBcdHour, 4, 5); // Display day of month in digits 4 and 5 (dot on 5)
-    bcdTo7Seg(gBcdMinute, 6, 8); // Display month in digits 6 and 7 (no dot)
+    if (!gcTriggerMode) {
+        iPrintStartDigit = 4;
+        iPrintDotDigit = 5;
+        bcdTo7Seg(gBcdHour); // Display hour in digits 4 and 5 (dot on 5)
+        bcdTo7Seg(gBcdMinute); // Display minute in digits 6 and 7 (no dot)
+    }
 
     // Light LED for set mode
+    char cCompareSetMode = gcSetMode + 2;
     for (char i = 2; i < 8; i++) {
-        if (i == (gcSetMode + 2))
+        if (i == cCompareSetMode)
             tm1638LEDs[i] = 1;
         else
             tm1638LEDs[i] = 0;
     }
-    tm1638LEDs[0] = gbHeaterOn;
-    tm1638LEDs[1] = gbFanOn;
+    tm1638LEDs[0] = HEATER;
+    tm1638LEDs[1] = FAN;
 
     // Write 0x40 [01000000] to indicate command to display data - [Write data to display register]
     tm1638strobe = 0;
@@ -659,11 +791,12 @@ void readTemp() {
 }
 
 /*********************************************************************************************
-  char bcdAdjust(char bcd, char bcdMax, char bcdMin, char iAdjustment)
+  char bcdAdjust(char bcd, char bcdMax, char bcdMin)
   Increment or Decrement a BCD variable for sending to the DS3231, within a given range
+  Must set iBcdAdjustment first
 *********************************************************************************************/
-char bcdAdjust(char bcd, char bcdMax, char bcdMin, char iAdjustment) {
-    if (iAdjustment == 1) {
+char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
+    if (iBcdAdjustment == 1) {
         // Increment
         // if at maximum, reset to minimum
         if (bcd == bcdMax)
@@ -672,7 +805,6 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin, char iAdjustment) {
             bcd += 0x10;
         else
             bcd++;
-        return bcd;
     } else {
         // Decrement
         // if at minimum, reset to maximum
@@ -682,33 +814,35 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin, char iAdjustment) {
             bcd -= 0x10;
         else
             bcd--;
-        return bcd;
     }
+    return bcd;
 }
 
 /*********************************************************************************************
-  adjustDateTime(char iAdjustment)
+  adjustDateTime()
   Increment or Decrement a BCD variable for sending to the DS3231, within a given range
+  Must set iBcdAdjustment first
 *********************************************************************************************/
-void adjustDateTime(char iAdjustment) {
+void adjustDateTime() {
     switch (gcSetMode) {
         case 1:
             // Setting year
-            gBcdYear = bcdAdjust(gBcdYear, 0x99, 0x00, iAdjustment);
+            gBcdYear = bcdAdjust(gBcdYear, 0x99, 0x00);
             break;
         case 2:
             // Setting month
-            gBcdMonth = bcdAdjust(gBcdMonth, 0x12, 0x01, iAdjustment);
+            gBcdMonth = bcdAdjust(gBcdMonth, 0x12, 0x01);
             break;
         case 3:
             // Setting day of month
-            char iMonth = gBcdDayOfMonth;
+            char iMonth = gBcdMonth;
             if (iMonth & 0xF0)
-                iMonth += (gBcdDayOfMonth >> 4);
+                iMonth += (gBcdMonth >> 4);
             iMonth--; // Make 0 to 11 index based
             char bcdMaxDay = gDaysInMonth[iMonth]; 
             // If February, adjust max days for leap years
             if (iMonth == 1) {
+                // See if the 24 leap years since 2000 match the current year
                 for (char i = 0; i < 24; i++) {
                     if (gLeapYears[i] == gBcdYear) {
                         bcdMaxDay = 0x29;
@@ -716,17 +850,75 @@ void adjustDateTime(char iAdjustment) {
                     }
                 }
             }
-            gBcdDayOfMonth = bcdAdjust(gBcdDayOfMonth, bcdMaxDay, 0x01, iAdjustment);
+            gBcdDayOfMonth = bcdAdjust(gBcdDayOfMonth, bcdMaxDay, 0x01);
             break;
         case 4:
             // Setting day of week
-            gDayOfWeek = bcdAdjust(gDayOfWeek, 0x07, 0x01, iAdjustment);
+            gDayOfWeek = bcdAdjust(gDayOfWeek, 0x07, 0x01);
         case 5:
             // Setting hour
-            gBcdHour = bcdAdjust(gBcdHour, 0x23, 0x00, iAdjustment);
+            gBcdHour = bcdAdjust(gBcdHour, 0x23, 0x00);
         case 6:
             // Setting minute
-            gBcdMinute = bcdAdjust(gBcdMinute, 0x59, 0x00, iAdjustment);
+            gBcdMinute = bcdAdjust(gBcdMinute, 0x59, 0x00);
+    }
+}
+
+/*********************************************************************************************
+  adjustTrigger()
+  Increment or Decrement a trigger time or temperate
+  Must set iBcdAdjustment first
+*********************************************************************************************/
+void adjustTrigger() {
+    switch (gcTriggerMode) {
+        case 1:
+            // White LED on hour
+            gBcdWhiteOnHour = bcdAdjust(gBcdWhiteOnHour, 0x23, 0x00);
+            break;
+        case 2:
+            // White LED on minute
+            gBcdWhiteOnMinute = bcdAdjust(gBcdWhiteOnMinute, 0x59, 0x00);
+            break;
+        case 3:
+            // White LED off hour
+            gBcdWhiteOffHour = bcdAdjust(gBcdWhiteOffHour, 0x23, 0x00);
+            break;
+        case 4:
+            // White LED off minute
+            gBcdWhiteOffMinute = bcdAdjust(gBcdWhiteOffMinute, 0x59, 0x00);
+            break;
+        case 5:
+            // Blue LED on hour
+            gBcdBlueOnHour = bcdAdjust(gBcdBlueOnHour, 0x23, 0x00);
+            break;
+        case 6:
+            // Blue LED on minute
+            gBcdBlueOnMinute = bcdAdjust(gBcdBlueOnMinute, 0x59, 0x00);
+            break;
+        case 7:
+            // Blue LED off hour
+            gBcdBlueOffHour = bcdAdjust(gBcdBlueOffHour, 0x23, 0x00);
+            break;
+        case 8:
+            // Blue LED off minute
+            gBcdBlueOffMinute = bcdAdjust(gBcdBlueOffMinute, 0x59, 0x00);
+            break;
+        case 9:
+            // Fan on temp - between 20 and 40 degrees C
+            gBcdFanOnTemp = bcdAdjust(gBcdFanOnTemp, 0x40, 0x20);
+            break;
+        case 10:
+            // Fan off temp - off must be lower than on, min 20 degrees C
+            gBcdFanOffTemp = bcdAdjust(gBcdFanOffTemp, gBcdFanOffTemp, 0x20);
+            break;
+        case 11:
+            // Heater on temp - between 20 and 40 degrees C
+            gBcdHeaterOnTemp = bcdAdjust(gBcdHeaterOnTemp, 0x40, 0x20);
+            break;
+        case 12:
+            // Heater off temp - off must be higher than on - max 40 degrees C
+            gBcdHeaterOffTemp = bcdAdjust(gBcdHeaterOffTemp, 0x40, gBcdHeaterOnTemp);
+            break;
     }
 }
 
@@ -734,15 +926,15 @@ void processKeys() {
     switch (tm1638Keys) {
         case 1:
             // Toggle white light on/off
-            gbWhiteOn = !gbWhiteOn;
+            WHITE_LED = !WHITE_LED;
             break;
         case 2:
             // Toggle blue light on/off
-            gbBlueOn = !gbBlueOn;
+            BLUE_LED = !BLUE_LED;
             break;
         case 3:
             // Toggle fan on/off
-            gbFanOn = !gbFanOn;
+            FAN = !FAN;
             break;
         case 4:
             // Display temp C/temp F/date
@@ -760,18 +952,27 @@ void processKeys() {
             break;
         case 6:
             // Adjust down
-            if (gcSetMode > 0) {
-                adjustDateTime(0);
+            iBcdAdjustment = 0;
+            if (gcSetMode) {
+                adjustDateTime();
+            } else if (gcTriggerMode) {
+                adjustTrigger();
             }
             break;
         case 7:
+            iBcdAdjustment = 1;
             // Adjust up
-            if (gcSetMode > 0) {
-                adjustDateTime(1);
+            if (gcSetMode) {
+                adjustDateTime();
+            } else if (gcTriggerMode) {
+                adjustTrigger();
             }
             break;
         case 8:
             // Timer
+            gcTriggerMode++;
+            if (gcTriggerMode > 12)
+                gcTriggerMode = 0;
             break;
     }
 }
@@ -801,9 +1002,37 @@ void main() {
                         // store it in the array, next display refresh will pick it up
                         convertTemp();
                     }
-                    // Display time and temp or date on TM1638
-                    tm1638UpdateDisplay();
                 }
+                // Trigger white led
+                if ((gBcdHour == gBcdWhiteOnHour) && (gBcdMinute == gBcdWhiteOnMinute)) {
+                    WHITE_LED = 1;
+                }
+                if ((gBcdHour == gBcdWhiteOffHour) && (gBcdMinute == gBcdWhiteOffMinute)) {
+                    WHITE_LED = 0;
+                }
+                // Trigger blue led
+                if ((gBcdHour == gBcdBlueOnHour) && (gBcdMinute == gBcdBlueOnMinute)) {
+                    BLUE_LED = 1;
+                }
+                if ((gBcdHour == gBcdBlueOffHour) && (gBcdMinute == gBcdBlueOffMinute)) {
+                    BLUE_LED = 0;
+                }
+                // Trigger fan
+                char cTempTruncated = giDS3231ValueBCD >> 8;
+                if (cTempTruncated == gBcdFanOnTemp) {
+                    FAN = 1;
+                }
+                if (cTempTruncated == gBcdFanOffTemp) {
+                    FAN = 0;
+                }
+                if (cTempTruncated == gBcdHeaterOnTemp) {
+                    HEATER = 1;
+                }
+                if (cTempTruncated == gBcdHeaterOffTemp) {
+                    HEATER = 0;
+                }
+                // Display time and temp or date on TM1638
+                tm1638UpdateDisplay();
                 
                 cTask.TASK_TIMER1 = 0;
             }

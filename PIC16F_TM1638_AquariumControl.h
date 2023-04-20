@@ -66,12 +66,14 @@ char iDigitToFlash = 8; // 8 = no digit to flash
 // Hold the upper and lower bytes from the ds18b0x
 char cTempH = 0;
 char cTempL = 0;
-char iDecimalPosition = 2;
+//char iDecimalPosition = 2;
 
 int giDS3231ValueBCD = 0;
 char gbDS3231IsMinus = 0;
 
 char cTask = 0; // Used for task scheduler
+
+// States
 bool gbWhiteOn = 0;
 bool gbBlueOn = 0;
 bool gbFanOn = 0;
@@ -79,7 +81,9 @@ bool gbHeaterOn = 0;
 bool gbFlashOff = 0;
 char gcDisplayMode = 0;
 char gcSetMode = 0;
+char gcTriggerMode = 0;
 
+// Triggers
 char gBcdWhiteOnMinute = 0; // 0 to 59
 char gBcdWhiteOnHour = 0; // 0 to 23
 char gBcdWhiteOffMinute = 0; // 0 to 59
@@ -90,11 +94,11 @@ char gBcdBlueOnHour = 0; // 0 to 23
 char gBcdBlueOffMinute = 0; // 0 to 59
 char gBcdBlueOffHour = 0; // 0 to 23
 
-char gFanOnTemp = 28; // Degrees C
-char gFanOffTemp = 27; // Degrees C
+char gBcdFanOnTemp = 0x28; // Degrees C
+char gBcdFanOffTemp = 0x27; // Degrees C
 
-char gHeaterOnTemp = 24; // Degrees C
-char gHeaterOffTemp = 25; // Degrees C
+char gBcdHeaterOnTemp = 0x24; // Degrees C
+char gBcdHeaterOffTemp = 0x25; // Degrees C
 
 // Used to output the segments from numbers
 char tm1638MaxDigits = 8;
@@ -116,6 +120,11 @@ char tm1638Data[] = {0, 0, 0, 0, 0, 0, 0, 0};
 char tm1638LEDs[] = {0, 0, 0, 0, 0, 0, 0, 0};
 // Copy of the keys
 char tm1638Keys = 0;
+// For printing
+char iPrintStartDigit = 0;
+char iPrintDotDigit = 8;
+// For adjusting bcd numbers up 1 or down !1
+char iBcdAdjustment = 1;
 
 // DS18B20 functions
 char oneWireIsPresent = 0;
@@ -141,7 +150,7 @@ void ds3231ReadDateTime();
 
 // TM1638 functions
 void tm1638ByteWrite(char bWrite);
-void bcdTo7Seg(char iBcdIn, char iOffsetFromLeft, char iDotPosition);
+void bcdTo7Seg(char iBcdIn);
 void tm1638UpdateDisplay();
 void tm1638ReadKeys();
 
@@ -150,8 +159,9 @@ int binToBcd(int iBin);
 void startTemp();
 void readTemp();
 
-char bcdAdjust(char bcd, char bcdMax, char bcdMin, char iAdjustment);
-void adjustDateTime(char iAdjustment);
+char bcdAdjust(char bcd, char bcdMax, char bcdMin);
+void adjustDateTime();
+void adjustTrigger();
 void processKeys();
 
 #endif

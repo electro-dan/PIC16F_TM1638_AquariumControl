@@ -226,10 +226,11 @@ _WDT_OFF	C:\Program Files\SourceBoost\Include\pic16F628A.h	200;"	d
 _WDT_ON	C:\Program Files\SourceBoost\Include\pic16F628A.h	199;"	d
 _XT_OSC	C:\Program Files\SourceBoost\Include\pic16F628A.h	215;"	d
 abs	C:\Program Files\SourceBoost\Include\boostc.h	29;"	d
-adjustDateTime	PIC16F_TM1638_AquariumControl.c	693;"	f
-bcdAdjust	PIC16F_TM1638_AquariumControl.c	665;"	f
+adjustDateTime	PIC16F_TM1638_AquariumControl.c	826;"	f
+adjustTrigger	PIC16F_TM1638_AquariumControl.c	872;"	f
+bcdAdjust	PIC16F_TM1638_AquariumControl.c	798;"	f
 bcdTo7Seg	PIC16F_TM1638_AquariumControl.c	296;"	f
-binToBcd	PIC16F_TM1638_AquariumControl.c	548;"	f
+binToBcd	PIC16F_TM1638_AquariumControl.c	680;"	f
 cTask	PIC16F_TM1638_AquariumControl.h	74;"	v
 cTempH	PIC16F_TM1638_AquariumControl.h	67;"	v
 cTempL	PIC16F_TM1638_AquariumControl.h	68;"	v
@@ -239,7 +240,7 @@ ccpr1l	C:\Program Files\SourceBoost\Include\pic16F628A.h	245;"	v
 clear_bit	C:\Program Files\SourceBoost\Include\boostc.h	22;"	d
 clear_wdt	C:\Program Files\SourceBoost\Include\boostc.h	64;"	f
 cmcon	C:\Program Files\SourceBoost\Include\pic16F628A.h	251;"	v
-convertTemp	PIC16F_TM1638_AquariumControl.c	583;"	f
+convertTemp	PIC16F_TM1638_AquariumControl.c	715;"	f
 ds3231Init	PIC16F_TM1638_AquariumControl.c	205;"	f
 ds3231ReadDateTime	PIC16F_TM1638_AquariumControl.c	265;"	f
 ds3231Start	PIC16F_TM1638_AquariumControl.c	231;"	f
@@ -266,54 +267,57 @@ eepromWrite	PIC16F_TM1638_AquariumControl.c	34;"	f
 eepromWriteAll	PIC16F_TM1638_AquariumControl.c	14;"	f
 fsr	C:\Program Files\SourceBoost\Include\boostcpic16.h	979;"	v
 fsr	C:\Program Files\SourceBoost\Include\pic16F628A.h	234;"	v
-gBcdBlueOffHour	PIC16F_TM1638_AquariumControl.h	91;"	v
-gBcdBlueOffMinute	PIC16F_TM1638_AquariumControl.h	90;"	v
-gBcdBlueOnHour	PIC16F_TM1638_AquariumControl.h	89;"	v
-gBcdBlueOnMinute	PIC16F_TM1638_AquariumControl.h	88;"	v
+gBcdBlueOffHour	PIC16F_TM1638_AquariumControl.h	95;"	v
+gBcdBlueOffMinute	PIC16F_TM1638_AquariumControl.h	94;"	v
+gBcdBlueOnHour	PIC16F_TM1638_AquariumControl.h	93;"	v
+gBcdBlueOnMinute	PIC16F_TM1638_AquariumControl.h	92;"	v
 gBcdDayOfMonth	PIC16F_TM1638_AquariumControl.h	55;"	v
+gBcdFanOffTemp	PIC16F_TM1638_AquariumControl.h	98;"	v
+gBcdFanOnTemp	PIC16F_TM1638_AquariumControl.h	97;"	v
+gBcdHeaterOffTemp	PIC16F_TM1638_AquariumControl.h	101;"	v
+gBcdHeaterOnTemp	PIC16F_TM1638_AquariumControl.h	100;"	v
 gBcdHour	PIC16F_TM1638_AquariumControl.h	53;"	v
 gBcdMinute	PIC16F_TM1638_AquariumControl.h	52;"	v
 gBcdMonth	PIC16F_TM1638_AquariumControl.h	56;"	v
 gBcdSeconds	PIC16F_TM1638_AquariumControl.h	51;"	v
-gBcdWhiteOffHour	PIC16F_TM1638_AquariumControl.h	86;"	v
-gBcdWhiteOffMinute	PIC16F_TM1638_AquariumControl.h	85;"	v
-gBcdWhiteOnHour	PIC16F_TM1638_AquariumControl.h	84;"	v
-gBcdWhiteOnMinute	PIC16F_TM1638_AquariumControl.h	83;"	v
+gBcdWhiteOffHour	PIC16F_TM1638_AquariumControl.h	90;"	v
+gBcdWhiteOffMinute	PIC16F_TM1638_AquariumControl.h	89;"	v
+gBcdWhiteOnHour	PIC16F_TM1638_AquariumControl.h	88;"	v
+gBcdWhiteOnMinute	PIC16F_TM1638_AquariumControl.h	87;"	v
 gBcdYear	PIC16F_TM1638_AquariumControl.h	57;"	v
 gDayOfWeek	PIC16F_TM1638_AquariumControl.h	54;"	v
 gDaysInMonth	PIC16F_TM1638_AquariumControl.h	58;"	v
-gFanOffTemp	PIC16F_TM1638_AquariumControl.h	94;"	v
-gFanOnTemp	PIC16F_TM1638_AquariumControl.h	93;"	v
-gHeaterOffTemp	PIC16F_TM1638_AquariumControl.h	97;"	v
-gHeaterOnTemp	PIC16F_TM1638_AquariumControl.h	96;"	v
 gLeapYears	PIC16F_TM1638_AquariumControl.h	59;"	v
-gbBlueOn	PIC16F_TM1638_AquariumControl.h	76;"	v
+gbBlueOn	PIC16F_TM1638_AquariumControl.h	78;"	v
 gbDS3231IsMinus	PIC16F_TM1638_AquariumControl.h	72;"	v
-gbFanOn	PIC16F_TM1638_AquariumControl.h	77;"	v
-gbFlashOff	PIC16F_TM1638_AquariumControl.h	79;"	v
-gbHeaterOn	PIC16F_TM1638_AquariumControl.h	78;"	v
-gbWhiteOn	PIC16F_TM1638_AquariumControl.h	75;"	v
-gcDisplayMode	PIC16F_TM1638_AquariumControl.h	80;"	v
-gcSetMode	PIC16F_TM1638_AquariumControl.h	81;"	v
+gbFanOn	PIC16F_TM1638_AquariumControl.h	79;"	v
+gbFlashOff	PIC16F_TM1638_AquariumControl.h	81;"	v
+gbHeaterOn	PIC16F_TM1638_AquariumControl.h	80;"	v
+gbWhiteOn	PIC16F_TM1638_AquariumControl.h	77;"	v
+gcDisplayMode	PIC16F_TM1638_AquariumControl.h	82;"	v
+gcSetMode	PIC16F_TM1638_AquariumControl.h	83;"	v
+gcTriggerMode	PIC16F_TM1638_AquariumControl.h	84;"	v
 giDS3231ValueBCD	PIC16F_TM1638_AquariumControl.h	71;"	v
 i2c_ARGS	PIC16F_TM1638_AquariumControl.h	27;"	d
-iDecimalPosition	PIC16F_TM1638_AquariumControl.h	69;"	v
+iBcdAdjustment	PIC16F_TM1638_AquariumControl.h	127;"	v
 iDigitToFlash	PIC16F_TM1638_AquariumControl.h	64;"	v
 iFlashDigitOff	PIC16F_TM1638_AquariumControl.h	63;"	v
+iPrintDotDigit	PIC16F_TM1638_AquariumControl.h	125;"	v
+iPrintStartDigit	PIC16F_TM1638_AquariumControl.h	124;"	v
 iTimer2Counts	PIC16F_TM1638_AquariumControl.h	62;"	v
 indf	C:\Program Files\SourceBoost\Include\boostcpic16.h	984;"	v
 indf	C:\Program Files\SourceBoost\Include\pic16F628A.h	230;"	v
-initialise	PIC16F_TM1638_AquariumControl.c	430;"	f
+initialise	PIC16F_TM1638_AquariumControl.c	562;"	f
 intcon	C:\Program Files\SourceBoost\Include\novo.h	60;"	v
 intcon	C:\Program Files\SourceBoost\Include\novo.h	67;"	v
 intcon	C:\Program Files\SourceBoost\Include\pic16F628A.h	238;"	v
-interrupt	PIC16F_TM1638_AquariumControl.c	525;"	f
-main	PIC16F_TM1638_AquariumControl.c	779;"	f
+interrupt	PIC16F_TM1638_AquariumControl.c	657;"	f
+main	PIC16F_TM1638_AquariumControl.c	980;"	f
 nop	C:\Program Files\SourceBoost\Include\boostc.h	59;"	f
 oneWireBus	PIC16F_TM1638_AquariumControl.h	9;"	d
 oneWireBusReset	PIC16F_TM1638_AquariumControl.c	97;"	f
-oneWireIsPresent	PIC16F_TM1638_AquariumControl.h	121;"	v
-oneWireResetStage	PIC16F_TM1638_AquariumControl.h	122;"	v
+oneWireIsPresent	PIC16F_TM1638_AquariumControl.h	130;"	v
+oneWireResetStage	PIC16F_TM1638_AquariumControl.h	131;"	v
 oneWireRxByte	PIC16F_TM1638_AquariumControl.c	161;"	f
 oneWireTris	PIC16F_TM1638_AquariumControl.h	10;"	d
 oneWireTxByte	PIC16F_TM1638_AquariumControl.c	119;"	f
@@ -327,16 +331,16 @@ pir1	C:\Program Files\SourceBoost\Include\pic16F628A.h	239;"	v
 porta	C:\Program Files\SourceBoost\Include\pic16F628A.h	235;"	v
 portb	C:\Program Files\SourceBoost\Include\pic16F628A.h	236;"	v
 pr2	C:\Program Files\SourceBoost\Include\pic16F628A.h	257;"	v
-processKeys	PIC16F_TM1638_AquariumControl.c	733;"	f
+processKeys	PIC16F_TM1638_AquariumControl.c	925;"	f
 rcreg	C:\Program Files\SourceBoost\Include\pic16F628A.h	250;"	v
 rcsta	C:\Program Files\SourceBoost\Include\pic16F628A.h	248;"	v
-readTemp	PIC16F_TM1638_AquariumControl.c	651;"	f
+readTemp	PIC16F_TM1638_AquariumControl.c	783;"	f
 reset	C:\Program Files\SourceBoost\Include\boostc.h	77;"	f
 reset	C:\Program Files\SourceBoost\Include\boostc.h	85;"	f
 set_bit	C:\Program Files\SourceBoost\Include\boostc.h	23;"	d
 sleep	C:\Program Files\SourceBoost\Include\boostc.h	69;"	f
 spbrg	C:\Program Files\SourceBoost\Include\pic16F628A.h	259;"	v
-startTemp	PIC16F_TM1638_AquariumControl.c	641;"	f
+startTemp	PIC16F_TM1638_AquariumControl.c	773;"	f
 status	C:\Program Files\SourceBoost\Include\pic16F628A.h	233;"	v
 swi2c_BCLIF_PIR	PIC16F_TM1638_AquariumControl.h	36;"	v
 swi2c_SSPADD	PIC16F_TM1638_AquariumControl.h	37;"	v
@@ -348,20 +352,20 @@ swi2c_SSPSTAT	PIC16F_TM1638_AquariumControl.h	33;"	v
 t1con	C:\Program Files\SourceBoost\Include\pic16F628A.h	242;"	v
 t2con	C:\Program Files\SourceBoost\Include\pic16F628A.h	244;"	v
 test_bit	C:\Program Files\SourceBoost\Include\boostc.h	24;"	d
-tm1638Brightness	PIC16F_TM1638_AquariumControl.h	103;"	v
-tm1638ByteReadData	PIC16F_TM1638_AquariumControl.h	107;"	v
-tm1638ByteSetAddr	PIC16F_TM1638_AquariumControl.h	109;"	v
-tm1638ByteSetData	PIC16F_TM1638_AquariumControl.h	105;"	v
-tm1638ByteSetOn	PIC16F_TM1638_AquariumControl.h	111;"	v
+tm1638Brightness	PIC16F_TM1638_AquariumControl.h	107;"	v
+tm1638ByteReadData	PIC16F_TM1638_AquariumControl.h	111;"	v
+tm1638ByteSetAddr	PIC16F_TM1638_AquariumControl.h	113;"	v
+tm1638ByteSetData	PIC16F_TM1638_AquariumControl.h	109;"	v
+tm1638ByteSetOn	PIC16F_TM1638_AquariumControl.h	115;"	v
 tm1638ByteWrite	PIC16F_TM1638_AquariumControl.c	287;"	f
-tm1638Data	PIC16F_TM1638_AquariumControl.h	114;"	v
-tm1638DisplayNumtoSeg	PIC16F_TM1638_AquariumControl.h	101;"	v
-tm1638Dot	PIC16F_TM1638_AquariumControl.h	102;"	v
-tm1638Keys	PIC16F_TM1638_AquariumControl.h	118;"	v
-tm1638LEDs	PIC16F_TM1638_AquariumControl.h	116;"	v
-tm1638MaxDigits	PIC16F_TM1638_AquariumControl.h	100;"	v
-tm1638ReadKeys	PIC16F_TM1638_AquariumControl.c	404;"	f
-tm1638UpdateDisplay	PIC16F_TM1638_AquariumControl.c	313;"	f
+tm1638Data	PIC16F_TM1638_AquariumControl.h	118;"	v
+tm1638DisplayNumtoSeg	PIC16F_TM1638_AquariumControl.h	105;"	v
+tm1638Dot	PIC16F_TM1638_AquariumControl.h	106;"	v
+tm1638Keys	PIC16F_TM1638_AquariumControl.h	122;"	v
+tm1638LEDs	PIC16F_TM1638_AquariumControl.h	120;"	v
+tm1638MaxDigits	PIC16F_TM1638_AquariumControl.h	104;"	v
+tm1638ReadKeys	PIC16F_TM1638_AquariumControl.c	536;"	f
+tm1638UpdateDisplay	PIC16F_TM1638_AquariumControl.c	316;"	f
 tm1638clk	PIC16F_TM1638_AquariumControl.h	12;"	d
 tm1638dio	PIC16F_TM1638_AquariumControl.h	11;"	d
 tm1638dioTris	PIC16F_TM1638_AquariumControl.h	13;"	d
