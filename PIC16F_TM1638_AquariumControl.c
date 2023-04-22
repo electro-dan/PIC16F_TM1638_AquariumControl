@@ -3,92 +3,11 @@
 #include "PIC16F_TM1638_AquariumControl.h"
 
 //Target PIC16F628A configuration word
-#pragma DATA _CONFIG, _PWRTE_OFF & _WDT_OFF & _INTRC_OSC_NOCLKOUT & _CP_OFF & _LVP_OFF & _BODEN_OFF & _MCLRE_OFF
+#pragma DATA _CONFIG, _BODEN_OFF & _PWRTE_ON & _WDT_OFF & _CP_OFF & _XT_OSC // Brown out reset off, Power-up Timer on, Watchdog timer off, Code Protection off, XT oscillator
 
 //Set clock frequency
 #pragma CLOCK_FREQ	4000000
 
-/***********************************************************************************
-  EEPROM read and write methods
-************************************************************************************/
-void eepromWriteAll() {
-    char didWrite = 0;
-    // only write value if it is different
-    didWrite += eepromWrite(1, gBcdWhiteOnMinute);
-    didWrite += eepromWrite(2, gBcdWhiteOnHour);
-    didWrite += eepromWrite(3, gBcdWhiteOffMinute);
-    didWrite += eepromWrite(4, gBcdWhiteOffHour);
-    didWrite += eepromWrite(5, gBcdBlueOnMinute);
-    didWrite += eepromWrite(6, gBcdBlueOnHour);
-    didWrite += eepromWrite(7, gBcdBlueOffMinute);
-    didWrite += eepromWrite(8, gBcdBlueOffHour);
-    didWrite += eepromWrite(9, gBcdFanOnTemp);
-    didWrite += eepromWrite(10, gBcdFanOffTemp);
-    didWrite += eepromWrite(11, gBcdHeaterOnTemp);
-    didWrite += eepromWrite(12, gBcdHeaterOffTemp);
-    
-    if (didWrite)
-        eepromWrite(0, 10); // To indicate EEPROM has been saved
-}
-
-char eepromWrite(char address, char data) {
-    char didWrite = 0;
-    if (eepromRead(address) != data) {
-        char intconsave = intcon;
-        
-        // Load address and data
-        eeadr = address;
-        eedata = data;
-    
-        eecon1.WREN = 1; // Enable writes
-        
-        // Required write sequence
-        intcon = 0;
-        eecon2 = 0x55; // Write 55h
-        eecon2 = 0xAA; // Write 0AAh
-        eecon1.WR = 1; // Set WR bit to begin write
-        intcon = intconsave;
-        eecon1.WREN = 0; // Disable writes on write complete (EEIF set)
-        while(!pir1.EEIF); // Wait for the interrupt bit EEIF to be set
-        pir1.EEIF = 0; // Clear EEIF
-        didWrite = 1;
-    }
-    return didWrite;
-}
-
-/******************************************************
-  Function to read the current variables from ROM
-*******************************************************/
-void eepromReadAll() {
-    // Read initial values from EEPROM
-    // Do not read other variables if the EEPROM has not been saved before
-    // as all default will be 0xFF
-    if (eepromRead(0) == 10) {
-        gBcdWhiteOnMinute = eepromRead(1);
-        gBcdWhiteOnHour = eepromRead(2);
-        gBcdWhiteOffMinute = eepromRead(3);
-        gBcdWhiteOffHour = eepromRead(4);
-        gBcdBlueOnMinute = eepromRead(5);
-        gBcdBlueOnHour = eepromRead(6);
-        gBcdBlueOffMinute = eepromRead(7);
-        gBcdBlueOffHour = eepromRead(8);
-        gBcdFanOnTemp = eepromRead(9);
-        gBcdFanOffTemp = eepromRead(10);
-        gBcdHeaterOnTemp = eepromRead(11);
-        gBcdHeaterOffTemp = eepromRead(12);
-    }
-}
-
-char eepromRead(char address) {
-    // Load address
-    eeadr = address;
-
-    // Read, data is available in eedata the next cycle.
-    eecon1.RD = 1;
-    
-    // Return value
-    return eedata;
-}
     
 /*********************************************************************************************
   oneWireBusReset()
@@ -185,6 +104,66 @@ char oneWireRxByte() {
     
     return cDataIn;
 }
+
+/*********************************************************************************************
+ at24c32WriteAll()
+ Write multiple bytes
+*********************************************************************************************/
+void at24c32WriteAll() {
+	i2c_start();
+	i2c_write(at24c32_addr); // address + write
+	i2c_write(0); // start at address 0
+	i2c_write(0); 
+	// Write bytes
+	i2c_write(gBcdWhiteOnMinute);
+    i2c_write(gBcdWhiteOnHour);
+    i2c_write(gBcdWhiteOffMinute);
+    i2c_write(gBcdWhiteOffHour);
+    i2c_write(gBcdBlueOnMinute);
+    i2c_write(gBcdBlueOnHour);
+    i2c_write(gBcdBlueOffMinute);
+    i2c_write(gBcdBlueOffHour);
+    i2c_write(gBcdFanOnTemp);
+    i2c_write(gBcdFanOffTemp);
+    i2c_write(gBcdHeaterOnTemp);
+    i2c_write(gBcdHeaterOffTemp);
+	i2c_stop();
+}
+
+/*********************************************************************************************
+ at24c32ReadAll()
+ Read all bytes
+*********************************************************************************************/
+void at24c32ReadAll() {
+	i2c_start();
+	i2c_write(at24c32_addr); // address + read
+	i2c_write(0); // start at address 0
+	i2c_stop();
+	
+	i2c_start();
+	i2c_write(ds3231_addr + 1); // address + read
+	gBcdSeconds = i2c_read(0); // ack
+	gBcdMinute = i2c_read(0); // ack
+	gBcdHour = i2c_read(0); // ack
+	gDayOfWeek = i2c_read(0); // ack
+	gBcdDayOfMonth = i2c_read(0); // ack
+	gBcdMonth = i2c_read(0); // ack
+	gBcdYear = i2c_read(1); // nack
+	gBcdWhiteOnMinute = i2c_read(0); // ack
+	gBcdWhiteOnHour = i2c_read(0); // ack
+	gBcdWhiteOffMinute = i2c_read(0); // ack
+	gBcdWhiteOffHour = i2c_read(0); // ack
+	gBcdBlueOnMinute = i2c_read(0); // ack
+	gBcdBlueOnHour = i2c_read(0); // ack
+	gBcdBlueOffMinute = i2c_read(0); // ack
+	gBcdBlueOffHour = i2c_read(0); // ack
+	gBcdFanOnTemp = i2c_read(0); // ack
+	gBcdFanOffTemp = i2c_read(0); // ack
+	gBcdHeaterOnTemp = i2c_read(0); // ack
+	gBcdHeaterOffTemp = i2c_read(1); // nack
+	i2c_stop();
+}
+
 
 /*********************************************************************************************
  ds3231Write(char ds3231Reg, char bWrite)
@@ -641,7 +620,7 @@ void initialise() {
     intcon.PEIE = 1;
 
     // Read in variables from EEPROM
-    eepromReadAll(); 
+    at24c32ReadAll();
 
 	i2c_init(1); 
 	ds3231Init();
@@ -971,8 +950,10 @@ void processKeys() {
         case 8:
             // Timer
             gcTriggerMode++;
-            if (gcTriggerMode > 12)
+            if (gcTriggerMode > 12) {
                 gcTriggerMode = 0;
+                at24c32WriteAll(); // Exiting trigger mode, save the new triggers to EEPROM chip
+            }
             break;
     }
 }
