@@ -3,15 +3,15 @@
 Debug:
 	@if not exist $@ mkdir $@
 
-CC = "C:\Program Files\SourceBoost\boostc_pic16.exe"
+CC = "C:\Program Files (x86)\SourceBoost\boostc_pic16.exe"
 
-Debug\PIC16F_TM1638_AquariumControl.obj: PIC16F_TM1638_AquariumControl.c PIC16F_TM1638_AquariumControl.h
-	$(CC) $< -t PIC16F628A  -idx 1 -obj Debug -d _DEBUG
+Debug\PIC16F_TM1638_AquariumControl.obj: PIC16F_TM1638_AquariumControl.c PIC16F_TM1638_AquariumControl.h PIC16F_TM1638_AquariumControl.Debug.__f
+	$(CC) $< -t PIC16F73  -idx 1 -obj Debug -d _DEBUG
 
-LD = "C:\Program Files\SourceBoost\boostlink_picmicro.exe"
+LD = "C:\Program Files (x86)\SourceBoost\boostlink_picmicro.exe"
 
 Debug\PIC16F_TM1638_AquariumControl.hex: Debug\PIC16F_TM1638_AquariumControl.obj 
-	$(LD)  -idx 1  /ld "C:\Program Files\SourceBoost\lib" libc.pic16.lib $+ /t PIC16F628A /d "Debug" /p PIC16F_TM1638_AquariumControl
+	$(LD)  -idx 1  /ld "C:\Program Files (x86)\SourceBoost\lib" libc.pic16.lib $+ /t PIC16F73 /d "Debug" /p PIC16F_TM1638_AquariumControl
 
 all: Debug Debug\PIC16F_TM1638_AquariumControl.hex
 

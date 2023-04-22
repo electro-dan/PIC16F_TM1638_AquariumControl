@@ -1,10 +1,13 @@
 [Settings]
 Active Compiler=BoostC
-Target=PIC16F628A
+Target=PIC16F73
 Active Directory=Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\
 Active Config=Debug
 Last Ext=casm
 Config=1
+Type=0
+Warnings=1
+Model=0
 [Files]
 PIC16F_TM1638_AquariumControl.c
 Count=3
@@ -26,3 +29,7 @@ Count=0
 Count=0
 [Debugger]
 DebugFromMain=1
+[Tools]
+BoostDir=C:\Program Files (x86)\SourceBoost\
+Programmer=
+PrefixWithBuildThreadNum=0
