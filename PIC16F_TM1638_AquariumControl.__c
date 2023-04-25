@@ -30,6 +30,6 @@ Count=0
 [Debugger]
 DebugFromMain=1
 [Tools]
-BoostDir=C:\Program Files (x86)\SourceBoost\
+BoostDir=C:\Program Files\SourceBoost
 Programmer=
 PrefixWithBuildThreadNum=0
