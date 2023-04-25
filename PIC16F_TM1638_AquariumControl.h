@@ -6,16 +6,16 @@
 #define TASK_TIMER1_READ 4
 #define TASK_TIMER2 5
 
-#define oneWireBus (porta.6)
-#define oneWireTris (trisa.6)
-#define tm1638dio (porta.1)
-#define tm1638clk (porta.0)
-#define tm1638dioTris (trisa.1)
-#define tm1638strobe (porta.7)
-#define WHITE_LED (portb.5)
-#define BLUE_LED (portb.4)
-#define FAN (portb.3)
-#define HEATER (portb.2)
+#define oneWireBus (portc.5)
+#define oneWireTris (trisc.5)
+#define tm1638dio (portb.1)
+#define tm1638dioTris (trisb.1)
+#define tm1638clk (portb.2)
+#define tm1638strobe (portb.3)
+#define WHITE_LED (portc.1)
+#define BLUE_LED (portc.2)
+#define FAN (porta.1)
+#define HEATER (porta.0)
 
 // This means timer 1 will overflow when 1 cycle completes, generating the interrupt
 #define TMR1HV 0xFF
@@ -23,8 +23,8 @@
 
 // i2c options
 #define use_i2c_SW
-// clock SCL on GP0, data SDA on GP1
-#define i2c_ARGS	2, PORTA, TRISA, 3, PORTA, TRISA, e_SSPCON1, e_SSPCON2, \
+// clock SCL on RA3, data SDA on RA4
+#define i2c_ARGS	3, PORTC, TRISC, 4, PORTC, TRISC, e_SSPCON1, e_SSPCON2, \
 					e_SSPSTAT, e_SSPBUF, e_SSPIF_BIT, e_SSPIF_PIR,			\
 					e_BCLIF_BIT, e_BCLIF_PIR, 7, e_SSPADD, (i2c_reset_wdt | i2c_SMP)
 // RAM used by the software i2c driver to emulate the equivalent i2c hardware registers					
@@ -45,8 +45,8 @@ unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
 #define e_SSPIF_BIT	3
 #define e_BCLIF_BIT	3
 
-#define ds3231_addr 0xD0
-#define at24c32_addr 0x57
+#define ds3231_addr 0xD0 // Left shifted 7 bit address 0x68
+#define at24c32_addr 0xAE // Left shifted 7 bit address 0x57
 
 // Time and date variables
 char gBcdSeconds = 0; // 0 to 59
@@ -148,6 +148,7 @@ void ds3231Start();
 void ds3231Stop();
 void ds3231WriteDateTime();
 void ds3231ReadDateTime();
+char ds3231ReadRegister(char cRegAddress);
 
 // TM1638 functions
 void tm1638ByteWrite(char bWrite);

@@ -8,5 +8,5 @@ x Set Min/Max Temp for Fan/Heater
 x Trigger Light On/Off based on time
 x Trigger Fan
 x Trigger Heater
-EEPROM variables using AT24C32
+x EEPROM variables using AT24C32
 x BCD to tm1638DisplayNumtoSeg put in function

@@ -5,7 +5,7 @@
 //Target PIC16F628A configuration word
 #pragma DATA _CONFIG, _BODEN_OFF & _PWRTE_ON & _WDT_OFF & _CP_OFF & _XT_OSC // Brown out reset off, Power-up Timer on, Watchdog timer off, Code Protection off, XT oscillator
 
-//Set clock frequency
+//Set clock frequency (for software delays) - 4MHz
 #pragma CLOCK_FREQ	4000000
 
     
@@ -105,6 +105,7 @@ char oneWireRxByte() {
     return cDataIn;
 }
 
+// https://www.instructables.com/The-Most-Comprehensive-Guide-to-Programming-the-AT/
 /*********************************************************************************************
  at24c32WriteAll()
  Write multiple bytes
@@ -112,9 +113,11 @@ char oneWireRxByte() {
 void at24c32WriteAll() {
 	i2c_start();
 	i2c_write(at24c32_addr); // address + write
-	i2c_write(0); // start at address 0
-	i2c_write(0); 
-	// Write bytes
+	// start at address 0
+	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
+	i2c_write(0); // Second word address 
+	// Write data bytes
+	// We're only writing 12 bytes here, so no need to worry about row rollover after 32 bytes
 	i2c_write(gBcdWhiteOnMinute);
     i2c_write(gBcdWhiteOnHour);
     i2c_write(gBcdWhiteOffMinute);
@@ -128,6 +131,7 @@ void at24c32WriteAll() {
     i2c_write(gBcdHeaterOnTemp);
     i2c_write(gBcdHeaterOffTemp);
 	i2c_stop();
+	delay_ms(10); // Write Cycle Time
 }
 
 /*********************************************************************************************
@@ -136,19 +140,14 @@ void at24c32WriteAll() {
 *********************************************************************************************/
 void at24c32ReadAll() {
 	i2c_start();
-	i2c_write(at24c32_addr); // address + read
-	i2c_write(0); // start at address 0
-	i2c_stop();
+	i2c_write(at24c32_addr); // address + write
+	// start at address 0
+	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
+	i2c_write(0); // Second word address 
+	i2c_stop(); // Don't actually write a byte, just stop
 	
 	i2c_start();
 	i2c_write(ds3231_addr + 1); // address + read
-	gBcdSeconds = i2c_read(0); // ack
-	gBcdMinute = i2c_read(0); // ack
-	gBcdHour = i2c_read(0); // ack
-	gDayOfWeek = i2c_read(0); // ack
-	gBcdDayOfMonth = i2c_read(0); // ack
-	gBcdMonth = i2c_read(0); // ack
-	gBcdYear = i2c_read(1); // nack
 	gBcdWhiteOnMinute = i2c_read(0); // ack
 	gBcdWhiteOnHour = i2c_read(0); // ack
 	gBcdWhiteOffMinute = i2c_read(0); // ack
@@ -184,39 +183,23 @@ void ds3231Write(char ds3231Reg, char bWrite) {
 void ds3231Init() {
 	/* control register 0Eh
     bit7 EOSC   Enable Oscillator (1 if oscillator must be stopped when on battery)
-    bit6 BBSQW  Battery Backed Square Wave
-    bit5 CONV   Convert temperature (1 forces a conversion NOW)
-    bit4 RS2    Rate select - frequency of square wave output
-    bit3 RS1    Rate select
+    bit6 BBSQW  Battery Backed Square Wave - 0 means square wave disabled when VCC falls below VPF (power fail voltage)
+    bit5 CONV   Convert temperature (1 forces a conversion)
+    bit4 RS2    Rate select - frequency of square wave output - NA for DS3231M
+    bit3 RS1    Rate select - NA for DS3231M
     bit2 INTCN  Interrupt control (1 for use of the alarms and to disable square wave)
     bit1 A2IE   Alarm2 interrupt enable (1 to enable)
     bit0 A1IE   Alarm1 interrupt enable (1 to enable)
     */
-	ds3231Write(0x0E, 0x80);
+	ds3231Write(0x0E, 0x00);
 	/* Status Register 0Fh
-    bit7 OSF     Oscillator Stop Flag
-    bit3 EN32kHz Enable 32kHz Output
+    bit7 OSF     Oscillator stopped flag - clear oscillator stop flag at init
+    bit3 EN32kHz Enable 32kHz Output - 0 for disabled
     bit2 BSY     Busy
     bit1 A2F     Alarm 2 Flag
     bit0 A1F     Alarm 1 Flag
     */
-	ds3231Write(0x0F, 0x80);
-}
-
-/*********************************************************************************************
- ds3231Start()
- Start the DS3231
-*********************************************************************************************/
-void ds3231Start() {
 	ds3231Write(0x0F, 0x00);
-}
-
-/*********************************************************************************************
- ds3231Stop()
- Stop the DS3231
-*********************************************************************************************/
-void ds3231Stop() {
-	ds3231Write(0x0F, 0x80);
 }
 
 /*********************************************************************************************
@@ -243,7 +226,7 @@ void ds3231WriteDateTime() {
 *********************************************************************************************/
 void ds3231ReadDateTime() {
 	i2c_start();
-	i2c_write(ds3231_addr); // address + read
+	i2c_write(ds3231_addr); // address + write
 	i2c_write(0); // start at address 0
 	i2c_stop();
 	
@@ -257,6 +240,24 @@ void ds3231ReadDateTime() {
 	gBcdMonth = i2c_read(0); // ack
 	gBcdYear = i2c_read(1); // nack
 	i2c_stop();
+}
+
+/*********************************************************************************************
+ ds3231ReadRegister(char cRegAddress)
+ Read one byte from a given DS3231 register address
+*********************************************************************************************/
+char ds3231ReadRegister(char cRegAddress) {
+	char cStatus;
+	i2c_start();
+	i2c_write(ds3231_addr); // address + write
+	i2c_write(cRegAddress); // start at requested address
+	i2c_stop();
+	
+	i2c_start();
+	i2c_write(ds3231_addr + 1); // address + read
+	cStatus = i2c_read(1); // read the byte, then nack
+    i2c_stop();
+    return cStatus;
 }
 
 /*********************************************************************************************
@@ -539,41 +540,58 @@ void tm1638ReadKeys() {
   setup the PIC registers
 *********************************************************************************************/
 void initialise() {
-    pcon.OSCF = 1; // 4MHz internal osc
+    //PIC16F73 doesn't have an internal oscillator
+    //pcon.OSCF = 1; // 4MHz internal osc
 
     // Configure port A
     /*
-    RA7     OUT TM1638 STB
-    RA6     IN/OUT DS18B20
+    RA7     Doesn't exist
+    RA6     Doesn't exist
     RA5     
-    RA4     ICSP VPP
-    RA3     IN/OUT DS3231M I2C SDA
-    RA2     IN/OUT DS3231M I2C CLK
-    RA1     IN/OUT TM1638 DIO
-    RA0     OUT TM1638 CLK
+    RA4     
+    RA3     
+    RA2     
+    RA1     OUT FANS
+    RA0     OUT HEATER
     */
-    trisa = 0x0C;
-    porta = 0x00; // 
+    trisa = 0x00; // all outputs
+    porta = 0x00; // All off
     
     // Configure port B
     /*      
     RB7     ICSP PGD
-    RB6     IN SQW DS3231M + ICSP PGC
-    RB5     OUT WHITE LIGHT PWM
-    RB4     OUT BLUE LIGHT PWM
-    RB3     OUT FANS
-    RB2     OUT HEATER
-    RB1     
+    RB6     ICSP PGC
+    RB5     
+    RB4     
+    RB3     OUT TM1638 STB
+    RB2     OUT TM1638 CLK
+    RB1     IN/OUT TM1638 DIO
     RB0     
     */
-    trisb = 0x00; // all outputs
-    portb = 0x00; // all off by default
+    trisb = 0x00; // all outputs by default
+    portb = 0x0E; // default TM1638 pins high
+
+    // Configure port C
+    /*      
+    RC7     
+    RC6     
+    RC5     IN/OUT DS18B20
+    RC4     IN/OUT DS3231M I2C SDA
+    RC3     IN/OUT DS3231M I2C CLK
+    RC2     OUT BLUE LIGHT PWM
+    RC1     OUT WHITE LIGHT PWM
+    RC0     IN SQW DS3231M
+    */
+    trisb = 0x01; // all outputs except RC0
+    portb = 0x38; // default DS18B20 and DS3231 pins high
 
     option_reg = 0;
     option_reg.NOT_RBPU = 1; // disable port b pull ups
 
     // ADC setup
-    cmcon = 7; // disable all comparators so port a is usable as digital io
+    // PIC16F73 doesn't have comparators
+    //cmcon = 7; // disable all comparators so port a is usable as digital io
+    adcon1 = 7; // Set RA0,RA1,RA2,RA5,RA3 all to digital I/O
 
 
     // Setup timer 0, used for PWM
@@ -619,13 +637,19 @@ void initialise() {
     intcon.GIE = 1;
     intcon.PEIE = 1;
 
+	// I2C Bus initialisation - baud rate divisor not applicable for software implementation
+	i2c_init(1); 
+
     // Read in variables from EEPROM
     at24c32ReadAll();
 
-	i2c_init(1); 
-	ds3231Init();
-	ds3231WriteDateTime();
-	ds3231Start();
+    // Check if the DS3231 needs initilising
+    char cStatus = ds3231ReadRegister(0x0F); // Read the status register
+    // If the oscillator (OSF bit in status register) has stopped, then init and write a default date/time
+    if (cStatus.7) {
+        ds3231Init();
+        ds3231WriteDateTime();
+    }
 }
 
 
