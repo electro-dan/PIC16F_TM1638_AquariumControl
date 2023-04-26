@@ -91,7 +91,7 @@ gbl_gBcdMonth                    EQU	0x0000003A ; bytes:1
 gbl_gBcdYear                     EQU	0x0000003B ; bytes:1
 gbl_gDaysInMonth                 EQU	0x0000003C ; bytes:1
 gbl_gLeapYears                   EQU	0x0000003D ; bytes:1
-gbl_iTimer2Counts                EQU	0x0000003E ; bytes:1
+gbl_iTimer0Counts                EQU	0x0000003E ; bytes:1
 gbl_iFlashDigitOff               EQU	0x0000003F ; bytes:1
 gbl_iDigitToFlash                EQU	0x00000048 ; bytes:1
 gbl_cTempH                       EQU	0x00000049 ; bytes:1
@@ -2343,22 +2343,21 @@ initialise_00000
 	BSF gbl_option_reg,7
 	MOVLW 0x07
 	MOVWF gbl_adcon1
-	MOVLW 0x06
+	BSF gbl_option_reg,2
+	BSF gbl_option_reg,1
+	BSF gbl_option_reg,0
+	MOVLW 0x3D
 	BCF STATUS, RP0
+	MOVWF gbl_tmr0
+	BCF gbl_intcon,2
+	BSF gbl_intcon,5
+	MOVLW 0x06
 	MOVWF gbl_t1con
 	MOVLW 0xFF
 	MOVWF gbl_tmr1h
 	MOVWF gbl_tmr1l
 	BSF STATUS, RP0
 	BSF gbl_pie1,0
-	MOVLW 0x78
-	BCF STATUS, RP0
-	IORWF gbl_t2con, F
-	BSF gbl_t2con,2
-	BSF gbl_t2con,1
-	MOVLW 0xC3
-	BSF STATUS, RP0
-	MOVWF gbl_pr2
 	BCF STATUS, RP0
 	CLRF gbl_cTask
 	BSF gbl_intcon,7
@@ -2379,7 +2378,7 @@ initialise_00000
 	RETURN
 ; } initialise function end
 
-	ORG 0x00000714
+	ORG 0x00000713
 ds3231Read_0001D
 ; { ds3231ReadDateTime ; function begin
 	CALL i2c_START_00000
@@ -2426,7 +2425,7 @@ ds3231Read_0001D
 	RETURN
 ; } ds3231ReadDateTime function end
 
-	ORG 0x0000073E
+	ORG 0x0000073D
 convertTem_00029
 ; { convertTemp ; function begin
 	BCF STATUS, RP0
@@ -2488,7 +2487,7 @@ label127
 	RETURN
 ; } convertTemp function end
 
-	ORG 0x00000776
+	ORG 0x00000775
 main
 ; { main ; function begin
 	CALL initialise_00000
@@ -2586,13 +2585,13 @@ label136
 	CALL tm1638Upda_00020
 	BCF gbl_cTask,2
 label137
-	BTFSS gbl_cTask,5
+	BTFSS gbl_cTask,1
 	GOTO	label138
 	MOVF gbl_gcSetMode, W
 	SUBLW 0x00
 	BTFSS STATUS,C
 	CALL tm1638Upda_00020
-	BCF gbl_cTask,5
+	BCF gbl_cTask,1
 label138
 	CALL tm1638Read_00022
 	MOVF gbl_tm1638Keys, F
@@ -2601,7 +2600,7 @@ label138
 	GOTO	label128
 ; } main function end
 
-	ORG 0x000007D7
+	ORG 0x000007D6
 _startup
 	BCF STATUS, RP0
 	BCF STATUS, RP1
@@ -2620,7 +2619,7 @@ _startup
 	MOVWF gbl_gDaysInMonth
 	MOVLW 0x01
 	MOVWF gbl_gLeapYears
-	CLRF gbl_iTimer2Counts
+	CLRF gbl_iTimer0Counts
 	CLRF gbl_iFlashDigitOff
 	MOVLW 0x08
 	MOVWF gbl_iDigitToFlash
@@ -2697,31 +2696,35 @@ _startup
 	BCF PCLATH,3
 	BCF PCLATH,4
 	GOTO	main
-	ORG 0x00000835
+	ORG 0x00000834
 interrupt
 ; { interrupt ; function begin
+	BTFSS gbl_intcon,2
+	GOTO	label141
+	BCF STATUS, RP0
+	BCF STATUS, RP1
+	INCF gbl_iTimer0Counts, F
+	MOVF gbl_iTimer0Counts, W
+	SUBLW 0x09
+	BTFSC STATUS,C
+	GOTO	label140
+	INCF gbl_iFlashDigitOff, F
+	CLRF gbl_iTimer0Counts
+	BSF gbl_cTask,1
+label140
+	MOVLW 0x3D
+	MOVWF gbl_tmr0
+	BCF gbl_intcon,2
+label141
 	BCF STATUS, RP0
 	BCF STATUS, RP1
 	BTFSS gbl_pir1,0
-	GOTO	label140
+	GOTO	label142
 	MOVLW 0xFF
 	MOVWF gbl_tmr1h
 	MOVWF gbl_tmr1l
 	BCF gbl_pir1,0
 	BSF gbl_cTask,2
-label140
-	BTFSS gbl_pir1,1
-	GOTO	label142
-	INCF gbl_iTimer2Counts, F
-	MOVF gbl_iTimer2Counts, W
-	SUBLW 0x09
-	BTFSC STATUS,C
-	GOTO	label141
-	INCF gbl_iFlashDigitOff, F
-	CLRF gbl_iTimer2Counts
-	BSF gbl_cTask,5
-label141
-	BCF gbl_pir1,1
 label142
 	SWAPF Int1BContext+D'2', W
 	MOVWF FSR

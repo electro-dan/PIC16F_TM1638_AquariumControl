@@ -1,10 +1,8 @@
 #ifndef _PIC16F_TM1638_AquariumControl_H_
 #define _PIC16F_TM1638_AquariumControl_H_
 
+#define TASK_TIMER0 1
 #define TASK_TIMER1 2
-#define TASK_TIMER1_START 3
-#define TASK_TIMER1_READ 4
-#define TASK_TIMER2 5
 
 #define oneWireBus (portc.5)
 #define oneWireTris (trisc.5)
@@ -17,6 +15,9 @@
 #define FAN (porta.1)
 #define HEATER (porta.0)
 
+// Timer 0 preload
+
+#define TMR0PRELOAD 61
 // This means timer 1 will overflow when 1 cycle completes, generating the interrupt
 #define TMR1HV 0xFF
 #define TMR1LV 0xFF
@@ -60,7 +61,7 @@ rom char *gDaysInMonth = {0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 
 rom char *gLeapYears = {0x04, 0x08, 0x12, 0x16, 0x20, 0x24, 0x28, 0x32, 0x36, 0x40, 0x44, 0x48, 0x52, 0x56, 0x60, 0x64, 0x68, 0x72, 0x76, 0x80, 0x84, 0x88, 0x92, 0x96}; // List of leap years
 
 // Timer variables
-char iTimer2Counts = 0;
+char iTimer0Counts = 0;
 char iFlashDigitOff = 0;
 char iDigitToFlash = 8; // 8 = no digit to flash
 

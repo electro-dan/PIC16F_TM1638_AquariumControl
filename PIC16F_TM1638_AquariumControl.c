@@ -594,19 +594,18 @@ void initialise() {
     adcon1 = 7; // Set RA0,RA1,RA2,RA5,RA3 all to digital I/O
 
 
-    // Setup timer 0, used for PWM
-    // https://labprojectsbd.com/2021/03/31/pwm-pulse-generation-using-pic12f675-micro-controller/
+    // Setup timer 0, used for flashing display
     // Timer calculator: http://eng-serve.com/pic/pic_timer.html
-    // Timer0 Registers Prescaler= 16 - TMR0 Preset = 0 - Freq = 244.14 Hz - Period = 0.004096 seconds
+    // Timer0 Registers Prescaler= 256 - TMR0 Preset = 61 - Freq = 20.03 Hz - Period = 0.049920 seconds
     //option_reg.T0CS = 0; // bit 5  TMR0 Clock Source Select bit...0 = Internal Clock (CLKO) 1 = Transition on T0CKI pin
     //option_reg.T0SE = 0; // bit 4 TMR0 Source Edge Select bit 0 = low/high 1 = high/low
     //option_reg.PSA = 0; // bit 3  Prescaler Assignment bit...0 = Prescaler is assigned to the Timer0
-    //option_reg.PS2 = 0; // bits 2-0  PS2:PS0: Prescaler Rate Select bits
-    /*option_reg.PS1 = 1;
+    option_reg.PS2 = 1; // bits 2-0  PS2:PS0: Prescaler Rate Select bits
+    option_reg.PS1 = 1;
     option_reg.PS0 = 1;
-    tmr0 = 0; // preset for timer register
+    tmr0 = TMR0PRELOAD; // preset for timer register (61)
     intcon.T0IF = 0; // Clear timer 1 interrupt flag bit
-    intcon.T0IE = 1; // Timer 1 interrupt enabled*/
+    intcon.T0IE = 1; // Timer 1 interrupt enabled
 
     // Setup timer 1, used to update clock display and periodically ask for a temperature reading
     // Timer 1 setup - interrupt on DS3231 SQW 1Hz
@@ -621,15 +620,6 @@ void initialise() {
     tmr1l = TMR1LV;      // preset for timer1 LSB register
     pie1.TMR1IE = 1;     // Timer 1 interrupt
     
-    // Setup timer 2, used for flashing display
-    // Timer calculator: http://eng-serve.com/pic/pic_timer.html
-    //Timer2 Registers Prescaler= 16 - TMR2 PostScaler = 16 - PR2 = 195 - Freq = 20.03 Hz - Period = 0.049920 seconds
-    t2con |= 120; // bits 6-3 Post scaler 1:1 thru 1:16
-    t2con.TMR2ON = 1; // bit 2 turn timer2 on;
-    t2con.T2CKPS1 = 1; // bits 1-0  Prescaler Rate Select bits
-    //t2con.T2CKPS0 = 0;
-    pr2 = 195; // PR2 (Timer2 Match value)
-
     // No task at initialisation
     cTask = 0;
     
@@ -658,6 +648,18 @@ void initialise() {
   Interrupt handler
 *********************************************************************************************/
 void interrupt() {
+    // Interrupt on timer0 - flash digit delay
+    if (intcon.T0IF) {
+        iTimer0Counts++;
+        if (iTimer0Counts > 9) {
+            iFlashDigitOff++;
+            iTimer0Counts = 0;
+            cTask.TASK_TIMER0 = 1;
+        }
+        tmr0 = TMR0PRELOAD;
+        // Clear interrupt flag
+        intcon.T0IF = 0; 
+    }
     // Handle timer1 interrupt - delay counter from DS3231
     if (pir1.TMR1IF) {
         tmr1h = TMR1HV;      // preset for timer1 MSB register
@@ -665,18 +667,6 @@ void interrupt() {
 
         pir1.TMR1IF = 0;     // Clear interrupt flag
         cTask.TASK_TIMER1 = 1;
-    }
-    
-    // Interrupt on timer2 - flash digit delay
-    if (pir1.TMR2IF) {
-        iTimer2Counts++;
-        if (iTimer2Counts > 9) {
-            iFlashDigitOff++;
-            iTimer2Counts = 0;
-            cTask.TASK_TIMER2 = 1;
-        }
-        // Clear interrupt flag
-        pir1.TMR2IF = 0; 
     }
 }
 
@@ -1041,11 +1031,11 @@ void main() {
                 
                 cTask.TASK_TIMER1 = 0;
             }
-            if (cTask.TASK_TIMER2) {
+            if (cTask.TASK_TIMER0) {
                 // If in set mode, update the display every ~half second to flash a digit
                 if (gcSetMode > 0)
                     tm1638UpdateDisplay();
-                cTask.TASK_TIMER2 = 0;
+                cTask.TASK_TIMER0 = 0;
             }
             // Poll keys
             tm1638ReadKeys();
