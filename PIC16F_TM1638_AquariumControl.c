@@ -10,7 +10,7 @@
 
     
 /*********************************************************************************************
-  oneWireBusReset()
+  void oneWireBusReset()
   First part of the reset routine - drive the bus low for 500us
 *********************************************************************************************/
 void oneWireBusReset() {
@@ -32,7 +32,7 @@ void oneWireBusReset() {
 }
 
 /*********************************************************************************************
-  oneWireTxByte(char data)
+  void oneWireTxByte(char data)
   Transmits a single byte from the bus
 *********************************************************************************************/
 void oneWireTxByte(char cData) {
@@ -61,7 +61,7 @@ void oneWireTxByte(char cData) {
 }
 
 /*********************************************************************************************
-  oneWireTxBytes(char data, char data2)
+  void oneWireTxBytes(char data, char data2)
   Transmits a 2 bytes from the bus
 *********************************************************************************************/
 void oneWireTxBytes(char cData, char cData2) {
@@ -74,7 +74,7 @@ void oneWireTxBytes(char cData, char cData2) {
 }
 
 /*********************************************************************************************
-  oneWireRxByte()
+  char oneWireRxByte()
   Receives a single byte from the bus
 *********************************************************************************************/
 char oneWireRxByte() {
@@ -105,19 +105,20 @@ char oneWireRxByte() {
     return cDataIn;
 }
 
-// https://www.instructables.com/The-Most-Comprehensive-Guide-to-Programming-the-AT/
 /*********************************************************************************************
- at24c32WriteAll()
- Write multiple bytes
+  void at24c32WriteAll()
+  Write multiple bytes
 *********************************************************************************************/
 void at24c32WriteAll() {
+	// https://www.instructables.com/The-Most-Comprehensive-Guide-to-Programming-the-AT/
 	i2c_start();
 	i2c_write(at24c32_addr); // address + write
 	// start at address 0
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
 	i2c_write(0); // Second word address 
 	// Write data bytes
-	// We're only writing 12 bytes here, so no need to worry about row rollover after 32 bytes
+	// We're only writing 13 bytes here, so no need to worry about row rollover after 32 bytes
+	i2c_write(0x44); // To indicate AT24C32 has been written to
 	i2c_write(gBcdWhiteOnMinute);
     i2c_write(gBcdWhiteOnHour);
     i2c_write(gBcdWhiteOffMinute);
@@ -135,8 +136,8 @@ void at24c32WriteAll() {
 }
 
 /*********************************************************************************************
- at24c32ReadAll()
- Read all bytes
+  void at24c32ReadAll()
+  Read all bytes
 *********************************************************************************************/
 void at24c32ReadAll() {
 	i2c_start();
@@ -147,26 +148,31 @@ void at24c32ReadAll() {
 	i2c_stop(); // Don't actually write a byte, just stop
 	
 	i2c_start();
-	i2c_write(ds3231_addr + 1); // address + read
-	gBcdWhiteOnMinute = i2c_read(0); // ack
-	gBcdWhiteOnHour = i2c_read(0); // ack
-	gBcdWhiteOffMinute = i2c_read(0); // ack
-	gBcdWhiteOffHour = i2c_read(0); // ack
-	gBcdBlueOnMinute = i2c_read(0); // ack
-	gBcdBlueOnHour = i2c_read(0); // ack
-	gBcdBlueOffMinute = i2c_read(0); // ack
-	gBcdBlueOffHour = i2c_read(0); // ack
-	gBcdFanOnTemp = i2c_read(0); // ack
-	gBcdFanOffTemp = i2c_read(0); // ack
-	gBcdHeaterOnTemp = i2c_read(0); // ack
-	gBcdHeaterOffTemp = i2c_read(1); // nack
+	i2c_write(at24c32_addr + 1); // address + read
+	char hasWritten = i2c_read(0); // ack
+	if (hasWritten != 0x44) {
+		i2c_read(1); // nack
+	} else {
+		gBcdWhiteOnMinute = i2c_read(0); // ack
+		gBcdWhiteOnHour = i2c_read(0); // ack
+		gBcdWhiteOffMinute = i2c_read(0); // ack
+		gBcdWhiteOffHour = i2c_read(0); // ack
+		gBcdBlueOnMinute = i2c_read(0); // ack
+		gBcdBlueOnHour = i2c_read(0); // ack
+		gBcdBlueOffMinute = i2c_read(0); // ack
+		gBcdBlueOffHour = i2c_read(0); // ack
+		gBcdFanOnTemp = i2c_read(0); // ack
+		gBcdFanOffTemp = i2c_read(0); // ack
+		gBcdHeaterOnTemp = i2c_read(0); // ack
+		gBcdHeaterOffTemp = i2c_read(1); // nack
+	}
 	i2c_stop();
 }
 
 
 /*********************************************************************************************
- ds3231Write(char ds3231Reg, char bWrite)
- Write one byte
+  void ds3231Write(char ds3231Reg, char bWrite)
+  Write one byte
 *********************************************************************************************/
 void ds3231Write(char ds3231Reg, char bWrite) {
 	i2c_start();
@@ -177,8 +183,8 @@ void ds3231Write(char ds3231Reg, char bWrite) {
 }
 
 /*********************************************************************************************
- ds3231Init()
- Initialise the DS3231
+  void ds3231Init()
+  Initialise the DS3231
 *********************************************************************************************/
 void ds3231Init() {
 	/* control register 0Eh
@@ -203,8 +209,8 @@ void ds3231Init() {
 }
 
 /*********************************************************************************************
- ds3231WriteDateTime()
- Write the date to the DS3231
+  void ds3231WriteDateTime()
+  Write the date to the DS3231
 *********************************************************************************************/
 void ds3231WriteDateTime() {
 	i2c_start();
@@ -221,8 +227,8 @@ void ds3231WriteDateTime() {
 }
 
 /*********************************************************************************************
- ds3231ReadDateTime()
- Write the date to the DS3231
+  void ds3231ReadDateTime()
+  Write the date to the DS3231
 *********************************************************************************************/
 void ds3231ReadDateTime() {
 	i2c_start();
@@ -243,8 +249,8 @@ void ds3231ReadDateTime() {
 }
 
 /*********************************************************************************************
- ds3231ReadRegister(char cRegAddress)
- Read one byte from a given DS3231 register address
+  char ds3231ReadRegister(char cRegAddress)
+  Read one byte from a given DS3231 register address
 *********************************************************************************************/
 char ds3231ReadRegister(char cRegAddress) {
 	char cStatus;
@@ -261,8 +267,8 @@ char ds3231ReadRegister(char cRegAddress) {
 }
 
 /*********************************************************************************************
- tm1638ByteWrite(char bWrite)
- Write one byte
+  void tm1638ByteWrite(char bWrite)
+  Write one byte
 *********************************************************************************************/
 void tm1638ByteWrite(char bWrite) {
     for (char i = 0; i < 8; i++) {
@@ -273,12 +279,28 @@ void tm1638ByteWrite(char bWrite) {
     }
 }
 
+/*********************************************************************************************
+  void tm1638DisplayOn()
+  Turns the display on, with defined brightness
+*********************************************************************************************/
+void tm1638DisplayOn() {
+    // Write 0x8F [10001000] to set display ON with pulse width 14/16
+    tm1638strobe = 0;
+    tm1638ByteWrite(0x88);
+    tm1638strobe = 1;
+}
+
+/*********************************************************************************************
+  void bcdTo7Seg(char iBcdIn)
+  Convert a single bcd byte into the 7-segment representation (two digits)
+  7-segment digit to be written will be iPrintStartDigit, which is auto-incremented after
+  If iPrintDotDigit matches, the dot on the display digit will be added
+*********************************************************************************************/
 void bcdTo7Seg(char iBcdIn) {
     char s7SegDisplay = 0;
     iPrintStartDigit++; // Increment to last digit
-    char sDigit = iPrintStartDigit;
     // Work backwards
-    for (sDigit; sDigit == iPrintStartDigit - 1; sDigit--) {
+    for (char sDigit = iPrintStartDigit; sDigit == iPrintStartDigit - 1; sDigit--) {
         s7SegDisplay = tm1638DisplayNumtoSeg[iBcdIn & 0x0F];
         if (sDigit == iPrintDotDigit)
             s7SegDisplay += tm1638Dot;
@@ -288,10 +310,9 @@ void bcdTo7Seg(char iBcdIn) {
     iPrintStartDigit++; // Increment to next digit
 }
 
-
 /*********************************************************************************************
- tm1638UpdateDisplay()
- Publish the tm1638Data and tm1638LEDs arrays to the display
+  void tm1638UpdateDisplay()
+  Publish the tm1638Data and tm1638LEDs arrays to the display
 *********************************************************************************************/
 void tm1638UpdateDisplay() {
     
@@ -481,7 +502,7 @@ void tm1638UpdateDisplay() {
     }
 
     // Light LED for set mode
-    char cCompareSetMode = gcSetMode + 2;
+    char cCompareSetMode = gcSetMode + 1;
     for (char i = 2; i < 8; i++) {
         if (i == cCompareSetMode)
             tm1638LEDs[i] = 1;
@@ -491,13 +512,13 @@ void tm1638UpdateDisplay() {
     tm1638LEDs[0] = HEATER;
     tm1638LEDs[1] = FAN;
 
-    // Write 0x40 [01000000] to indicate command to display data - [Write data to display register]
+    // Write 0x40 [01000000] (table 5.1) to indicate command to display data - [Write data to display register]
     tm1638strobe = 0;
     tm1638ByteWrite(tm1638ByteSetData);
     tm1638strobe = 1;
     
     tm1638strobe = 0;
-    // Specify the display address 0xC0 [11000000] then write out all 8 bytes
+    // Specify the display address 0xC0 [11000000] (table 5.2) then write out all 8 bytes [Display address 00H]
     tm1638ByteWrite(tm1638ByteSetAddr);
     for (char i = 0; i < tm1638MaxDigits; i++) {
         if (iFlashDigitOff.0 && (i == iDigitToFlash))
@@ -510,8 +531,8 @@ void tm1638UpdateDisplay() {
 }
 
 /*********************************************************************************************
- tm1638ReadKeys()
- Reads the keys status into tm1638Keys
+  void tm1638ReadKeys()
+  Reads the keys status into tm1638Keys
 *********************************************************************************************/
 void tm1638ReadKeys() {
     // Write 0x42 [01000010] to indicate command to read data
@@ -536,174 +557,8 @@ void tm1638ReadKeys() {
 }
 
 /*********************************************************************************************
-  Function called once only to initialise variables and
-  setup the PIC registers
-*********************************************************************************************/
-void initialise() {
-    //PIC16F73 doesn't have an internal oscillator
-    //pcon.OSCF = 1; // 4MHz internal osc
-
-    // Configure port A
-    /*
-    RA7     Doesn't exist
-    RA6     Doesn't exist
-    RA5     
-    RA4     
-    RA3     
-    RA2     
-    RA1     OUT FANS
-    RA0     OUT HEATER
-    */
-    trisa = 0x00; // all outputs
-    porta = 0x00; // All off
-    
-    // Configure port B
-    /*      
-    RB7     ICSP PGD
-    RB6     ICSP PGC
-    RB5     
-    RB4     
-    RB3     OUT TM1638 STB
-    RB2     OUT TM1638 CLK
-    RB1     IN/OUT TM1638 DIO
-    RB0     
-    */
-    trisb = 0x00; // all outputs by default
-    portb = 0x0E; // default TM1638 pins high
-
-    // Configure port C
-    /*      
-    RC7     
-    RC6     
-    RC5     IN/OUT DS18B20
-    RC4     IN/OUT DS3231M I2C SDA
-    RC3     IN/OUT DS3231M I2C CLK
-    RC2     OUT BLUE LIGHT PWM
-    RC1     OUT WHITE LIGHT PWM
-    RC0     IN SQW DS3231M
-    */
-    trisb = 0x01; // all outputs except RC0
-    portb = 0x38; // default DS18B20 and DS3231 pins high
-
-    option_reg = 0;
-    option_reg.NOT_RBPU = 1; // disable port b pull ups
-
-    // ADC setup
-    // PIC16F73 doesn't have comparators
-    //cmcon = 7; // disable all comparators so port a is usable as digital io
-    adcon1 = 7; // Set RA0,RA1,RA2,RA5,RA3 all to digital I/O
-
-
-    // Setup timer 0, used for flashing display
-    // Timer calculator: http://eng-serve.com/pic/pic_timer.html
-    // Timer0 Registers Prescaler= 256 - TMR0 Preset = 61 - Freq = 20.03 Hz - Period = 0.049920 seconds
-    //option_reg.T0CS = 0; // bit 5  TMR0 Clock Source Select bit...0 = Internal Clock (CLKO) 1 = Transition on T0CKI pin
-    //option_reg.T0SE = 0; // bit 4 TMR0 Source Edge Select bit 0 = low/high 1 = high/low
-    //option_reg.PSA = 0; // bit 3  Prescaler Assignment bit...0 = Prescaler is assigned to the Timer0
-    option_reg.PS2 = 1; // bits 2-0  PS2:PS0: Prescaler Rate Select bits
-    option_reg.PS1 = 1;
-    option_reg.PS0 = 1;
-    tmr0 = TMR0PRELOAD; // preset for timer register (61)
-    intcon.T0IF = 0; // Clear timer 1 interrupt flag bit
-    intcon.T0IE = 1; // Timer 1 interrupt enabled
-
-    // Setup timer 1, used to update clock display and periodically ask for a temperature reading
-    // Timer 1 setup - interrupt on DS3231 SQW 1Hz
-    // Timer1 Registers Prescaler= 1 - TMR1 Preset = 65535 - Freq = 1 Hz
-    // Bits 5-4 T1CKPS1:T1CKPS0 = 00: Prescaler Rate Select bits, 00 = 1:1 prescaler
-    // Bit 3 T1OSCEN = 0: Timer1 LP Oscillator Enable Control bit, 0 = off
-    // Bit 2 NOT_T1SYNC = 1: Timer1 External Clock Input Synchronization Control bit, 1 = Do not synchronize external clock input
-    // Bit 1 TMR1CS = 1: Timer1 Clock Source Select bit, 1 = External clock from T1OSO/T1CKI pin (on the rising edge)
-    // Bit 0 TMR1ON = 0: Timer1 On Bit, 0 = off
-    t1con = 0b00000110;
-    tmr1h = TMR1HV;      // preset for timer1 MSB register
-    tmr1l = TMR1LV;      // preset for timer1 LSB register
-    pie1.TMR1IE = 1;     // Timer 1 interrupt
-    
-    // No task at initialisation
-    cTask = 0;
-    
-    // Enable interrupts
-    intcon.GIE = 1;
-    intcon.PEIE = 1;
-
-	// I2C Bus initialisation - baud rate divisor not applicable for software implementation
-	i2c_init(1); 
-
-    // Read in variables from EEPROM
-    at24c32ReadAll();
-
-    // Check if the DS3231 needs initilising
-    char cStatus = ds3231ReadRegister(0x0F); // Read the status register
-    // If the oscillator (OSF bit in status register) has stopped, then init and write a default date/time
-    if (cStatus.7) {
-        ds3231Init();
-        ds3231WriteDateTime();
-    }
-}
-
-
-/*********************************************************************************************
-  interrupt()
-  Interrupt handler
-*********************************************************************************************/
-void interrupt() {
-    // Interrupt on timer0 - flash digit delay
-    if (intcon.T0IF) {
-        iTimer0Counts++;
-        if (iTimer0Counts > 9) {
-            iFlashDigitOff++;
-            iTimer0Counts = 0;
-            cTask.TASK_TIMER0 = 1;
-        }
-        tmr0 = TMR0PRELOAD;
-        // Clear interrupt flag
-        intcon.T0IF = 0; 
-    }
-    // Handle timer1 interrupt - delay counter from DS3231
-    if (pir1.TMR1IF) {
-        tmr1h = TMR1HV;      // preset for timer1 MSB register
-        tmr1l = TMR1LV;      // preset for timer1 LSB register
-
-        pir1.TMR1IF = 0;     // Clear interrupt flag
-        cTask.TASK_TIMER1 = 1;
-    }
-}
-
-int binToBcd(int iBin) {
-    int iBcd = 0; // 16-bit BCD value - only supporting up to 9999
-    int iTest = 32768; // Start testing from MSB
-    // Loop through the 16 bits in the two bytes
-    for (char i = 0; i < 16; i++) {
-        // Shift one
-        iBcd <<= 1;
-        // If the bit is set, add one
-        if (iBin & iTest)
-            iBcd++;
-        
-        // Add 3 to any BCD column 5 or greater
-        if ((iBcd & 0x0F) > 0x04)
-            iBcd += 3;
-        if ((iBcd & 0xF0) > 0x49)
-            iBcd += 0x30;
-        if ((iBcd & 0xF00) > 0x499)
-            iBcd += 0x300;
-        if ((iBcd & 0xF000) > 0x4999)
-            iBcd += 0x3000;
-        
-        // move the test bit
-        iTest >>= 1;
-    }
-
-    return iBcd;
-}
-
-
-/*********************************************************************************************
-  displayTemp()
+  void convertTemp()
   Used to split the 16 bit integer returned from the ds18b20 into parts for display
-  cTempH - upper 8 bits
-  cTempL - lower 8 bits
 *********************************************************************************************/
 void convertTemp() {
     // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
@@ -727,7 +582,29 @@ void convertTemp() {
     //giDS3231ValueBCD += iValue % 10;
     
     // Double Dabble
-    giDS3231ValueBCD = binToBcd(iValue);
+    giDS3231ValueBCD = 0; // 16-bit BCD value - only supporting up to 9999
+    int iTest = 32768; // Start testing from MSB
+    // Loop through the 16 bits in the two bytes
+    for (char i = 0; i < 16; i++) {
+        // Shift one
+        giDS3231ValueBCD <<= 1;
+        // If the bit is set, add one
+        if (iValue & iTest)
+            giDS3231ValueBCD++;
+        
+        // Add 3 to any BCD column 5 or greater
+        if ((giDS3231ValueBCD & 0x0F) > 0x04)
+            giDS3231ValueBCD += 3;
+        if ((giDS3231ValueBCD & 0xF0) > 0x49)
+            giDS3231ValueBCD += 0x30;
+        if ((giDS3231ValueBCD & 0xF00) > 0x499)
+            giDS3231ValueBCD += 0x300;
+        if ((giDS3231ValueBCD & 0xF000) > 0x4999)
+            giDS3231ValueBCD += 0x3000;
+        
+        // move the test bit
+        iTest >>= 1;
+    }
     
     // less program memory needed - may be slower executing
     // https://electronics.stackexchange.com/questions/158563/how-to-split-a-floating-point-number-into-individual-digits
@@ -760,7 +637,7 @@ void convertTemp() {
 }
 
 /*********************************************************************************************
-  startTemp()
+  void startTemp()
   Sends the Convert T [44h] function command to the ds18b20
 *********************************************************************************************/
 void startTemp() {
@@ -770,7 +647,7 @@ void startTemp() {
 }
 
 /*********************************************************************************************
-  startTemp()
+  void startTemp()
   Sends the Read Scratchpad [BEh] function command to the ds18b20
 *********************************************************************************************/
 void readTemp() {
@@ -812,7 +689,7 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
 }
 
 /*********************************************************************************************
-  adjustDateTime()
+  void adjustDateTime()
   Increment or Decrement a BCD variable for sending to the DS3231, within a given range
   Must set iBcdAdjustment first
 *********************************************************************************************/
@@ -858,7 +735,7 @@ void adjustDateTime() {
 }
 
 /*********************************************************************************************
-  adjustTrigger()
+  void adjustTrigger()
   Increment or Decrement a trigger time or temperate
   Must set iBcdAdjustment first
 *********************************************************************************************/
@@ -915,6 +792,10 @@ void adjustTrigger() {
     }
 }
 
+/*********************************************************************************************
+  void processKeys()
+  Action a key press
+*********************************************************************************************/
 void processKeys() {
     switch (tm1638Keys) {
         case 1:
@@ -972,11 +853,151 @@ void processKeys() {
     }
 }
 
+/*********************************************************************************************
+  void interrupt()
+  Interrupt handler
+*********************************************************************************************/
+void interrupt() {
+    // Interrupt on timer0 - flash digit delay
+    if (intcon.T0IF) {
+        iTimer0Counts++;
+        if (iTimer0Counts > 9) {
+            iFlashDigitOff++;
+            iTimer0Counts = 0;
+            cTask.TASK_TIMER0 = 1;
+        }
+        tmr0 = TMR0PRELOAD;
+        // Clear interrupt flag
+        intcon.T0IF = 0; 
+    }
+    // Handle timer1 interrupt - delay counter from DS3231
+    if (pir1.TMR1IF) {
+        tmr1h = TMR1HV;      // preset for timer1 MSB register
+        tmr1l = TMR1LV;      // preset for timer1 LSB register
+
+        pir1.TMR1IF = 0;     // Clear interrupt flag
+        cTask.TASK_TIMER1 = 1;
+    }
+}
+
+/*********************************************************************************************
+  void initialise()
+  Function called once only to initialise variables and
+  setup the PIC registers
+*********************************************************************************************/
+void initialise() {
+    //PIC16F73 doesn't have an internal oscillator
+    //pcon.OSCF = 1; // 4MHz internal osc
+
+    // Configure port A
+    /*
+    RA7     Doesn't exist
+    RA6     Doesn't exist
+    RA5     
+    RA4     
+    RA3     
+    RA2     
+    RA1     OUT FANS
+    RA0     OUT HEATER
+    */
+    trisa = 0x00; // all outputs
+    porta = 0x00; // All off
+    
+    // Configure port B
+    /*      
+    RB7     ICSP PGD
+    RB6     ICSP PGC
+    RB5     
+    RB4     
+    RB3     OUT TM1638 STB
+    RB2     OUT TM1638 CLK
+    RB1     IN/OUT TM1638 DIO
+    RB0     
+    */
+    trisb = 0x00; // all outputs by default
+    portb = 0x0E; // default TM1638 pins high
+
+    // Configure port C
+    /*      
+    RC7     
+    RC6     
+    RC5     IN/OUT DS18B20
+    RC4     IN/OUT DS3231M I2C SDA
+    RC3     IN/OUT DS3231M I2C CLK
+    RC2     OUT BLUE LIGHT PWM
+    RC1     OUT WHITE LIGHT PWM
+    RC0     IN SQW DS3231M
+    */
+    trisc = 0x21; // RC0 and RC5 inputs
+    portc = 0x38; // default DS18B20 and DS3231 pins high
+
+    option_reg = 0;
+    option_reg.NOT_RBPU = 1; // disable port b pull ups
+
+    // ADC setup
+    // PIC16F73 doesn't have comparators
+    //cmcon = 7; // disable all comparators so port a is usable as digital io
+    adcon1 = 7; // Set RA0,RA1,RA2,RA5,RA3 all to digital I/O
+
+
+    // Setup timer 0, used for flashing display
+    // Timer calculator: http://eng-serve.com/pic/pic_timer.html
+    // Timer0 Registers Prescaler= 256 - TMR0 Preset = 61 - Freq = 20.03 Hz - Period = 0.049920 seconds
+    //option_reg.T0CS = 0; // bit 5  TMR0 Clock Source Select bit...0 = Internal Clock (CLKO) 1 = Transition on T0CKI pin
+    //option_reg.T0SE = 0; // bit 4 TMR0 Source Edge Select bit 0 = low/high 1 = high/low
+    //option_reg.PSA = 0; // bit 3  Prescaler Assignment bit...0 = Prescaler is assigned to the Timer0
+    option_reg.PS2 = 1; // bits 2-0  PS2:PS0: Prescaler Rate Select bits
+    option_reg.PS1 = 1;
+    option_reg.PS0 = 1;
+    tmr0 = TMR0PRELOAD; // preset for timer register (61)
+    intcon.T0IF = 0; // Clear timer 1 interrupt flag bit
+    intcon.T0IE = 1; // Timer 1 interrupt enabled
+
+    // Setup timer 1, used to update clock display and periodically ask for a temperature reading
+    // Timer 1 setup - interrupt on DS3231 SQW 1Hz
+    // Timer1 Registers Prescaler= 1 - TMR1 Preset = 65535 - Freq = 1 Hz
+    // Bits 5-4 T1CKPS1:T1CKPS0 = 00: Prescaler Rate Select bits, 00 = 1:1 prescaler
+    // Bit 3 T1OSCEN = 0: Timer1 LP Oscillator Enable Control bit, 0 = off
+    // Bit 2 NOT_T1SYNC = 1: Timer1 External Clock Input Synchronization Control bit, 1 = Do not synchronize external clock input
+    // Bit 1 TMR1CS = 1: Timer1 Clock Source Select bit, 1 = External clock from T1OSO/T1CKI pin (on the rising edge)
+    // Bit 0 TMR1ON = 0: Timer1 On Bit, 0 = off
+    t1con = 0b00000111;
+    tmr1h = TMR1HV;      // preset for timer1 MSB register
+    tmr1l = TMR1LV;      // preset for timer1 LSB register
+    pie1.TMR1IE = 1;     // Timer 1 interrupt
+    
+    // No task at initialisation
+    cTask = 0;
+    
+    // Enable interrupts
+    intcon.GIE = 1;
+    intcon.PEIE = 1;
+
+	// I2C Bus initialisation - baud rate divisor not applicable for software implementation
+	i2c_init(1); 
+
+    // Read in variables from EEPROM
+    at24c32ReadAll();
+
+    // Check if the DS3231 needs initilising
+    char cStatus = ds3231ReadRegister(0x0F); // Read the status register
+    // If the oscillator (OSF bit in status register) has stopped, then init and write a default date/time
+    if (cStatus.7) {
+        ds3231Init();
+        ds3231WriteDateTime();
+    }
+    
+	tm1638DisplayOn();
+    tm1638UpdateDisplay();
+}
+
+/*********************************************************************************************
+  void main()
+  Entry method. Loops infinitely with a simple task scheduler.
+*********************************************************************************************/
 void main() {
     initialise();
-    //convertTemp();
-    tm1638UpdateDisplay();
-
+    
     // Endless loop
     while(1) {
         // Task scheduler
@@ -1037,11 +1058,13 @@ void main() {
                     tm1638UpdateDisplay();
                 cTask.TASK_TIMER0 = 0;
             }
-            // Poll keys
-            tm1638ReadKeys();
-            if (tm1638Keys != 0) {
-                processKeys();
-            }
         }
+		// Poll keys
+		tm1638ReadKeys();
+		if (tm1638Keys != tm1638KeysOld) {
+			if (tm1638Keys != 0)
+				processKeys();
+			tm1638KeysOld = tm1638Keys;
+		}
     }
 }
