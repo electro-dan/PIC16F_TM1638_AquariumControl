@@ -10,3 +10,6 @@ x Trigger Heater
 x EEPROM variables using AT24C32
 x BCD to tm1638DisplayNumtoSeg put in function
 Brightness PWM - not built for now as unsure of frequency affect on fish
+
+Issues:
+- No timer interrupt - check DS3231 init

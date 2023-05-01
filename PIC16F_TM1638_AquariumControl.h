@@ -65,12 +65,12 @@ char iTimer0Counts = 0;
 char iFlashDigitOff = 0;
 char iDigitToFlash = 8; // 8 = no digit to flash
 
-// Hold the upper and lower bytes from the ds18b0x
-char cTempH = 0;
-char cTempL = 0;
+// Hold the upper and lower bytes from the ds18b20
+char cTempH = 1;
+char cTempL = 70;
 //char iDecimalPosition = 2;
 
-int giDS3231ValueBCD = 0;
+int giDS3231ValueBCD = 0x2000;
 char gbDS3231IsMinus = 0;
 
 char cTask = 0; // Used for task scheduler
@@ -122,6 +122,7 @@ char tm1638Data[] = {0, 0, 0, 0, 0, 0, 0, 0};
 char tm1638LEDs[] = {0, 0, 0, 0, 0, 0, 0, 0};
 // Copy of the keys
 char tm1638Keys = 0;
+char tm1638KeysOld = 0;
 // For printing
 char iPrintStartDigit = 0;
 char iPrintDotDigit = 8;
@@ -154,6 +155,7 @@ char ds3231ReadRegister(char cRegAddress);
 // TM1638 functions
 void tm1638ByteWrite(char bWrite);
 void bcdTo7Seg(char iBcdIn);
+void tm1638DisplayOn();
 void tm1638UpdateDisplay();
 void tm1638ReadKeys();
 
