@@ -90,10 +90,11 @@ char oneWireRxByte() {
 
         // Release bus for 6us, this is enough time for the slave to respond
         oneWireTris = 1;
-        delay_us(6); // Delay 6us
+        delay_us(3); // Delay 6us
         
         // Shift data already received left
         cDataIn >>= 1;
+        
         // Check the value of the onewire bus - set the MSB of cDataIn if so
         if (oneWireBus)
             cDataIn.7 = 1;
@@ -238,7 +239,7 @@ void ds3231ReadDateTime() {
 	
 	i2c_start();
 	i2c_write(ds3231_addr + 1); // address + read
-	gBcdSeconds = i2c_read(0); // ack
+	gBcdSecond = i2c_read(0); // ack
 	gBcdMinute = i2c_read(0); // ack
 	gBcdHour = i2c_read(0); // ack
 	gDayOfWeek = i2c_read(0); // ack
@@ -291,23 +292,26 @@ void tm1638DisplayOn() {
 }
 
 /*********************************************************************************************
-  void bcdTo7Seg(char iBcdIn)
-  Convert a single bcd byte into the 7-segment representation (two digits)
+  void nibbleTo7Seg(char iNibble)
+  Convert a single nibble into the 7-segment representation (two digits)
   7-segment digit to be written will be iPrintStartDigit, which is auto-incremented after
   If iPrintDotDigit matches, the dot on the display digit will be added
 *********************************************************************************************/
+void nibbleTo7Seg(char bNibble) {
+	char s7SegDisplay = tm1638DisplayNumtoSeg[bNibble & 0x0F];
+	if (iPrintStartDigit == iPrintDotDigit)
+        s7SegDisplay += tm1638Dot;
+    tm1638Data[iPrintStartDigit] = s7SegDisplay;
+    iPrintStartDigit++;
+}
+
+/*********************************************************************************************
+  void bcdTo7Seg(char iBcdIn)
+  Convert a single bcd byte into the 7-segment representation (two digits)
+*********************************************************************************************/
 void bcdTo7Seg(char iBcdIn) {
-    char s7SegDisplay = 0;
-    iPrintStartDigit++; // Increment to last digit
-    // Work backwards
-    for (char sDigit = iPrintStartDigit; sDigit == iPrintStartDigit - 1; sDigit--) {
-        s7SegDisplay = tm1638DisplayNumtoSeg[iBcdIn & 0x0F];
-        if (sDigit == iPrintDotDigit)
-            s7SegDisplay += tm1638Dot;
-        tm1638Data[sDigit] = s7SegDisplay;
-        iBcdIn >>= 4;
-    }
-    iPrintStartDigit++; // Increment to next digit
+    nibbleTo7Seg(iBcdIn >> 4);
+    nibbleTo7Seg(iBcdIn);
 }
 
 /*********************************************************************************************
@@ -340,7 +344,7 @@ void tm1638UpdateDisplay() {
                 case 1:
                     // White LED on hour
                     tm1638Data[0] = 0x38; // L
-                    tm1638Data[1] = 0x30; // I
+                    tm1638Data[1] = 0; // 
                     tm1638Data[2] = 0x3f; // O
                     tm1638Data[3] = 0x54; // n
                     iDigitToFlash = 5;
@@ -427,7 +431,7 @@ void tm1638UpdateDisplay() {
                     break;
                 case 11:
                     // Heater on temperature
-                    tm1638Data[0] = 0x38; // H
+                    tm1638Data[0] = 0x76; // H
                     tm1638Data[1] = 0x7B; // e
                     tm1638Data[2] = 0x30; // a
                     tm1638Data[3] = 0x78; // t
@@ -480,10 +484,11 @@ void tm1638UpdateDisplay() {
             giDS3231ValueBCD >>= 4;
             iPrintDotDigit = 2;
         }*/
-        // Display current temperature in digits 0 to 3 (+dot on 1, or 2 if <=-10)
+        // Display current temperature in digits 0 to 3 (+dot on digit 1 and 3)
         iPrintStartDigit = 0;
-        bcdTo7Seg(giDS3231ValueBCD);
         bcdTo7Seg(giDS3231ValueBCD >> 8);
+        iPrintDotDigit = 3;
+        bcdTo7Seg(giDS3231ValueBCD);
 
         // left fill zeroes with blanks up to the digit before the decimal place
         if (tm1638Data[0] == 0x3f)
@@ -496,7 +501,11 @@ void tm1638UpdateDisplay() {
     // HH.MM in last 4 digits of TM1638
     if (!gcTriggerMode) {
         iPrintStartDigit = 4;
-        iPrintDotDigit = 5;
+        // Flash dot every second
+        if (gBcdSecond.0)
+			iPrintDotDigit = 5;
+		else
+			iPrintDotDigit = 8;
         bcdTo7Seg(gBcdHour); // Display hour in digits 4 and 5 (dot on 5)
         bcdTo7Seg(gBcdMinute); // Display minute in digits 6 and 7 (no dot)
     }
@@ -518,13 +527,15 @@ void tm1638UpdateDisplay() {
     tm1638strobe = 1;
     
     tm1638strobe = 0;
-    // Specify the display address 0xC0 [11000000] (table 5.2) then write out all 8 bytes [Display address 00H]
+    // Specify the display address 0xC0 [11000000] (table 5.2) [Display address 00H] then write out all 16 bytes
     tm1638ByteWrite(tm1638ByteSetAddr);
     for (char i = 0; i < tm1638MaxDigits; i++) {
+        // display digit first
         if (iFlashDigitOff.0 && (i == iDigitToFlash))
             tm1638ByteWrite(0);
         else
             tm1638ByteWrite(tm1638Data[i]);
+        // then LED
         tm1638ByteWrite(tm1638LEDs[i]);
     }
     tm1638strobe = 1;
@@ -547,13 +558,23 @@ void tm1638ReadKeys() {
         tm1638clk = 0;
         delay_us(1);
         if(tm1638dio)
-            tm1638KeysTemp = (tm1638KeysTemp << 1);
+            tm1638KeysTemp <<= 1;
         tm1638clk = 1;
     }
     tm1638dioTris = 0; // Set data pin to output
     tm1638strobe = 1;
 
     tm1638Keys = tm1638KeysTemp;
+    /*
+    1F = 0001 1111
+	17 = 0001 0111
+	0F = 0000 1111
+	07 = 0000 0111
+	1B = 0001 1011
+	13 = 0001 0011
+	0B = 0000 1011
+	03 = 0000 0111
+	*/
 }
 
 /*********************************************************************************************
@@ -562,7 +583,6 @@ void tm1638ReadKeys() {
 *********************************************************************************************/
 void convertTemp() {
     // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
-    
     signed int iTemp = (cTempH << 8) | cTempL;
     
     // Celcius
@@ -582,7 +602,7 @@ void convertTemp() {
     //giDS3231ValueBCD += iValue % 10;
     
     // Double Dabble
-    giDS3231ValueBCD = 0; // 16-bit BCD value - only supporting up to 9999
+    /*giDS3231ValueBCD = 0; // 16-bit BCD value - only supporting up to 9999
     int iTest = 32768; // Start testing from MSB
     // Loop through the 16 bits in the two bytes
     for (char i = 0; i < 16; i++) {
@@ -604,36 +624,36 @@ void convertTemp() {
         
         // move the test bit
         iTest >>= 1;
-    }
+    }*/
     
     // less program memory needed - may be slower executing
     // https://electronics.stackexchange.com/questions/158563/how-to-split-a-floating-point-number-into-individual-digits
-    /*giDS3231ValueBCD = 0;
+    giDS3231ValueBCD = 0;
 
     // incrementing variables for each digit
     // determine to thousands digit
     while (iValue >= 1000) {
         iValue = iValue - 1000;
         // each time we take off 1000, the digit is incremented
-        giDS3231ValueBCD += 0x1000;
+        giDS3231ValueBCD = giDS3231ValueBCD + 0x1000;
     }
 
     // determine to hundreds digit
     while (iValue >= 100) {
         iValue = iValue - 100;
         // each time we take off 100, the digit is incremented
-        giDS3231ValueBCD += 0x100;
+        giDS3231ValueBCD = giDS3231ValueBCD + 0x100;
     }
 
     // determine to tens digit
     while (iValue >= 10) {
         iValue = iValue - 10;
         // each time we take off 10, the left most digit is incremented
-        giDS3231ValueBCD += 0x10;
+        giDS3231ValueBCD = giDS3231ValueBCD + 0x10;
     }
 
     // the last digit is what's left on iValue
-    giDS3231ValueBCD += iValue;*/
+    giDS3231ValueBCD = giDS3231ValueBCD + iValue;
 }
 
 /*********************************************************************************************
@@ -672,7 +692,7 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
         if (bcd == bcdMax)
             bcd = bcdMin;
         else if ((bcd & 0x0F) == 9)
-            bcd += 0x10;
+            bcd += 0x07; // add 0x10, minus 9
         else
             bcd++;
     } else {
@@ -681,7 +701,7 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
         if (bcd == bcdMin)
             bcd = bcdMax;
         else if ((bcd & 0x0F) == 0)
-            bcd -= 0x10;
+            bcd -= 0x07; // mins 0x10, add 9
         else
             bcd--;
     }
@@ -798,33 +818,38 @@ void adjustTrigger() {
 *********************************************************************************************/
 void processKeys() {
     switch (tm1638Keys) {
-        case 1:
+        case 0x1F:
             // Toggle white light on/off
             WHITE_LED = !WHITE_LED;
             break;
-        case 2:
+        case 0x17:
             // Toggle blue light on/off
             BLUE_LED = !BLUE_LED;
             break;
-        case 3:
+        case 0x0F:
             // Toggle fan on/off
-            FAN = !FAN;
+            gbFanOn = !gbFanOn;
             break;
-        case 4:
+        case 0x07:
+            // Exit other modes
+            gcSetMode = 0;
+            gcTriggerMode = 0;
             // Display temp C/temp F/date
             gcDisplayMode++;
             if (gcDisplayMode > 2)
                 gcDisplayMode = 0;
             break;
-        case 5:
-            // Set
+        case 0x1B:
+            // Exit other modes
+            gcTriggerMode = 0;
+            // Adjust set mode
             gcSetMode++;
             if (gcSetMode > 6) {
                 ds3231WriteDateTime();
                 gcSetMode = 0;
             }
             break;
-        case 6:
+        case 0x13:
             // Adjust down
             iBcdAdjustment = 0;
             if (gcSetMode) {
@@ -833,7 +858,7 @@ void processKeys() {
                 adjustTrigger();
             }
             break;
-        case 7:
+        case 0x0B:
             iBcdAdjustment = 1;
             // Adjust up
             if (gcSetMode) {
@@ -842,8 +867,10 @@ void processKeys() {
                 adjustTrigger();
             }
             break;
-        case 8:
-            // Timer
+        case 0x03:
+            // Exit set mode
+            gcSetMode = 0;
+            // Adjust timer mode
             gcTriggerMode++;
             if (gcTriggerMode > 12) {
                 gcTriggerMode = 0;
@@ -861,12 +888,8 @@ void interrupt() {
     // Interrupt on timer0 - flash digit delay
     if (intcon.T0IF) {
         iTimer0Counts++;
-        if (iTimer0Counts > 9) {
-            iFlashDigitOff++;
-            iTimer0Counts = 0;
-            cTask.TASK_TIMER0 = 1;
-        }
         tmr0 = TMR0PRELOAD;
+        cTask.TASK_TIMER0 = 1;
         // Clear interrupt flag
         intcon.T0IF = 0; 
     }
@@ -1007,11 +1030,11 @@ void main() {
             if (cTask.TASK_TIMER1) {
                 if (gcSetMode == 0) {
                     ds3231ReadDateTime();
-                    if ((gBcdSeconds == 0x29) || (gBcdSeconds == 0x59)) {
+                    if ((gBcdSecond == 0x29) || (gBcdSecond == 0x59)) {
                         // Ask to convert for temperature reading at 29 seconds or 59 seconds past the minute
                         oneWireBusReset();
                         startTemp();
-                    } else if ((gBcdSeconds == 0) || (gBcdSeconds == 0x30)) {
+                    } else if ((gBcdSecond == 0) || (gBcdSecond == 0x30)) {
                         // 1 second later, read the converted temperature
                         oneWireBusReset();
                         readTemp(); 
@@ -1035,16 +1058,20 @@ void main() {
                 }
                 // Trigger fan
                 char cTempTruncated = giDS3231ValueBCD >> 8;
-                if (cTempTruncated == gBcdFanOnTemp) {
+                if (cTempTruncated >= gBcdFanOnTemp) {
                     FAN = 1;
                 }
-                if (cTempTruncated == gBcdFanOffTemp) {
+                if (cTempTruncated <= gBcdFanOffTemp) {
                     FAN = 0;
                 }
-                if (cTempTruncated == gBcdHeaterOnTemp) {
+                // Forced on
+                if (gbFanOn)
+					FAN = 1;
+                // Trigger heater
+                if (cTempTruncated <= gBcdHeaterOnTemp) {
                     HEATER = 1;
                 }
-                if (cTempTruncated == gBcdHeaterOffTemp) {
+                if (cTempTruncated >= gBcdHeaterOffTemp) {
                     HEATER = 0;
                 }
                 // Display time and temp or date on TM1638
@@ -1053,18 +1080,25 @@ void main() {
                 cTask.TASK_TIMER1 = 0;
             }
             if (cTask.TASK_TIMER0) {
-                // If in set mode, update the display every ~half second to flash a digit
-                if (gcSetMode > 0)
-                    tm1638UpdateDisplay();
+				// ~half second count
+				if (iTimer0Counts > 9) {
+					iFlashDigitOff++;
+					iTimer0Counts = 0;					
+					// If in set mode, update the display every ~half second to flash a digit
+					if (gcSetMode > 0)
+						tm1638UpdateDisplay();
+				}
+				// Poll keys every 50ms
+				tm1638ReadKeys();
+				if (tm1638Keys != tm1638KeysOld) {
+					//if (tm1638Keys != 0) {
+						processKeys();
+						tm1638UpdateDisplay();
+					//}
+					tm1638KeysOld = tm1638Keys;
+				}
                 cTask.TASK_TIMER0 = 0;
             }
         }
-		// Poll keys
-		tm1638ReadKeys();
-		if (tm1638Keys != tm1638KeysOld) {
-			if (tm1638Keys != 0)
-				processKeys();
-			tm1638KeysOld = tm1638Keys;
-		}
     }
 }

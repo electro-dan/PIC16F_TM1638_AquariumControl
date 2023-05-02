@@ -50,7 +50,7 @@ unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
 #define at24c32_addr 0xAE // Left shifted 7 bit address 0x57
 
 // Time and date variables
-char gBcdSeconds = 0; // 0 to 59
+char gBcdSecond = 0; // 0 to 59
 char gBcdMinute = 0; // 0 to 59
 char gBcdHour = 0; // 0 to 23 or 1 to 12. Also contains 12/24 setting at bit 6. If 12 hour, AM/PM uses bit 5
 char gDayOfWeek = 1; // 1 to 7

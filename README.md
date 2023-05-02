@@ -12,4 +12,10 @@ x BCD to tm1638DisplayNumtoSeg put in function
 Brightness PWM - not built for now as unsure of frequency affect on fish
 
 Issues:
-- No timer interrupt - check DS3231 init
+x No timer interrupt - check DS3231 init
+- BCD inc/dec wrong
+- hour/min both set
+- fan/heat message wrong
+- flashing issue
+- fan on/off override
+- set mode should exit when trigger mode actived + vice versa
