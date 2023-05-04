@@ -113,7 +113,7 @@ char oneWireRxByte() {
 void at24c32WriteAll() {
 	// https://www.instructables.com/The-Most-Comprehensive-Guide-to-Programming-the-AT/
 	i2c_start();
-	i2c_write(at24c32_addr); // address + write
+	i2c_write(at24c32Addr); // address + write
 	// start at address 0
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
 	i2c_write(0); // Second word address 
@@ -142,14 +142,14 @@ void at24c32WriteAll() {
 *********************************************************************************************/
 void at24c32ReadAll() {
 	i2c_start();
-	i2c_write(at24c32_addr); // address + write
+	i2c_write(at24c32Addr); // address + write
 	// start at address 0
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
 	i2c_write(0); // Second word address 
 	i2c_stop(); // Don't actually write a byte, just stop
 	
 	i2c_start();
-	i2c_write(at24c32_addr + 1); // address + read
+	i2c_write(at24c32Addr + 1); // address + read
 	char hasWritten = i2c_read(0); // ack
 	if (hasWritten != 0x44) {
 		i2c_read(1); // nack
@@ -177,7 +177,7 @@ void at24c32ReadAll() {
 *********************************************************************************************/
 void ds3231Write(char ds3231Reg, char bWrite) {
 	i2c_start();
-	i2c_write(ds3231_addr); // address + write
+	i2c_write(ds3231Addr); // address + write
 	i2c_write(ds3231Reg); // start at address
 	i2c_write(bWrite); // start at address
 	i2c_stop();
@@ -215,7 +215,7 @@ void ds3231Init() {
 *********************************************************************************************/
 void ds3231WriteDateTime() {
 	i2c_start();
-	i2c_write(ds3231_addr); // address + write
+	i2c_write(ds3231Addr); // address + write
 	i2c_write(0); // start at address 0
 	i2c_write(0); // seconds
 	i2c_write(gBcdMinute); // minutes
@@ -233,12 +233,12 @@ void ds3231WriteDateTime() {
 *********************************************************************************************/
 void ds3231ReadDateTime() {
 	i2c_start();
-	i2c_write(ds3231_addr); // address + write
+	i2c_write(ds3231Addr); // address + write
 	i2c_write(0); // start at address 0
 	i2c_stop();
 	
 	i2c_start();
-	i2c_write(ds3231_addr + 1); // address + read
+	i2c_write(ds3231Addr + 1); // address + read
 	gBcdSecond = i2c_read(0); // ack
 	gBcdMinute = i2c_read(0); // ack
 	gBcdHour = i2c_read(0); // ack
@@ -256,12 +256,12 @@ void ds3231ReadDateTime() {
 char ds3231ReadRegister(char cRegAddress) {
 	char cStatus;
 	i2c_start();
-	i2c_write(ds3231_addr); // address + write
+	i2c_write(ds3231Addr); // address + write
 	i2c_write(cRegAddress); // start at requested address
 	i2c_stop();
 	
 	i2c_start();
-	i2c_write(ds3231_addr + 1); // address + read
+	i2c_write(ds3231Addr + 1); // address + read
 	cStatus = i2c_read(1); // read the byte, then nack
     i2c_stop();
     return cStatus;
@@ -327,9 +327,8 @@ void tm1638UpdateDisplay() {
             // Display year
             // Start printing from digit 0
             iPrintStartDigit = 0;
-            iPrintDotDigit = 1;
-            bcdTo7Seg(0x20); // Display 20 in digits 0 and 1 (+dot on 1)
             iPrintDotDigit = 3;
+            bcdTo7Seg(0x20); // Display 20 in digits 0 and 1 (no dot)
             bcdTo7Seg(gBcdYear); // Display year in digits 2 and 3 (+dot on 3)
         } else if (gcSetMode == 4) {
             iDigitToFlash = 3;
@@ -407,12 +406,14 @@ void tm1638UpdateDisplay() {
                 case 8:
                     // Blue LED off minute
                     iDigitToFlash = 7;
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 9:
                     // Fan on temperature
-                    tm1638Data[0] = 0x38; // F
-                    tm1638Data[1] = 0x30; // a
+                    tm1638Data[0] = 0x71; // F
+                    tm1638Data[1] = 0x5F; // a
                     tm1638Data[2] = 0x54; // n
                     tm1638Data[3] = 0x00; // 
                     tm1638Data[4] = 0x3f; // O
@@ -433,7 +434,7 @@ void tm1638UpdateDisplay() {
                     // Heater on temperature
                     tm1638Data[0] = 0x76; // H
                     tm1638Data[1] = 0x7B; // e
-                    tm1638Data[2] = 0x30; // a
+                    tm1638Data[2] = 0x5F; // a
                     tm1638Data[3] = 0x78; // t
                     tm1638Data[4] = 0x3f; // O
                     tm1638Data[5] = 0x54; // n
@@ -475,6 +476,7 @@ void tm1638UpdateDisplay() {
             bcdTo7Seg(gBcdMonth); // Display month in digits 2 and 3 (+dot on 3)
         }
     } else {
+        iDigitToFlash = 8; // No flashing digit in this mode
         // translate DS3231 temperature to digit values
         iPrintDotDigit = 1;
         /*
@@ -602,29 +604,32 @@ void convertTemp() {
     //giDS3231ValueBCD += iValue % 10;
     
     // Double Dabble
-    /*giDS3231ValueBCD = 0; // 16-bit BCD value - only supporting up to 9999
-    int iTest = 32768; // Start testing from MSB
-    // Loop through the 16 bits in the two bytes
-    for (char i = 0; i < 16; i++) {
-        // Shift one
+    // Less program memory needed - may be slower executing
+    // https://www.electro-tech-online.com/threads/32bit-bin2bcd-casting.126235/#post-1047937
+    // Init the 16-bit BCD value to zero - output only supporting an input value up to 9999 in this implementation
+    /*giDS3231ValueBCD = 0;
+    int iMask;
+    // 48 loops
+    // Shift 12 times
+    for(char i = 0; i < 12; i++){
+        // Check if any nibble is 5 or greater
+        // Start with the right most nibble (digit), shifting 4 bits each time
+        //for(; iMask != 0; iMask >>= 4){
+        iMask = 0xF000; // Start checking the thousands digit 10^3
+        for (char j = 0; j < 4; j++) {
+            // For the digit we're checking, if bcd value is greater than or equal to 5, add 3
+            if ((iMask & giDS3231ValueBCD) >= (iMask & 0x5555))
+                giDS3231ValueBCD += (iMask & 0x3333); // Add 3
+            iMask = iMask >> 4; // Shift the mask byte 4 bits (one nibble) right
+        }
+        // Shift bcd value
         giDS3231ValueBCD <<= 1;
-        // If the bit is set, add one
-        if (iValue & iTest)
+        // Increment bcd value (right most bit) if left most bit is set in the input byte
+        if (iValue & 0x8000)
             giDS3231ValueBCD++;
-        
-        // Add 3 to any BCD column 5 or greater
-        if ((giDS3231ValueBCD & 0x0F) > 0x04)
-            giDS3231ValueBCD += 3;
-        if ((giDS3231ValueBCD & 0xF0) > 0x49)
-            giDS3231ValueBCD += 0x30;
-        if ((giDS3231ValueBCD & 0xF00) > 0x499)
-            giDS3231ValueBCD += 0x300;
-        if ((giDS3231ValueBCD & 0xF000) > 0x4999)
-            giDS3231ValueBCD += 0x3000;
-        
-        // move the test bit
-        iTest >>= 1;
-    }*/
+        // Shift input value
+        iValue <<= 1;
+    }
     
     // less program memory needed - may be slower executing
     // https://electronics.stackexchange.com/questions/158563/how-to-split-a-floating-point-number-into-individual-digits
@@ -633,27 +638,27 @@ void convertTemp() {
     // incrementing variables for each digit
     // determine to thousands digit
     while (iValue >= 1000) {
-        iValue = iValue - 1000;
+        iValue -= 1000;
         // each time we take off 1000, the digit is incremented
-        giDS3231ValueBCD = giDS3231ValueBCD + 0x1000;
+        giDS3231ValueBCD += 0x1000;
     }
 
     // determine to hundreds digit
     while (iValue >= 100) {
-        iValue = iValue - 100;
+        iValue -= 100;
         // each time we take off 100, the digit is incremented
-        giDS3231ValueBCD = giDS3231ValueBCD + 0x100;
+        giDS3231ValueBCD += 0x100;
     }
 
     // determine to tens digit
     while (iValue >= 10) {
-        iValue = iValue - 10;
+        iValue -= 10;
         // each time we take off 10, the left most digit is incremented
-        giDS3231ValueBCD = giDS3231ValueBCD + 0x10;
+        giDS3231ValueBCD += 0x10;
     }
 
     // the last digit is what's left on iValue
-    giDS3231ValueBCD = giDS3231ValueBCD + iValue;
+    giDS3231ValueBCD += iValue;
 }
 
 /*********************************************************************************************
@@ -692,7 +697,7 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
         if (bcd == bcdMax)
             bcd = bcdMin;
         else if ((bcd & 0x0F) == 9)
-            bcd += 0x07; // add 0x10, minus 9
+            bcd += 0x07; // add 0x10 (16), minus 9
         else
             bcd++;
     } else {
@@ -701,7 +706,7 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
         if (bcd == bcdMin)
             bcd = bcdMax;
         else if ((bcd & 0x0F) == 0)
-            bcd -= 0x07; // mins 0x10, add 9
+            bcd -= 0x07; // minus 0x10 (16), add 9
         else
             bcd--;
     }
@@ -745,12 +750,15 @@ void adjustDateTime() {
         case 4:
             // Setting day of week
             gDayOfWeek = bcdAdjust(gDayOfWeek, 0x07, 0x01);
+            break;
         case 5:
             // Setting hour
             gBcdHour = bcdAdjust(gBcdHour, 0x23, 0x00);
+            break;
         case 6:
             // Setting minute
             gBcdMinute = bcdAdjust(gBcdMinute, 0x59, 0x00);
+            break;
     }
 }
 
@@ -799,7 +807,9 @@ void adjustTrigger() {
             break;
         case 10:
             // Fan off temp - off must be lower than on, min 20 degrees C
-            gBcdFanOffTemp = bcdAdjust(gBcdFanOffTemp, gBcdFanOffTemp, 0x20);
+            if (gBcdFanOffTemp > gBcdFanOnTemp)
+				gBcdFanOffTemp = gBcdFanOnTemp;
+            gBcdFanOffTemp = bcdAdjust(gBcdFanOffTemp, gBcdFanOnTemp, 0x20);
             break;
         case 11:
             // Heater on temp - between 20 and 40 degrees C
@@ -807,6 +817,8 @@ void adjustTrigger() {
             break;
         case 12:
             // Heater off temp - off must be higher than on - max 40 degrees C
+            if (gBcdHeaterOnTemp < gBcdHeaterOffTemp)
+				gBcdHeaterOnTemp = gBcdHeaterOffTemp;
             gBcdHeaterOffTemp = bcdAdjust(gBcdHeaterOffTemp, 0x40, gBcdHeaterOnTemp);
             break;
     }
@@ -1028,7 +1040,8 @@ void main() {
         // most recent task from the array and execute it
         while (cTask > 0) {
             if (cTask.TASK_TIMER1) {
-                if (gcSetMode == 0) {
+                if (!gcSetMode) {
+                    // Don't read date/time when in set mode
                     ds3231ReadDateTime();
                     if ((gBcdSecond == 0x29) || (gBcdSecond == 0x59)) {
                         // Ask to convert for temperature reading at 29 seconds or 59 seconds past the minute
@@ -1042,40 +1055,57 @@ void main() {
                         convertTemp();
                     }
                 }
-                // Trigger white led
-                if ((gBcdHour == gBcdWhiteOnHour) && (gBcdMinute == gBcdWhiteOnMinute)) {
-                    WHITE_LED = 1;
+                if (!gcTriggerMode) {
+					// Don't activate triggers when in trigger set mode
+					// Trigger white led
+					// Don't activate/deactivate if on and off set hour/min are the same
+					if ((gBcdWhiteOnHour != gBcdWhiteOffHour) || (gBcdWhiteOnMinute != gBcdWhiteOffMinute)) {
+						if ((gBcdHour == gBcdWhiteOnHour) && (gBcdMinute == gBcdWhiteOnMinute)) {
+							WHITE_LED = 1;
+						}
+						if ((gBcdHour == gBcdWhiteOffHour) && (gBcdMinute == gBcdWhiteOffMinute)) {
+							WHITE_LED = 0;
+						}
+					}
+					// Trigger blue led
+					// Don't activate/deactivate if on and off set hour/min are the same
+					if ((gBcdBlueOnHour != gBcdBlueOffHour) || (gBcdBlueOnMinute != gBcdBlueOffMinute)) {
+						if ((gBcdHour == gBcdBlueOnHour) && (gBcdMinute == gBcdBlueOnMinute)) {
+							BLUE_LED = 1;
+						}
+						if ((gBcdHour == gBcdBlueOffHour) && (gBcdMinute == gBcdBlueOffMinute)) {
+							BLUE_LED = 0;
+						}
+					}
+					// Trigger fan
+					char cTempTruncated = giDS3231ValueBCD >> 8;
+					// Don't activate/deactivate if on and off temperature are the same
+					if (gBcdFanOnTemp != gBcdFanOffTemp) {
+						if (cTempTruncated >= gBcdFanOnTemp) {
+							FAN = 1;
+						}
+						if (cTempTruncated <= gBcdFanOffTemp) {
+							FAN = 0;
+						}
+					}
+					// Forced on
+					if (gbFanOn)
+						FAN = 1;
+					// Trigger heater
+					// Don't activate/deactivate if on and off temperature are the same
+					if (gBcdHeaterOnTemp != gBcdHeaterOffTemp) {
+						if (cTempTruncated <= gBcdHeaterOnTemp) {
+							HEATER = 1;
+						}
+						if (cTempTruncated >= gBcdHeaterOffTemp) {
+							HEATER = 0;
+						}
+					}
+				}
+				// Display time and temperature or date on TM1638 after clock tick
+				if (!gcTriggerMode && !gcSetMode) {
+					tm1638UpdateDisplay();
                 }
-                if ((gBcdHour == gBcdWhiteOffHour) && (gBcdMinute == gBcdWhiteOffMinute)) {
-                    WHITE_LED = 0;
-                }
-                // Trigger blue led
-                if ((gBcdHour == gBcdBlueOnHour) && (gBcdMinute == gBcdBlueOnMinute)) {
-                    BLUE_LED = 1;
-                }
-                if ((gBcdHour == gBcdBlueOffHour) && (gBcdMinute == gBcdBlueOffMinute)) {
-                    BLUE_LED = 0;
-                }
-                // Trigger fan
-                char cTempTruncated = giDS3231ValueBCD >> 8;
-                if (cTempTruncated >= gBcdFanOnTemp) {
-                    FAN = 1;
-                }
-                if (cTempTruncated <= gBcdFanOffTemp) {
-                    FAN = 0;
-                }
-                // Forced on
-                if (gbFanOn)
-					FAN = 1;
-                // Trigger heater
-                if (cTempTruncated <= gBcdHeaterOnTemp) {
-                    HEATER = 1;
-                }
-                if (cTempTruncated >= gBcdHeaterOffTemp) {
-                    HEATER = 0;
-                }
-                // Display time and temp or date on TM1638
-                tm1638UpdateDisplay();
                 
                 cTask.TASK_TIMER1 = 0;
             }
@@ -1084,8 +1114,8 @@ void main() {
 				if (iTimer0Counts > 9) {
 					iFlashDigitOff++;
 					iTimer0Counts = 0;					
-					// If in set mode, update the display every ~half second to flash a digit
-					if (gcSetMode > 0)
+					// If in set or trigger mode, update the display every ~half second to flash a digit
+					if (gcSetMode || gcTriggerMode)
 						tm1638UpdateDisplay();
 				}
 				// Poll keys every 50ms

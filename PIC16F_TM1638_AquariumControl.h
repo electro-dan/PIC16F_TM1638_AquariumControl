@@ -46,8 +46,8 @@ unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
 #define e_SSPIF_BIT	3
 #define e_BCLIF_BIT	3
 
-#define ds3231_addr 0xD0 // Left shifted 7 bit address 0x68
-#define at24c32_addr 0xAE // Left shifted 7 bit address 0x57
+#define ds3231Addr 0xD0 // Left shifted 7 bit address 0x68
+#define at24c32Addr 0xAE // Left shifted 7 bit address 0x57
 
 // Time and date variables
 char gBcdSecond = 0; // 0 to 59

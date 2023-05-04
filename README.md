@@ -12,10 +12,18 @@ x BCD to tm1638DisplayNumtoSeg put in function
 Brightness PWM - not built for now as unsure of frequency affect on fish
 
 Issues:
-x No timer interrupt - check DS3231 init
-- BCD inc/dec wrong
-- hour/min both set
-- fan/heat message wrong
-- flashing issue
-- fan on/off override
-- set mode should exit when trigger mode actived + vice versa
+d No timer interrupt - check DS3231 init
+d BCD inc/dec wrong
+d fan/heat message wrong
+d flashing issue
+d fan on/off override
+d set mode should exit when trigger mode activated + vice versa
+d day adj changing min and hour
+d hour adj changing min
+d last digit not displayed after adj
+d in trig mode, flashing not working
+d digit on year
+d strange min on light on
+d cannot adjust blue light off min
+- battery in ds3231 for date/time retention
+z Double Dabble temp split alternative (seems worse)
