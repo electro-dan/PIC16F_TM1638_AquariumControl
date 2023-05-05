@@ -118,7 +118,7 @@ void at24c32WriteAll() {
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
 	i2c_write(0); // Second word address 
 	// Write data bytes
-	// We're only writing 13 bytes here, so no need to worry about row rollover after 32 bytes
+	// We're only writing 14 bytes here, so no need to worry about row rollover after 32 bytes
 	i2c_write(0x44); // To indicate AT24C32 has been written to
 	i2c_write(gBcdWhiteOnMinute);
     i2c_write(gBcdWhiteOnHour);
@@ -132,6 +132,7 @@ void at24c32WriteAll() {
     i2c_write(gBcdFanOffTemp);
     i2c_write(gBcdHeaterOnTemp);
     i2c_write(gBcdHeaterOffTemp);
+    i2c_write(gcHourMode);
 	i2c_stop();
 	delay_ms(10); // Write Cycle Time
 }
@@ -165,7 +166,8 @@ void at24c32ReadAll() {
 		gBcdFanOnTemp = i2c_read(0); // ack
 		gBcdFanOffTemp = i2c_read(0); // ack
 		gBcdHeaterOnTemp = i2c_read(0); // ack
-		gBcdHeaterOffTemp = i2c_read(1); // nack
+		gBcdHeaterOffTemp = i2c_read(0); // ack
+		gcHourMode = i2c_read(1); // nack
 	}
 	i2c_stop();
 }
@@ -300,7 +302,7 @@ void tm1638DisplayOn() {
 void nibbleTo7Seg(char bNibble) {
 	char s7SegDisplay = tm1638DisplayNumtoSeg[bNibble & 0x0F];
 	if (iPrintStartDigit == iPrintDotDigit)
-        s7SegDisplay += tm1638Dot;
+        s7SegDisplay |= tm1638Dot;
     tm1638Data[iPrintStartDigit] = s7SegDisplay;
     iPrintStartDigit++;
 }
@@ -321,7 +323,7 @@ void bcdTo7Seg(char iBcdIn) {
 void tm1638UpdateDisplay() {
     
     // Display current temperature unless set, trigger or alt display mode is active
-    if (gcDisplayMode | gcSetMode | gcTriggerMode) {
+    if ((gcDisplayMode == 2) | gcSetMode | gcTriggerMode) {
         if (gcSetMode == 1) {
             iDigitToFlash = 3;
             // Display year
@@ -337,13 +339,25 @@ void tm1638UpdateDisplay() {
             tm1638Data[1] = 0x5F; // a
             tm1638Data[2] = 0x6E; // y
             tm1638Data[3] = tm1638DisplayNumtoSeg[gDayOfWeek] + tm1638Dot;
+        } else if (gcSetMode == 5) {
+            iDigitToFlash = 1;
+            // Display day of week
+            if (gcHourMode) {
+				tm1638Data[0] = 0x06; // 1
+				tm1638Data[1] = 0x5b; // 2
+			} else {
+				tm1638Data[0] = 0x5b; // 2
+				tm1638Data[1] = 0x66; // 4
+			}
+            tm1638Data[2] = 0x74; // h
+            tm1638Data[3] = 0x00; // blank
         } else if (gcTriggerMode) {
             iPrintDotDigit = 5;
             switch (gcTriggerMode) {
                 case 1:
                     // White LED on hour
                     tm1638Data[0] = 0x38; // L
-                    tm1638Data[1] = 0; // 
+                    tm1638Data[1] = 0x00; // space
                     tm1638Data[2] = 0x3f; // O
                     tm1638Data[3] = 0x54; // n
                     iDigitToFlash = 5;
@@ -415,7 +429,7 @@ void tm1638UpdateDisplay() {
                     tm1638Data[0] = 0x71; // F
                     tm1638Data[1] = 0x5F; // a
                     tm1638Data[2] = 0x54; // n
-                    tm1638Data[3] = 0x00; // 
+                    tm1638Data[3] = 0x00; // space
                     tm1638Data[4] = 0x3f; // O
                     tm1638Data[5] = 0x54; // n
                     iDigitToFlash = 7;
@@ -459,10 +473,10 @@ void tm1638UpdateDisplay() {
                 case 3:
                     iDigitToFlash = 1;
                     break;
-                case 5:
+                case 6:
                     iDigitToFlash = 5;
                     break;
-                case 6:
+                case 7:
                     iDigitToFlash = 7;
                     break;
                 default:
@@ -479,20 +493,22 @@ void tm1638UpdateDisplay() {
         iDigitToFlash = 8; // No flashing digit in this mode
         // translate DS3231 temperature to digit values
         iPrintDotDigit = 1;
-        /*
-        No support for -10 or below - aquarium should never get that cold!
+        if (gcDisplayMode == 1) // no dot on the first two digits for fahrenheit
+			iPrintDotDigit = 2;
+        // For -10 or below, shift digits right
         if (gbDS3231IsMinus && (giDS3231ValueBCD & 0xF000)) {
-            // If minus and value less than or equal -10 (checked as >1000), shift the digits right
             giDS3231ValueBCD >>= 4;
             iPrintDotDigit = 2;
-        }*/
+        }
         // Display current temperature in digits 0 to 3 (+dot on digit 1 and 3)
         iPrintStartDigit = 0;
         bcdTo7Seg(giDS3231ValueBCD >> 8);
-        iPrintDotDigit = 3;
         bcdTo7Seg(giDS3231ValueBCD);
+        // Also display dot on 4th digit (always)
+		//tm1638Data[3] = tm1638Data[3] + tm1638Dot;
+		tm1638Data[3] |= tm1638Dot;
 
-        // left fill zeroes with blanks up to the digit before the decimal place
+        // left fill zero with blank
         if (tm1638Data[0] == 0x3f)
             tm1638Data[0] = 0;
         // If minus, overwrite left most digit with minus sign
@@ -508,12 +524,27 @@ void tm1638UpdateDisplay() {
 			iPrintDotDigit = 5;
 		else
 			iPrintDotDigit = 8;
-        bcdTo7Seg(gBcdHour); // Display hour in digits 4 and 5 (dot on 5)
+        char cBcdHourDisp = gBcdHour;
+        if (gcHourMode && (gBcdHour > 0x12)) {
+			// convert to 12h
+			cBcdHourDisp -= 0x12;
+        }
+        if (gcHourMode && gBcdHour == 0) {
+			cBcdHourDisp = 0x12; // 12am
+        }
+        bcdTo7Seg(cBcdHourDisp); // Display hour in digits 4 and 5 (dot on 5)
+        // left fill zero with blank
+        if (tm1638Data[4] == 0x3f)
+            tm1638Data[4] = 0;
+        if (gcHourMode && (gBcdHour > 0x11)) {
+			// PM dot
+			iPrintDotDigit = 7;
+        }
         bcdTo7Seg(gBcdMinute); // Display minute in digits 6 and 7 (no dot)
     }
 
     // Light LED for set mode
-    char cCompareSetMode = gcSetMode + 1;
+    char cCompareSetMode = gcSetMode;
     for (char i = 2; i < 8; i++) {
         if (i == cCompareSetMode)
             tm1638LEDs[i] = 1;
@@ -580,34 +611,22 @@ void tm1638ReadKeys() {
 }
 
 /*********************************************************************************************
-  void convertTemp()
-  Used to split the 16 bit integer returned from the ds18b20 into parts for display
+  int intToBcd(int iValue)
+  Used to split the 16 bit integer into bcd parts (max 9999)
 *********************************************************************************************/
-void convertTemp() {
-    // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
-    signed int iTemp = (cTempH << 8) | cTempL;
-    
-    // Celcius
-    gbDS3231IsMinus = (iTemp < 0);
-    if (gbDS3231IsMinus) {
-        iTemp = ~iTemp + 1;
-    }
-    // this gets celcius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
-    int iValue = (6 * iTemp) + (iTemp / 4);
-
-    // Split the temperature reading into digits
-    
+int intToBcd(int iValue) {
+    int iBcdOut = 0;
     // simple way, but more program memory needed for PIC12 or PIC16 (more than 100 words more)
-    //giDS3231ValueBCD = iValue / 1000;
-    //giDS3231ValueBCD += (iValue / 100) % 10;
-    //giDS3231ValueBCD += (iValue / 10) % 10;
-    //giDS3231ValueBCD += iValue % 10;
+    //iBcdOut = iValue / 1000;
+    //iOutput += (iValue / 100) % 10;
+    //iBcdOut += (iValue / 10) % 10;
+    //iBcdOut += iValue % 10;
     
     // Double Dabble
     // Less program memory needed - may be slower executing
     // https://www.electro-tech-online.com/threads/32bit-bin2bcd-casting.126235/#post-1047937
     // Init the 16-bit BCD value to zero - output only supporting an input value up to 9999 in this implementation
-    /*giDS3231ValueBCD = 0;
+    /*iBcdOut = 0;
     int iMask;
     // 48 loops
     // Shift 12 times
@@ -618,47 +637,82 @@ void convertTemp() {
         iMask = 0xF000; // Start checking the thousands digit 10^3
         for (char j = 0; j < 4; j++) {
             // For the digit we're checking, if bcd value is greater than or equal to 5, add 3
-            if ((iMask & giDS3231ValueBCD) >= (iMask & 0x5555))
-                giDS3231ValueBCD += (iMask & 0x3333); // Add 3
+            if ((iMask & iBcdOut) >= (iMask & 0x5555))
+                iBcdOut += (iMask & 0x3333); // Add 3
             iMask = iMask >> 4; // Shift the mask byte 4 bits (one nibble) right
         }
         // Shift bcd value
-        giDS3231ValueBCD <<= 1;
+        iBcdOut <<= 1;
         // Increment bcd value (right most bit) if left most bit is set in the input byte
         if (iValue & 0x8000)
-            giDS3231ValueBCD++;
+            iBcdOut++;
         // Shift input value
         iValue <<= 1;
-    }
+    }*/
     
     // less program memory needed - may be slower executing
     // https://electronics.stackexchange.com/questions/158563/how-to-split-a-floating-point-number-into-individual-digits
-    giDS3231ValueBCD = 0;
+    iBcdOut = 0;
 
     // incrementing variables for each digit
     // determine to thousands digit
     while (iValue >= 1000) {
         iValue -= 1000;
         // each time we take off 1000, the digit is incremented
-        giDS3231ValueBCD += 0x1000;
+        iBcdOut += 0x1000;
     }
 
     // determine to hundreds digit
     while (iValue >= 100) {
         iValue -= 100;
         // each time we take off 100, the digit is incremented
-        giDS3231ValueBCD += 0x100;
+        iBcdOut += 0x100;
     }
 
     // determine to tens digit
     while (iValue >= 10) {
         iValue -= 10;
         // each time we take off 10, the left most digit is incremented
-        giDS3231ValueBCD += 0x10;
+        iBcdOut += 0x10;
     }
 
     // the last digit is what's left on iValue
-    giDS3231ValueBCD += iValue;
+    iBcdOut += iValue;
+}
+
+/*********************************************************************************************
+  void convertTemp()
+  Used to convert the ds18b20 temperature to display values
+*********************************************************************************************/
+void convertTemp() {
+    // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
+    signed int iTemp = (cTempH << 8) | cTempL;
+    signed int iTemp2 = iTemp;
+    
+    // this gets celcius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
+    // Celcius value is always required for triggering
+	gbDS3231IsMinus = (iTemp2 < 0);
+	if (gbDS3231IsMinus) {
+		iTemp2 = ~iTemp2 + 1;
+	}
+    int iValueC = (6 * iTemp2) + (iTemp2 / 4);
+    // Split the temperature reading into digits
+    giDS3231ValueBCD = intToBcd(iValueC);
+    // Truncated value for triggering heater/fans
+    giDS3231ValueTruncCBCD = giDS3231ValueBCD >> 8;
+    
+    if (gcDisplayMode == 1) {
+		// -17.8125 (-285/65251) results in minus fahrenheit (-0.125), -17.75 (-284/65250) results in positive fahrenheit (1)
+        // this gets Fahrenheit * 10 - https://www.electro-tech-online.com/threads/temperature-sensor-ds18b20-display-fahrenhiet.117377/
+        iTemp2 = ((iTemp + 4) / 8) + iTemp + 320;
+        // convert to absolute value
+        gbDS3231IsMinus = (iTemp2 < 0);
+        if (gbDS3231IsMinus) {
+            iTemp2 = ~iTemp2 + 1;
+        }
+        // Split the temperature reading into digits
+        giDS3231ValueBCD = intToBcd(iTemp2);
+	}
 }
 
 /*********************************************************************************************
@@ -752,10 +806,16 @@ void adjustDateTime() {
             gDayOfWeek = bcdAdjust(gDayOfWeek, 0x07, 0x01);
             break;
         case 5:
+            // Setting 12h/24h
+            gcHourMode++;
+            if (gcHourMode > 2)
+				gcHourMode = 0;
+            break;
+        case 6:
             // Setting hour
             gBcdHour = bcdAdjust(gBcdHour, 0x23, 0x00);
             break;
-        case 6:
+        case 7:
             // Setting minute
             gBcdMinute = bcdAdjust(gBcdMinute, 0x59, 0x00);
             break;
@@ -812,13 +872,13 @@ void adjustTrigger() {
             gBcdFanOffTemp = bcdAdjust(gBcdFanOffTemp, gBcdFanOnTemp, 0x20);
             break;
         case 11:
-            // Heater on temp - between 20 and 40 degrees C
-            gBcdHeaterOnTemp = bcdAdjust(gBcdHeaterOnTemp, 0x40, 0x20);
+            // Heater on temp - between 0 and 40 degrees C
+            gBcdHeaterOnTemp = bcdAdjust(gBcdHeaterOnTemp, 0x40, 0);
             break;
         case 12:
-            // Heater off temp - off must be higher than on - max 40 degrees C
-            if (gBcdHeaterOnTemp < gBcdHeaterOffTemp)
-				gBcdHeaterOnTemp = gBcdHeaterOffTemp;
+            // Heater off temp - off must be equal or higher than on - max 40 degrees C
+            if (gBcdHeaterOffTemp < gBcdHeaterOnTemp)
+				gBcdHeaterOffTemp = gBcdHeaterOnTemp;
             gBcdHeaterOffTemp = bcdAdjust(gBcdHeaterOffTemp, 0x40, gBcdHeaterOnTemp);
             break;
     }
@@ -848,15 +908,16 @@ void processKeys() {
             gcTriggerMode = 0;
             // Display temp C/temp F/date
             gcDisplayMode++;
-            if (gcDisplayMode > 2)
+            if (gcDisplayMode > 3)
                 gcDisplayMode = 0;
+            convertTemp(); // force conversion (no read)
             break;
         case 0x1B:
             // Exit other modes
             gcTriggerMode = 0;
             // Adjust set mode
             gcSetMode++;
-            if (gcSetMode > 6) {
+            if (gcSetMode > 7) {
                 ds3231WriteDateTime();
                 gcSetMode = 0;
             }
@@ -1054,6 +1115,19 @@ void main() {
                         // store it in the array, next display refresh will pick it up
                         convertTemp();
                     }
+                    // daylight savings time handling (UK/europe) - last sunday of March or October (this can fall between the 25th and the 31st)
+                    if ((gBcdSecond == 0) && (gDayOfWeek == 7) && (gBcdDayOfMonth > 0x24)) {
+						// In March, at 1AM, apply daylight savings time if appropriate 
+						if ((gBcdHour == 1) && (gBcdMonth == 3)) {
+							gBcdHour++; // one hour forwards
+							ds3231WriteDateTime();
+						}
+						// In October, at 2AM, remove daylight savings time if appropriate (UK/europe) daylight savings time if appropriate (UK/europe) - last sunday of October
+						if ((gBcdHour == 2) && (gBcdMonth == 0x10)) {
+							gBcdHour--; // one hour back
+							ds3231WriteDateTime();
+						}
+					}
                 }
                 if (!gcTriggerMode) {
 					// Don't activate triggers when in trigger set mode
@@ -1078,13 +1152,12 @@ void main() {
 						}
 					}
 					// Trigger fan
-					char cTempTruncated = giDS3231ValueBCD >> 8;
 					// Don't activate/deactivate if on and off temperature are the same
 					if (gBcdFanOnTemp != gBcdFanOffTemp) {
-						if (cTempTruncated >= gBcdFanOnTemp) {
+						if (giDS3231ValueTruncCBCD >= gBcdFanOnTemp) {
 							FAN = 1;
 						}
-						if (cTempTruncated <= gBcdFanOffTemp) {
+						if (giDS3231ValueTruncCBCD <= gBcdFanOffTemp) {
 							FAN = 0;
 						}
 					}
@@ -1094,13 +1167,16 @@ void main() {
 					// Trigger heater
 					// Don't activate/deactivate if on and off temperature are the same
 					if (gBcdHeaterOnTemp != gBcdHeaterOffTemp) {
-						if (cTempTruncated <= gBcdHeaterOnTemp) {
+						if (giDS3231ValueTruncCBCD <= gBcdHeaterOnTemp) {
 							HEATER = 1;
 						}
-						if (cTempTruncated >= gBcdHeaterOffTemp) {
+						if (giDS3231ValueTruncCBCD >= gBcdHeaterOffTemp) {
 							HEATER = 0;
 						}
 					}
+					// If temperature is minus, always trigger heater
+					if (gbDS3231IsMinus)
+						HEATER = 1;
 				}
 				// Display time and temperature or date on TM1638 after clock tick
 				if (!gcTriggerMode && !gcSetMode) {

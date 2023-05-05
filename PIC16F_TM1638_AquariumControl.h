@@ -50,12 +50,12 @@ unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
 #define at24c32Addr 0xAE // Left shifted 7 bit address 0x57
 
 // Time and date variables
-char gBcdSecond = 0; // 0 to 59
-char gBcdMinute = 0; // 0 to 59
-char gBcdHour = 0; // 0 to 23 or 1 to 12. Also contains 12/24 setting at bit 6. If 12 hour, AM/PM uses bit 5
+char gBcdSecond = 0; // 0 to 0x59
+char gBcdMinute = 0; // 0 to 0x59
+char gBcdHour = 0; // 0 to 0x23 or 1 to 0x12. Also contains 12/24 setting at bit 6. If 12 hour, AM/PM uses bit 5
 char gDayOfWeek = 1; // 1 to 7
-char gBcdDayOfMonth = 1; // 1 to 31
-char gBcdMonth = 1; // 1 to 12 + century at bit 7
+char gBcdDayOfMonth = 1; // 1 to 0x31
+char gBcdMonth = 1; // 1 to 0x12 + century at bit 7
 char gBcdYear = 0x23; // Init to 0x23
 rom char *gDaysInMonth = {0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31}; // Days in each month
 rom char *gLeapYears = {0x04, 0x08, 0x12, 0x16, 0x20, 0x24, 0x28, 0x32, 0x36, 0x40, 0x44, 0x48, 0x52, 0x56, 0x60, 0x64, 0x68, 0x72, 0x76, 0x80, 0x84, 0x88, 0x92, 0x96}; // List of leap years
@@ -70,7 +70,8 @@ char cTempH = 1;
 char cTempL = 70;
 //char iDecimalPosition = 2;
 
-int giDS3231ValueBCD = 0x2000;
+int giDS3231ValueBCD = 0x0000;
+char giDS3231ValueTruncCBCD = 0x00;
 char gbDS3231IsMinus = 0;
 
 char cTask = 0; // Used for task scheduler
@@ -83,6 +84,7 @@ bool gbHeaterOn = 0;
 bool gbFlashOff = 0;
 char gcDisplayMode = 0;
 char gcSetMode = 0;
+char gcHourMode = 0;
 char gcTriggerMode = 0;
 
 // Triggers

@@ -25,5 +25,9 @@ d in trig mode, flashing not working
 d digit on year
 d strange min on light on
 d cannot adjust blue light off min
-- battery in ds3231 for date/time retention
+d battery in ds3231 for date/time retention
 z Double Dabble temp split alternative (seems worse)
+d heater off temp set wrong
+d fahrenheit support
+d auto daylight savings time
+d am/pm
