@@ -118,7 +118,7 @@ void at24c32WriteAll() {
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
 	i2c_write(0); // Second word address 
 	// Write data bytes
-	// We're only writing 14 bytes here, so no need to worry about row rollover after 32 bytes
+	// We're only writing 18 bytes here, so no need to worry about row rollover after 32 bytes
 	i2c_write(0x44); // To indicate AT24C32 has been written to
 	i2c_write(gBcdWhiteOnMinute);
     i2c_write(gBcdWhiteOnHour);
@@ -133,6 +133,10 @@ void at24c32WriteAll() {
     i2c_write(gBcdHeaterOnTemp);
     i2c_write(gBcdHeaterOffTemp);
     i2c_write(gcHourMode);
+    i2c_write(gBcdBlue2OnMinute);
+    i2c_write(gBcdBlue2OnHour);
+    i2c_write(gBcdBlue2OffMinute);
+    i2c_write(gBcdBlue2OffHour);
 	i2c_stop();
 	delay_ms(10); // Write Cycle Time
 }
@@ -167,7 +171,11 @@ void at24c32ReadAll() {
 		gBcdFanOffTemp = i2c_read(0); // ack
 		gBcdHeaterOnTemp = i2c_read(0); // ack
 		gBcdHeaterOffTemp = i2c_read(0); // ack
-		gcHourMode = i2c_read(1); // nack
+		gcHourMode = i2c_read(0); // ack
+		gBcdBlue2OnMinute = i2c_read(0); // ack
+		gBcdBlue2OnHour = i2c_read(0); // ack
+		gBcdBlue2OffMinute = i2c_read(0); // ack
+		gBcdBlue2OffHour = i2c_read(1); // nack
 	}
 	i2c_stop();
 }
@@ -390,41 +398,64 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdWhiteOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 5:
+                case 9:
                     // Blue LED on hour
                     tm1638Data[0] = 0x7C; // b
-                    //tm1638Data[1] = 0x30; // l
+                    if (gcTriggerMode == 5)
+                        tm1638Data[1] = 0x06; // 1
+                    else
+                        tm1638Data[1] = 0x5B; // 2
                     //tm1638Data[2] = 0x3f; // O
                     tm1638Data[3] = 0x54; // n
                     iDigitToFlash = 5;
                     // Start printing from digit 4
                     iPrintStartDigit = 4;
-                    bcdTo7Seg(gBcdBlueOnHour); // Display hour in digits 4 and 5 (dot on 5)
-                    bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    if (gcTriggerMode == 5) {
+                        bcdTo7Seg(gBcdBlueOnHour); // Display hour in digits 4 and 5 (dot on 5)
+                        bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    } else {
+                        bcdTo7Seg(gBcdBlue2OnHour); // Display hour in digits 4 and 5 (dot on 5)
+                        bcdTo7Seg(gBcdBlue2OnMinute); // Display minute in digits 6 and 7 (no dot)
+                    }
                     break;
                 case 6:
+                case 10:
                     // Blue LED on minute
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    if (gcTriggerMode == 5)
+                        bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    else
+                        bcdTo7Seg(gBcdBlue2OnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 7:
+                case 11:
                     // Blue LED off hour
                     tm1638Data[3] = 0x71; // F
                     iDigitToFlash = 5;
                     // Start printing from digit 4
                     iPrintStartDigit = 4;
-                    bcdTo7Seg(gBcdBlueOffHour); // Display hour in digits 4 and 5 (dot on 5)
-                    bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    if (gcTriggerMode == 5) {
+                        bcdTo7Seg(gBcdBlueOffHour); // Display hour in digits 4 and 5 (dot on 5)
+                        bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    } else {
+                        bcdTo7Seg(gBcdBlue2OffHour); // Display hour in digits 4 and 5 (dot on 5)
+                        bcdTo7Seg(gBcdBlue2OffMinute); // Display minute in digits 6 and 7 (no dot)
+                    }
                     break;
                 case 8:
+                case 12:
                     // Blue LED off minute
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    if (gcTriggerMode == 5)
+                        bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    else
+                        bcdTo7Seg(gBcdBlue2OffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
-                case 9:
+                case 13:
                     // Fan on temperature
                     tm1638Data[0] = 0x71; // F
                     tm1638Data[1] = 0x5F; // a
@@ -437,14 +468,14 @@ void tm1638UpdateDisplay() {
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdFanOnTemp); // Display celcius in digits 6 and 7 (no dot)
                     break;
-                case 10:
+                case 14:
                     // Fan off temperature
                     tm1638Data[5] = 0x71; // f
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdFanOffTemp); // Display celcius in digits 6 and 7 (no dot)
                     break;
-                case 11:
+                case 15:
                     // Heater on temperature
                     tm1638Data[0] = 0x76; // H
                     tm1638Data[1] = 0x7B; // e
@@ -457,7 +488,7 @@ void tm1638UpdateDisplay() {
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdHeaterOnTemp); // Display celcius in digits 6 and 7 (no dot)
                     break;
-                case 12:
+                case 16:
                     // Heater off temperature
                     tm1638Data[5] = 0x71; // f
                     // Start printing from digit 6
@@ -528,6 +559,9 @@ void tm1638UpdateDisplay() {
         if (gcHourMode && (gBcdHour > 0x12)) {
 			// convert to 12h
 			cBcdHourDisp -= 0x12;
+			// For 8 and 9pm, take off another 6
+			if ((cBcdHourDisp & 0x0F) > 7)
+                cBcdHourDisp -= 6;
         }
         if (gcHourMode && gBcdHour == 0) {
 			cBcdHourDisp = 0x12; // 12am
@@ -862,20 +896,36 @@ void adjustTrigger() {
             gBcdBlueOffMinute = bcdAdjust(gBcdBlueOffMinute, 0x59, 0x00);
             break;
         case 9:
+            // Blue LED on hour
+            gBcdBlue2OnHour = bcdAdjust(gBcdBlue2OnHour, 0x23, 0x00);
+            break;
+        case 10:
+            // Blue LED on minute
+            gBcdBlue2OnMinute = bcdAdjust(gBcdBlue2OnMinute, 0x59, 0x00);
+            break;
+        case 11:
+            // Blue LED off hour
+            gBcdBlue2OffHour = bcdAdjust(gBcdBlue2OffHour, 0x23, 0x00);
+            break;
+        case 12:
+            // Blue LED off minute
+            gBcdBlue2OffMinute = bcdAdjust(gBcdBlue2OffMinute, 0x59, 0x00);
+            break;
+        case 13:
             // Fan on temp - between 20 and 40 degrees C
             gBcdFanOnTemp = bcdAdjust(gBcdFanOnTemp, 0x40, 0x20);
             break;
-        case 10:
+        case 14:
             // Fan off temp - off must be lower than on, min 20 degrees C
             if (gBcdFanOffTemp > gBcdFanOnTemp)
 				gBcdFanOffTemp = gBcdFanOnTemp;
             gBcdFanOffTemp = bcdAdjust(gBcdFanOffTemp, gBcdFanOnTemp, 0x20);
             break;
-        case 11:
+        case 15:
             // Heater on temp - between 0 and 40 degrees C
             gBcdHeaterOnTemp = bcdAdjust(gBcdHeaterOnTemp, 0x40, 0);
             break;
-        case 12:
+        case 16:
             // Heater off temp - off must be equal or higher than on - max 40 degrees C
             if (gBcdHeaterOffTemp < gBcdHeaterOnTemp)
 				gBcdHeaterOffTemp = gBcdHeaterOnTemp;
@@ -1148,6 +1198,16 @@ void main() {
 							BLUE_LED = 1;
 						}
 						if ((gBcdHour == gBcdBlueOffHour) && (gBcdMinute == gBcdBlueOffMinute)) {
+							BLUE_LED = 0;
+						}
+					}
+					// 2nd Trigger blue led
+					// Don't activate/deactivate if on and off set hour/min are the same
+					if ((gBcdBlue2OnHour != gBcdBlue2OffHour) || (gBcdBlue2OnMinute != gBcdBlue2OffMinute)) {
+						if ((gBcdHour == gBcdBlue2OnHour) && (gBcdMinute == gBcdBlue2OnMinute)) {
+							BLUE_LED = 1;
+						}
+						if ((gBcdHour == gBcdBlue2OffHour) && (gBcdMinute == gBcdBlue2OffMinute)) {
 							BLUE_LED = 0;
 						}
 					}

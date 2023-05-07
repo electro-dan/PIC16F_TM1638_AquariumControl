@@ -98,6 +98,11 @@ char gBcdBlueOnHour = 0; // 0 to 23
 char gBcdBlueOffMinute = 0; // 0 to 59
 char gBcdBlueOffHour = 0; // 0 to 23
 
+char gBcdBlue2OnMinute = 0; // 0 to 59
+char gBcdBlue2OnHour = 0; // 0 to 23
+char gBcdBlue2OffMinute = 0; // 0 to 59
+char gBcdBlue2OffHour = 0; // 0 to 23
+
 char gBcdFanOnTemp = 0x28; // Degrees C
 char gBcdFanOffTemp = 0x27; // Degrees C
 
@@ -106,7 +111,7 @@ char gBcdHeaterOffTemp = 0x25; // Degrees C
 
 // Used to output the segments from numbers
 char tm1638MaxDigits = 8;
-rom char *tm1638DisplayNumtoSeg = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f};
+rom char *tm1638DisplayNumtoSeg = {0x3f, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 char tm1638Dot = 0x80;
 char tm1638Brightness = 7; // 0 to 7
 // 0x40 [01000000] = indicate command to display data
