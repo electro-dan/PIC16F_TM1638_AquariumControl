@@ -31,30 +31,30 @@ Address  Length   Unique Name      Name
 0000022D:00000008 bcdTo7Seg_00000  bcdTo7Seg(unsigned char)  
 00000235:0000002A bcdAdjust_00000  bcdAdjust(unsigned char,unsigned char,unsigned char)  
 0000025F:00000034 __mul_16s__0000F __mul_16s_16s__16(signed short,signed short)  
-00000293:00000221 tm1638Upda_00022 tm1638UpdateDisplay(void)  
-000004B4:00000008 tm1638Disp_00021 tm1638DisplayOn(void)  
-000004BC:00000007 oneWireTxB_00019 oneWireTxBytes(unsigned char,unsigned char)  
-000004C3:0000001E oneWireRxB_0001A oneWireRxByte(void)  
-000004E1:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
-000004F4:0000001C ds3231Writ_0001C ds3231WriteDateTime(void)  
-00000510:00000015 ds3231Read_0001E ds3231ReadRegister(unsigned char)  
-00000525:0000000B ds3231Init_00000 ds3231Init(void)  
-00000530:0000007D convertTem_0002A convertTemp(void)  
-000005AD:00000043 at24c32Wri_0002B at24c32WriteAll(void)  
-000005F0:00000060 at24c32Rea_0002C at24c32ReadAll(void)  
-00000650:000000D3 adjustTrig_00028 adjustTrigger(void)  
-00000723:00000085 adjustDate_00027 adjustDateTime(void)  
-000007A8:00000023 tm1638Read_00025 tm1638ReadKeys(void)  
-000007CB:00000008 startTemp_00000  startTemp(void)  
-000007D3:0000000E readTemp_00000   readTemp(void)  
-000007E1:0000006C processKey_00029 processKeys(void)  
-0000084D:00000019 oneWireBus_00017 oneWireBusReset(void)  
-00000866:0000003C initialise_00000 initialise(void)  
-000008A2:0000002B ds3231Read_0001D ds3231ReadDateTime(void)  
-000008CD:000000D8 main             main(void)  
-000009A5:00000067 _startup_00000   _startup(void)  
-00000A0C:0000001B interrupt        interrupt(void)  
-00000A27:000005D9 *Unused Block 
+00000293:00000222 tm1638Upda_00022 tm1638UpdateDisplay(void)  
+000004B5:00000008 tm1638Disp_00021 tm1638DisplayOn(void)  
+000004BD:00000007 oneWireTxB_00019 oneWireTxBytes(unsigned char,unsigned char)  
+000004C4:0000001E oneWireRxB_0001A oneWireRxByte(void)  
+000004E2:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
+000004F5:0000001C ds3231Writ_0001C ds3231WriteDateTime(void)  
+00000511:00000015 ds3231Read_0001E ds3231ReadRegister(unsigned char)  
+00000526:0000000B ds3231Init_00000 ds3231Init(void)  
+00000531:0000007D convertTem_0002A convertTemp(void)  
+000005AE:00000043 at24c32Wri_0002B at24c32WriteAll(void)  
+000005F1:00000060 at24c32Rea_0002C at24c32ReadAll(void)  
+00000651:000000D3 adjustTrig_00028 adjustTrigger(void)  
+00000724:00000085 adjustDate_00027 adjustDateTime(void)  
+000007A9:00000023 tm1638Read_00025 tm1638ReadKeys(void)  
+000007CC:00000008 startTemp_00000  startTemp(void)  
+000007D4:0000000E readTemp_00000   readTemp(void)  
+000007E2:0000006C processKey_00029 processKeys(void)  
+0000084E:00000019 oneWireBus_00017 oneWireBusReset(void)  
+00000867:0000003C initialise_00000 initialise(void)  
+000008A3:0000002B ds3231Read_0001D ds3231ReadDateTime(void)  
+000008CE:000000D8 main             main(void)  
+000009A6:00000067 _startup_00000   _startup(void)  
+00000A0D:0000001B interrupt        interrupt(void)  
+00000A28:000005D8 *Unused Block 
 
 Register usage
 ==============
@@ -162,12 +162,12 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 00000076:00000010             convertTem_0002A_1_iValueC       iValueC
 00000077:00000008             delay_10us_00000_arg_del         del
 00000078:00000008             delay_us_00000_arg_del           del
-00000079:00000008             CompTempVar626                  
-0000007A:00000008             CompTempVar635                  
+00000079:00000008             CompTempVar629                  
+0000007A:00000008             CompTempVar638                  
 0000007B:00000008             __rom_get_00000_arg_objNumb      objNumb
 0000007C:00000008             __rom_get_00000_arg_idx          idx
 0000007D:00000010             __rom_get_00000_1_romAddr        romAddr
-0000007E:00000008             CompTempVar649                  
+0000007E:00000008             CompTempVar652                  
 0000007F:00000008             Int1Context                      Int1Context
 00000081:00000008             gbl_option_reg                   option_reg
 00000085:00000008             gbl_trisa                        trisa
@@ -195,4 +195,4 @@ Memory Usage Report
 ===================
 RAM available:192 bytes, used:101 bytes (52.7%), free:91 bytes (47.3%), 
 Heap size:91 bytes, Heap max single alloc:90 bytes
-ROM available:4096 words, used:2599 words (63.5%), free:1497 words (36.5%)
+ROM available:4096 words, used:2600 words (63.5%), free:1496 words (36.5%)

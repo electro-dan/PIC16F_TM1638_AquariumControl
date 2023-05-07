@@ -398,62 +398,74 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdWhiteOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 5:
-                case 9:
-                    // Blue LED on hour
+                    // 1st Blue LED on hour
                     tm1638Data[0] = 0x7C; // b
-                    if (gcTriggerMode == 5)
-                        tm1638Data[1] = 0x06; // 1
-                    else
-                        tm1638Data[1] = 0x5B; // 2
+                    tm1638Data[1] = 0x06; // 1
                     //tm1638Data[2] = 0x3F; // O
                     tm1638Data[3] = 0x54; // n
                     iDigitToFlash = 5;
                     // Start printing from digit 4
                     iPrintStartDigit = 4;
-                    if (gcTriggerMode == 5) {
-                        bcdTo7Seg(gBcdBlueOnHour); // Display hour in digits 4 and 5 (dot on 5)
-                        bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
-                    } else {
-                        bcdTo7Seg(gBcdBlue2OnHour); // Display hour in digits 4 and 5 (dot on 5)
-                        bcdTo7Seg(gBcdBlue2OnMinute); // Display minute in digits 6 and 7 (no dot)
-                    }
+                    bcdTo7Seg(gBcdBlueOnHour); // Display hour in digits 4 and 5 (dot on 5)
+                    bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 6:
-                case 10:
-                    // Blue LED on minute
+                    // 1st Blue LED on minute
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    if (gcTriggerMode == 5)
-                        bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
-                    else
-                        bcdTo7Seg(gBcdBlue2OnMinute); // Display minute in digits 6 and 7 (no dot)
+                    bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 7:
-                case 11:
-                    // Blue LED off hour
+                    // 1st Blue LED off hour
                     tm1638Data[3] = 0x71; // F
                     iDigitToFlash = 5;
                     // Start printing from digit 4
                     iPrintStartDigit = 4;
-                    if (gcTriggerMode == 5) {
-                        bcdTo7Seg(gBcdBlueOffHour); // Display hour in digits 4 and 5 (dot on 5)
-                        bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
-                    } else {
-                        bcdTo7Seg(gBcdBlue2OffHour); // Display hour in digits 4 and 5 (dot on 5)
-                        bcdTo7Seg(gBcdBlue2OffMinute); // Display minute in digits 6 and 7 (no dot)
-                    }
+                    bcdTo7Seg(gBcdBlueOffHour); // Display hour in digits 4 and 5 (dot on 5)
+                    bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 8:
-                case 12:
-                    // Blue LED off minute
+                    // 1st Blue LED off minute
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    if (gcTriggerMode == 5)
-                        bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
-                    else
-                        bcdTo7Seg(gBcdBlue2OffMinute); // Display minute in digits 6 and 7 (no dot)
+                    bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 9:
+                    // 2nd Blue LED on hour
+                    tm1638Data[0] = 0x7C; // b
+                    tm1638Data[1] = 0x5B; // 2
+                    //tm1638Data[2] = 0x3F; // O
+                    tm1638Data[3] = 0x54; // n
+                    iDigitToFlash = 5;
+                    // Start printing from digit 4
+                    iPrintStartDigit = 4;
+                    bcdTo7Seg(gBcdBlue2OnHour); // Display hour in digits 4 and 5 (dot on 5)
+                    bcdTo7Seg(gBcdBlue2OnMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 10:
+                    // 2nd Blue LED on minute
+                    iDigitToFlash = 7;
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 11:
+                    // 2nd Blue LED off hour
+                    tm1638Data[3] = 0x71; // F
+                    iDigitToFlash = 5;
+                    // Start printing from digit 4
+                    iPrintStartDigit = 4;
+                    bcdTo7Seg(gBcdBlue2OffHour); // Display hour in digits 4 and 5 (dot on 5)
+                    bcdTo7Seg(gBcdBlue2OffMinute); // Display minute in digits 6 and 7 (no dot)
+                    break;
+                case 12:
+                    // 2nd Blue LED off minute
+                    iDigitToFlash = 7;
+                    // Start printing from digit 6
+                    iPrintStartDigit = 6;
+                    bcdTo7Seg(gBcdBlue2OffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 13:
                     // Fan on temperature
