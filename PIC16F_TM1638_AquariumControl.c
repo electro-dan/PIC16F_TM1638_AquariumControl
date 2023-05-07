@@ -352,9 +352,9 @@ void tm1638UpdateDisplay() {
             // Display day of week
             if (gcHourMode) {
 				tm1638Data[0] = 0x06; // 1
-				tm1638Data[1] = 0x5b; // 2
+				tm1638Data[1] = 0x5B; // 2
 			} else {
-				tm1638Data[0] = 0x5b; // 2
+				tm1638Data[0] = 0x5B; // 2
 				tm1638Data[1] = 0x66; // 4
 			}
             tm1638Data[2] = 0x74; // h
@@ -366,7 +366,7 @@ void tm1638UpdateDisplay() {
                     // White LED on hour
                     tm1638Data[0] = 0x38; // L
                     tm1638Data[1] = 0x00; // space
-                    tm1638Data[2] = 0x3f; // O
+                    tm1638Data[2] = 0x3F; // O
                     tm1638Data[3] = 0x54; // n
                     iDigitToFlash = 5;
                     // Start printing from digit 4
@@ -405,7 +405,7 @@ void tm1638UpdateDisplay() {
                         tm1638Data[1] = 0x06; // 1
                     else
                         tm1638Data[1] = 0x5B; // 2
-                    //tm1638Data[2] = 0x3f; // O
+                    //tm1638Data[2] = 0x3F; // O
                     tm1638Data[3] = 0x54; // n
                     iDigitToFlash = 5;
                     // Start printing from digit 4
@@ -461,7 +461,7 @@ void tm1638UpdateDisplay() {
                     tm1638Data[1] = 0x5F; // a
                     tm1638Data[2] = 0x54; // n
                     tm1638Data[3] = 0x00; // space
-                    tm1638Data[4] = 0x3f; // O
+                    tm1638Data[4] = 0x3F; // O
                     tm1638Data[5] = 0x54; // n
                     iDigitToFlash = 7;
                     // Start printing from digit 6
@@ -481,7 +481,7 @@ void tm1638UpdateDisplay() {
                     tm1638Data[1] = 0x7B; // e
                     tm1638Data[2] = 0x5F; // a
                     tm1638Data[3] = 0x78; // t
-                    tm1638Data[4] = 0x3f; // O
+                    tm1638Data[4] = 0x3F; // O
                     tm1638Data[5] = 0x54; // n
                     iDigitToFlash = 7;
                     // Start printing from digit 6
@@ -540,7 +540,7 @@ void tm1638UpdateDisplay() {
 		tm1638Data[3] |= tm1638Dot;
 
         // left fill zero with blank
-        if (tm1638Data[0] == 0x3f)
+        if (tm1638Data[0] == 0x3F)
             tm1638Data[0] = 0;
         // If minus, overwrite left most digit with minus sign
         if (gbDS3231IsMinus)
@@ -568,7 +568,7 @@ void tm1638UpdateDisplay() {
         }
         bcdTo7Seg(cBcdHourDisp); // Display hour in digits 4 and 5 (dot on 5)
         // left fill zero with blank
-        if (tm1638Data[4] == 0x3f)
+        if (tm1638Data[4] == 0x3F)
             tm1638Data[4] = 0;
         if (gcHourMode && (gBcdHour > 0x11)) {
 			// PM dot
@@ -650,41 +650,7 @@ void tm1638ReadKeys() {
 *********************************************************************************************/
 int intToBcd(int iValue) {
     int iBcdOut = 0;
-    // simple way, but more program memory needed for PIC12 or PIC16 (more than 100 words more)
-    //iBcdOut = iValue / 1000;
-    //iOutput += (iValue / 100) % 10;
-    //iBcdOut += (iValue / 10) % 10;
-    //iBcdOut += iValue % 10;
-    
-    // Double Dabble
-    // Less program memory needed - may be slower executing
-    // https://www.electro-tech-online.com/threads/32bit-bin2bcd-casting.126235/#post-1047937
-    // Init the 16-bit BCD value to zero - output only supporting an input value up to 9999 in this implementation
-    /*iBcdOut = 0;
-    int iMask;
-    // 48 loops
-    // Shift 12 times
-    for(char i = 0; i < 12; i++){
-        // Check if any nibble is 5 or greater
-        // Start with the right most nibble (digit), shifting 4 bits each time
-        //for(; iMask != 0; iMask >>= 4){
-        iMask = 0xF000; // Start checking the thousands digit 10^3
-        for (char j = 0; j < 4; j++) {
-            // For the digit we're checking, if bcd value is greater than or equal to 5, add 3
-            if ((iMask & iBcdOut) >= (iMask & 0x5555))
-                iBcdOut += (iMask & 0x3333); // Add 3
-            iMask = iMask >> 4; // Shift the mask byte 4 bits (one nibble) right
-        }
-        // Shift bcd value
-        iBcdOut <<= 1;
-        // Increment bcd value (right most bit) if left most bit is set in the input byte
-        if (iValue & 0x8000)
-            iBcdOut++;
-        // Shift input value
-        iValue <<= 1;
-    }*/
-    
-    // less program memory needed - may be slower executing
+    // Split via loops = less program memory needed, may be slower executing
     // https://electronics.stackexchange.com/questions/158563/how-to-split-a-floating-point-number-into-individual-digits
     iBcdOut = 0;
 
