@@ -325,6 +325,17 @@ void bcdTo7Seg(char iBcdIn) {
 }
 
 /*********************************************************************************************
+  void zeroToBlank(char iDigit)
+  For the given digit, change a zero to blank. Used for removing left filled zeroes
+*********************************************************************************************/
+void zeroToBlank(char iDigit) {
+    // replace zero with blank
+    if (tm1638Data[iDigit] == 0x3F)
+        tm1638Data[iDigit] = 0;
+
+}
+
+/*********************************************************************************************
   void tm1638UpdateDisplay()
   Publish the tm1638Data and tm1638LEDs arrays to the display
 *********************************************************************************************/
@@ -349,7 +360,7 @@ void tm1638UpdateDisplay() {
             tm1638Data[3] = tm1638DisplayNumtoSeg[gDayOfWeek] + tm1638Dot;
         } else if (gcSetMode == 5) {
             iDigitToFlash = 1;
-            // Display day of week
+            // Display 24h or 12h setting
             if (gcHourMode) {
 				tm1638Data[0] = 0x06; // 1
 				tm1638Data[1] = 0x5B; // 2
@@ -449,7 +460,7 @@ void tm1638UpdateDisplay() {
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
+                    bcdTo7Seg(gBcdBlue2OnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 11:
                     // 2nd Blue LED off hour
@@ -529,8 +540,11 @@ void tm1638UpdateDisplay() {
             iPrintStartDigit = 0;
             iPrintDotDigit = 1;
             bcdTo7Seg(gBcdDayOfMonth); // Display day of month in digits 0 and 1 (+dot on 1)
+            zeroToBlank(0); // left fill zero with blank
+
             iPrintDotDigit = 3;
             bcdTo7Seg(gBcdMonth); // Display month in digits 2 and 3 (+dot on 3)
+            zeroToBlank(2); // left fill zero with blank
         }
     } else {
         iDigitToFlash = 8; // No flashing digit in this mode
@@ -548,12 +562,10 @@ void tm1638UpdateDisplay() {
         bcdTo7Seg(giDS3231ValueBCD >> 8);
         bcdTo7Seg(giDS3231ValueBCD);
         // Also display dot on 4th digit (always)
-		//tm1638Data[3] = tm1638Data[3] + tm1638Dot;
 		tm1638Data[3] |= tm1638Dot;
 
         // left fill zero with blank
-        if (tm1638Data[0] == 0x3F)
-            tm1638Data[0] = 0;
+        zeroToBlank(0);
         // If minus, overwrite left most digit with minus sign
         if (gbDS3231IsMinus)
             tm1638Data[0] = 0x40;
@@ -580,8 +592,7 @@ void tm1638UpdateDisplay() {
         }
         bcdTo7Seg(cBcdHourDisp); // Display hour in digits 4 and 5 (dot on 5)
         // left fill zero with blank
-        if (tm1638Data[4] == 0x3F)
-            tm1638Data[4] = 0;
+        zeroToBlank(4);
         if (gcHourMode && (gBcdHour > 0x11)) {
 			// PM dot
 			iPrintDotDigit = 7;
@@ -973,7 +984,7 @@ void processKeys() {
             gcSetMode = 0;
             // Adjust timer mode
             gcTriggerMode++;
-            if (gcTriggerMode > 12) {
+            if (gcTriggerMode > 16) {
                 gcTriggerMode = 0;
                 at24c32WriteAll(); // Exiting trigger mode, save the new triggers to EEPROM chip
             }

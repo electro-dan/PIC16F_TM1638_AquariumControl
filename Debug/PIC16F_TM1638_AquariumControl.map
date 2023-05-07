@@ -23,38 +23,39 @@ Address  Length   Unique Name      Name
 000000A5:00000051 i2c_WRITE_00000  i2c_WRITE(unsigned char)  
 000000F6:00000030 i2c_STOP_00000   i2c_STOP(void)  
 00000126:00000035 i2c_START_00000  i2c_START(void)  
-0000015B:00000013 tm1638Byte_0001F tm1638ByteWrite(unsigned char)  
-0000016E:0000001C oneWireTxB_00018 oneWireTxByte(unsigned char)  
-0000018A:00000043 intToBcd_00000   intToBcd(signed short)  
-000001CD:00000054 i2c_READ_00000   i2c_READ(unsigned char)  
-00000221:0000000C ds3231Writ_0001B ds3231Write(unsigned char,unsigned char)  
-0000022D:00000008 bcdTo7Seg_00000  bcdTo7Seg(unsigned char)  
-00000235:0000002A bcdAdjust_00000  bcdAdjust(unsigned char,unsigned char,unsigned char)  
-0000025F:00000034 __mul_16s__0000F __mul_16s_16s__16(signed short,signed short)  
-00000293:00000222 tm1638Upda_00022 tm1638UpdateDisplay(void)  
-000004B5:00000008 tm1638Disp_00021 tm1638DisplayOn(void)  
-000004BD:00000007 oneWireTxB_00019 oneWireTxBytes(unsigned char,unsigned char)  
-000004C4:0000001E oneWireRxB_0001A oneWireRxByte(void)  
-000004E2:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
-000004F5:0000001C ds3231Writ_0001C ds3231WriteDateTime(void)  
-00000511:00000015 ds3231Read_0001E ds3231ReadRegister(unsigned char)  
-00000526:0000000B ds3231Init_00000 ds3231Init(void)  
-00000531:0000007D convertTem_0002A convertTemp(void)  
-000005AE:00000043 at24c32Wri_0002B at24c32WriteAll(void)  
-000005F1:00000060 at24c32Rea_0002C at24c32ReadAll(void)  
-00000651:000000D3 adjustTrig_00028 adjustTrigger(void)  
-00000724:00000085 adjustDate_00027 adjustDateTime(void)  
-000007A9:00000023 tm1638Read_00025 tm1638ReadKeys(void)  
-000007CC:00000008 startTemp_00000  startTemp(void)  
-000007D4:0000000E readTemp_00000   readTemp(void)  
-000007E2:0000006C processKey_00029 processKeys(void)  
-0000084E:00000019 oneWireBus_00017 oneWireBusReset(void)  
-00000867:0000003C initialise_00000 initialise(void)  
-000008A3:0000002B ds3231Read_0001D ds3231ReadDateTime(void)  
-000008CE:000000D8 main             main(void)  
-000009A6:00000067 _startup_00000   _startup(void)  
-00000A0D:0000001B interrupt        interrupt(void)  
-00000A28:000005D8 *Unused Block 
+0000015B:00000011 zeroToBlan_00025 zeroToBlank(unsigned char)  
+0000016C:00000013 tm1638Byte_0001F tm1638ByteWrite(unsigned char)  
+0000017F:0000001C oneWireTxB_00018 oneWireTxByte(unsigned char)  
+0000019B:00000043 intToBcd_00000   intToBcd(signed short)  
+000001DE:00000054 i2c_READ_00000   i2c_READ(unsigned char)  
+00000232:0000000C ds3231Writ_0001B ds3231Write(unsigned char,unsigned char)  
+0000023E:00000008 bcdTo7Seg_00000  bcdTo7Seg(unsigned char)  
+00000246:0000002A bcdAdjust_00000  bcdAdjust(unsigned char,unsigned char,unsigned char)  
+00000270:00000034 __mul_16s__0000F __mul_16s_16s__16(signed short,signed short)  
+000002A4:00000224 tm1638Upda_00022 tm1638UpdateDisplay(void)  
+000004C8:00000008 tm1638Disp_00021 tm1638DisplayOn(void)  
+000004D0:00000007 oneWireTxB_00019 oneWireTxBytes(unsigned char,unsigned char)  
+000004D7:0000001E oneWireRxB_0001A oneWireRxByte(void)  
+000004F5:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
+00000508:0000001C ds3231Writ_0001C ds3231WriteDateTime(void)  
+00000524:00000015 ds3231Read_0001E ds3231ReadRegister(unsigned char)  
+00000539:0000000B ds3231Init_00000 ds3231Init(void)  
+00000544:0000007D convertTem_0002B convertTemp(void)  
+000005C1:00000043 at24c32Wri_0002C at24c32WriteAll(void)  
+00000604:00000060 at24c32Rea_0002D at24c32ReadAll(void)  
+00000664:000000D3 adjustTrig_00029 adjustTrigger(void)  
+00000737:00000085 adjustDate_00028 adjustDateTime(void)  
+000007BC:00000023 tm1638Read_00026 tm1638ReadKeys(void)  
+000007DF:00000008 startTemp_00000  startTemp(void)  
+000007E7:0000000E readTemp_00000   readTemp(void)  
+000007F5:0000006C processKey_0002A processKeys(void)  
+00000861:00000019 oneWireBus_00017 oneWireBusReset(void)  
+0000087A:0000003C initialise_00000 initialise(void)  
+000008B6:0000002B ds3231Read_0001D ds3231ReadDateTime(void)  
+000008E1:000000D8 main             main(void)  
+000009B9:00000067 _startup_00000   _startup(void)  
+00000A20:0000001B interrupt        interrupt(void)  
+00000A3B:000005C5 *Unused Block 
 
 Register usage
 ==============
@@ -157,17 +158,17 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 00000071:00000008             gbl_oneWireResetStage            oneWireResetStage
 00000072:00000008             delay_ms_00000_arg_del           del
 00000073:00000008             i2c_INIT_00000_arg_i2c_divisor   i2c_divisor
-00000074:00000010             convertTem_0002A_1_iTemp2        iTemp2
+00000074:00000010             convertTem_0002B_1_iTemp2        iTemp2
 00000075:00000008             i2c_READ_00000_arg_ack_status    ack_status
-00000076:00000010             convertTem_0002A_1_iValueC       iValueC
+00000076:00000010             convertTem_0002B_1_iValueC       iValueC
 00000077:00000008             delay_10us_00000_arg_del         del
 00000078:00000008             delay_us_00000_arg_del           del
-00000079:00000008             CompTempVar629                  
-0000007A:00000008             CompTempVar638                  
+00000079:00000008             CompTempVar627                  
+0000007A:00000008             CompTempVar636                  
 0000007B:00000008             __rom_get_00000_arg_objNumb      objNumb
 0000007C:00000008             __rom_get_00000_arg_idx          idx
 0000007D:00000010             __rom_get_00000_1_romAddr        romAddr
-0000007E:00000008             CompTempVar652                  
+0000007E:00000008             CompTempVar650                  
 0000007F:00000008             Int1Context                      Int1Context
 00000081:00000008             gbl_option_reg                   option_reg
 00000085:00000008             gbl_trisa                        trisa
@@ -195,4 +196,4 @@ Memory Usage Report
 ===================
 RAM available:192 bytes, used:101 bytes (52.7%), free:91 bytes (47.3%), 
 Heap size:91 bytes, Heap max single alloc:90 bytes
-ROM available:4096 words, used:2600 words (63.5%), free:1496 words (36.5%)
+ROM available:4096 words, used:2619 words (64.0%), free:1477 words (36.0%)
