@@ -106,12 +106,14 @@ char oneWireRxByte() {
     return cDataIn;
 }
 
+
+
 /*********************************************************************************************
   void at24c32WriteAll()
   Write multiple bytes
+  from https://www.instructables.com/The-Most-Comprehensive-Guide-to-Programming-the-AT/
 *********************************************************************************************/
 void at24c32WriteAll() {
-	// https://www.instructables.com/The-Most-Comprehensive-Guide-to-Programming-the-AT/
 	i2c_start();
 	i2c_write(at24c32Addr); // address + write
 	// start at address 0
@@ -196,6 +198,7 @@ void ds3231Write(char ds3231Reg, char bWrite) {
 /*********************************************************************************************
   void ds3231Init()
   Initialise the DS3231
+  from https://github.com/adafruit/RTClib
 *********************************************************************************************/
 void ds3231Init() {
 	/* control register 0Eh
@@ -277,9 +280,12 @@ char ds3231ReadRegister(char cRegAddress) {
     return cStatus;
 }
 
+
+
 /*********************************************************************************************
   void tm1638ByteWrite(char bWrite)
   Write one byte
+  from http://www.piclearning.net/280/pic-and-tm1638-ledkey-module.php
 *********************************************************************************************/
 void tm1638ByteWrite(char bWrite) {
     for (char i = 0; i < 8; i++) {
@@ -300,6 +306,8 @@ void tm1638DisplayOn() {
     tm1638ByteWrite(0x88);
     tm1638strobe = 1;
 }
+
+
 
 /*********************************************************************************************
   void nibbleTo7Seg(char iNibble)
@@ -344,23 +352,23 @@ void tm1638UpdateDisplay() {
     // Display current temperature unless set, trigger or alt display mode is active
     if ((gcDisplayMode == 2) | gcSetMode | gcTriggerMode) {
         if (gcSetMode == 1) {
-            iDigitToFlash = 3;
-            // Display year
+            // Display year in the first 4 digits, for setting RTC year
             // Start printing from digit 0
+            iDigitToFlash = 3; // 4th digit will flash
             iPrintStartDigit = 0;
             iPrintDotDigit = 3;
             bcdTo7Seg(0x20); // Display 20 in digits 0 and 1 (no dot)
             bcdTo7Seg(gBcdYear); // Display year in digits 2 and 3 (+dot on 3)
         } else if (gcSetMode == 4) {
-            iDigitToFlash = 3;
-            // Display day of week
+            // Display day of week - 'day' followed by number 1 to 7 on 4th digit, for setting RTC day of week
+            iDigitToFlash = 3; // 4th digit will flash
             tm1638Data[0] = 0x5E; // d
             tm1638Data[1] = 0x5F; // a
             tm1638Data[2] = 0x6E; // y
             tm1638Data[3] = tm1638DisplayNumtoSeg[gDayOfWeek] + tm1638Dot;
         } else if (gcSetMode == 5) {
-            iDigitToFlash = 1;
-            // Display 24h or 12h setting
+            // Display 24h or 12h setting in first 4 digits, for setting the time display preference
+            iDigitToFlash = 1; // 2nd digit will flash
             if (gcHourMode) {
 				tm1638Data[0] = 0x06; // 1
 				tm1638Data[1] = 0x5B; // 2
@@ -371,10 +379,11 @@ void tm1638UpdateDisplay() {
             tm1638Data[2] = 0x74; // h
             tm1638Data[3] = 0x00; // blank
         } else if (gcTriggerMode) {
+            // Show relevant display of trigger time or temperature
             iPrintDotDigit = 5;
             switch (gcTriggerMode) {
                 case 1:
-                    // White LED on hour
+                    // White LED on hour, shows as 'L On' followed by hh:mm with 6th digit flashing
                     tm1638Data[0] = 0x38; // L
                     tm1638Data[1] = 0x00; // space
                     tm1638Data[2] = 0x3F; // O
@@ -386,14 +395,14 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdWhiteOnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 2:
-                    // White LED on minute
+                    // White LED on minute, shows as 'L On' followed by hh:mm with 8th digit flashing
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdWhiteOnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 3:
-                    // White LED off hour
+                    // White LED off hour, shows as 'L OF' followed by hh:mm with 6th digit flashing
                     tm1638Data[3] = 0x71; // F
                     iDigitToFlash = 5;
                     // Start printing from digit 4
@@ -402,14 +411,14 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdWhiteOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 4:
-                    // White LED off minute
+                    // White LED off minute, shows as 'L OF' followed by hh:mm with 8th digit flashing
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdWhiteOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 5:
-                    // 1st Blue LED on hour
+                    // 1st Blue LED on hour, shows as 'b1On' followed by hh:mm with 6th digit flashing
                     tm1638Data[0] = 0x7C; // b
                     tm1638Data[1] = 0x06; // 1
                     //tm1638Data[2] = 0x3F; // O
@@ -421,14 +430,14 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 6:
-                    // 1st Blue LED on minute
+                    // 1st Blue LED on minute, shows as 'b1On' followed by hh:mm with 8th digit flashing
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdBlueOnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 7:
-                    // 1st Blue LED off hour
+                    // 1st Blue LED off hour, shows as 'b1OF' followed by hh:mm with 6th digit flashing
                     tm1638Data[3] = 0x71; // F
                     iDigitToFlash = 5;
                     // Start printing from digit 4
@@ -437,14 +446,14 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 8:
-                    // 1st Blue LED off minute
+                    // 1st Blue LED off minute, shows as 'b1OF' followed by hh:mm with 8th digit flashing
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdBlueOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 9:
-                    // 2nd Blue LED on hour
+                    // 2nd Blue LED on hour, shows as 'b2On' followed by hh:mm with 6th digit flashing
                     tm1638Data[0] = 0x7C; // b
                     tm1638Data[1] = 0x5B; // 2
                     //tm1638Data[2] = 0x3F; // O
@@ -456,14 +465,14 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdBlue2OnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 10:
-                    // 2nd Blue LED on minute
+                    // 2nd Blue LED on minute, shows as 'b2On' followed by hh:mm with 8th digit flashing
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdBlue2OnMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 11:
-                    // 2nd Blue LED off hour
+                    // 2nd Blue LED off hour, shows as 'b2OF' followed by hh:mm with 6th digit flashing
                     tm1638Data[3] = 0x71; // F
                     iDigitToFlash = 5;
                     // Start printing from digit 4
@@ -472,14 +481,14 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdBlue2OffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 12:
-                    // 2nd Blue LED off minute
+                    // 2nd Blue LED off minute, shows as 'b2OF' followed by hh:mm with 8th digit flashing
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdBlue2OffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 13:
-                    // Fan on temperature
+                    // Fan on temperature, shows as 'Fan On' followed by nn (temperature in degrees C) with 8th digit flashing
                     tm1638Data[0] = 0x71; // F
                     tm1638Data[1] = 0x5F; // a
                     tm1638Data[2] = 0x54; // n
@@ -492,14 +501,14 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdFanOnTemp); // Display celcius in digits 6 and 7 (no dot)
                     break;
                 case 14:
-                    // Fan off temperature
-                    tm1638Data[5] = 0x71; // f
+                    // Fan off temperature, shows as 'Fan OF' followed by nn (temperature in degrees C) with 8th digit flashing
+                    tm1638Data[5] = 0x71; // F
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
                     bcdTo7Seg(gBcdFanOffTemp); // Display celcius in digits 6 and 7 (no dot)
                     break;
                 case 15:
-                    // Heater on temperature
+                    // Heater on temperature, shows as 'HeatOn' followed by nn (temperature in degrees C) with 8th digit flashing
                     tm1638Data[0] = 0x76; // H
                     tm1638Data[1] = 0x7B; // e
                     tm1638Data[2] = 0x5F; // a
@@ -512,7 +521,7 @@ void tm1638UpdateDisplay() {
                     bcdTo7Seg(gBcdHeaterOnTemp); // Display celcius in digits 6 and 7 (no dot)
                     break;
                 case 16:
-                    // Heater off temperature
+                    // Heater off temperature, shows as 'HeatOF' followed by nn (temperature in degrees C) with 8th digit flashing
                     tm1638Data[5] = 0x71; // f
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
@@ -520,23 +529,28 @@ void tm1638UpdateDisplay() {
                     break;
             }
         } else {
+            // If in set mode, set the relevant digit to flash
             switch (gcSetMode) {
                 case 2:
+                    // Month
                     iDigitToFlash = 3;
                     break;
                 case 3:
+                    // Day of month
                     iDigitToFlash = 1;
                     break;
                 case 6:
+                    // Clock Hour
                     iDigitToFlash = 5;
                     break;
                 case 7:
+                    // Clock Minute
                     iDigitToFlash = 7;
                     break;
                 default:
-                    iDigitToFlash = 8;
+                    iDigitToFlash = 8; // digit no flashing
             }
-            // Display date DD.MM
+            // Display date in DD.MM format when in set mode or gcDisplayMode = 2
             iPrintStartDigit = 0;
             iPrintDotDigit = 1;
             bcdTo7Seg(gBcdDayOfMonth); // Display day of month in digits 0 and 1 (+dot on 1)
@@ -547,7 +561,7 @@ void tm1638UpdateDisplay() {
             zeroToBlank(2); // left fill zero with blank
         }
     } else {
-        iDigitToFlash = 8; // No flashing digit in this mode
+        iDigitToFlash = 8; // No flashing digit in normal mode
         // translate DS3231 temperature to digit values
         iPrintDotDigit = 1;
         if (gcDisplayMode == 1) // no dot on the first two digits for fahrenheit
@@ -563,23 +577,23 @@ void tm1638UpdateDisplay() {
         bcdTo7Seg(giDS3231ValueBCD);
         // Also display dot on 4th digit (always)
 		tm1638Data[3] |= tm1638Dot;
-
-        // left fill zero with blank
+        // left fill zero with blank (1st digit)
         zeroToBlank(0);
         // If minus, overwrite left most digit with minus sign
         if (gbDS3231IsMinus)
             tm1638Data[0] = 0x40;
     }
 
-    // HH.MM in last 4 digits of TM1638
+    // Display clock HH.MM in last 4 digits of TM1638 (unless in trigger mode)
     if (!gcTriggerMode) {
-        iPrintStartDigit = 4;
         // Flash dot every second
         if (gBcdSecond.0)
 			iPrintDotDigit = 5;
 		else
 			iPrintDotDigit = 8;
+        
         char cBcdHourDisp = gBcdHour;
+        // 12h clock handling - convert from 24h
         if (gcHourMode && (gBcdHour > 0x12)) {
 			// convert to 12h
 			cBcdHourDisp -= 0x12;
@@ -590,8 +604,9 @@ void tm1638UpdateDisplay() {
         if (gcHourMode && gBcdHour == 0) {
 			cBcdHourDisp = 0x12; // 12am
         }
+        iPrintStartDigit = 4;
         bcdTo7Seg(cBcdHourDisp); // Display hour in digits 4 and 5 (dot on 5)
-        // left fill zero with blank
+        // left fill zero with blank (for 5th digit)
         zeroToBlank(4);
         if (gcHourMode && (gBcdHour > 0x11)) {
 			// PM dot
@@ -608,19 +623,22 @@ void tm1638UpdateDisplay() {
         else
             tm1638LEDs[i] = 0;
     }
-    tm1638LEDs[0] = HEATER;
-    tm1638LEDs[1] = FAN;
+    tm1638LEDs[0] = HEATER; // Light 1st LED if the heater is on
+    tm1638LEDs[1] = FAN; // Light 2nd LED if the fans are on
+
+    // Now we have the data for the LED 7-segment display and LEDs, push these to the TM1638
 
     // Write 0x40 [01000000] (table 5.1) to indicate command to display data - [Write data to display register]
     tm1638strobe = 0;
     tm1638ByteWrite(tm1638ByteSetData);
     tm1638strobe = 1;
     
-    tm1638strobe = 0;
     // Specify the display address 0xC0 [11000000] (table 5.2) [Display address 00H] then write out all 16 bytes
+    tm1638strobe = 0;
     tm1638ByteWrite(tm1638ByteSetAddr);
     for (char i = 0; i < tm1638MaxDigits; i++) {
-        // display digit first
+        // display 7-segment digit first
+        // If flashing the digit, alternate a blank output
         if (iFlashDigitOff.0 && (i == iDigitToFlash))
             tm1638ByteWrite(0);
         else
@@ -634,6 +652,7 @@ void tm1638UpdateDisplay() {
 /*********************************************************************************************
   void tm1638ReadKeys()
   Reads the keys status into tm1638Keys
+  from http://www.piclearning.net/280/pic-and-tm1638-ledkey-module.php
 *********************************************************************************************/
 void tm1638ReadKeys() {
     // Write 0x42 [01000010] to indicate command to read data
@@ -765,7 +784,7 @@ void readTemp() {
 /*********************************************************************************************
   char bcdAdjust(char bcd, char bcdMax, char bcdMin)
   Increment or Decrement a BCD variable for sending to the DS3231, within a given range
-  Must set iBcdAdjustment first
+  Must set iBcdAdjustment (up/down increment) first
 *********************************************************************************************/
 char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
     if (iBcdAdjustment == 1) {
@@ -793,26 +812,26 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
 /*********************************************************************************************
   void adjustDateTime()
   Increment or Decrement a BCD variable for sending to the DS3231, within a given range
-  Must set iBcdAdjustment first
+  Must set iBcdAdjustment (up/down increment) first
 *********************************************************************************************/
 void adjustDateTime() {
     switch (gcSetMode) {
         case 1:
-            // Setting year
+            // Setting year - from 00 to 99
             gBcdYear = bcdAdjust(gBcdYear, 0x99, 0x00);
             break;
         case 2:
-            // Setting month
+            // Setting month - from 1 to 12
             gBcdMonth = bcdAdjust(gBcdMonth, 0x12, 0x01);
             break;
         case 3:
-            // Setting day of month
+            // Setting day of month - from 1 to max days in month (i.e. 31, 30 or 28/29)
             char iMonth = gBcdMonth;
             if (iMonth & 0xF0)
                 iMonth += (gBcdMonth >> 4);
             iMonth--; // Make 0 to 11 index based
             char bcdMaxDay = gDaysInMonth[iMonth]; 
-            // If February, adjust max days for leap years
+            // If February(1), adjust max days for leap years
             if (iMonth == 1) {
                 // See if the 24 leap years since 2000 match the current year
                 for (char i = 0; i < 24; i++) {
@@ -825,7 +844,7 @@ void adjustDateTime() {
             gBcdDayOfMonth = bcdAdjust(gBcdDayOfMonth, bcdMaxDay, 0x01);
             break;
         case 4:
-            // Setting day of week
+            // Setting day of week - from 1 to 7
             gDayOfWeek = bcdAdjust(gDayOfWeek, 0x07, 0x01);
             break;
         case 5:
@@ -835,11 +854,11 @@ void adjustDateTime() {
 				gcHourMode = 0;
             break;
         case 6:
-            // Setting hour
+            // Setting hour - from 0 to 23
             gBcdHour = bcdAdjust(gBcdHour, 0x23, 0x00);
             break;
         case 7:
-            // Setting minute
+            // Setting minute - from 0 to 59
             gBcdMinute = bcdAdjust(gBcdMinute, 0x59, 0x00);
             break;
     }
@@ -853,51 +872,51 @@ void adjustDateTime() {
 void adjustTrigger() {
     switch (gcTriggerMode) {
         case 1:
-            // White LED on hour
+            // White LED on hour - from 0 to 23
             gBcdWhiteOnHour = bcdAdjust(gBcdWhiteOnHour, 0x23, 0x00);
             break;
         case 2:
-            // White LED on minute
+            // White LED on minute - from 0 to 59
             gBcdWhiteOnMinute = bcdAdjust(gBcdWhiteOnMinute, 0x59, 0x00);
             break;
         case 3:
-            // White LED off hour
+            // White LED off hour - from 0 to 23
             gBcdWhiteOffHour = bcdAdjust(gBcdWhiteOffHour, 0x23, 0x00);
             break;
         case 4:
-            // White LED off minute
+            // White LED off minute - from 0 to 59
             gBcdWhiteOffMinute = bcdAdjust(gBcdWhiteOffMinute, 0x59, 0x00);
             break;
         case 5:
-            // Blue LED on hour
+            // 1st Blue LED on hour - from 0 to 23
             gBcdBlueOnHour = bcdAdjust(gBcdBlueOnHour, 0x23, 0x00);
             break;
         case 6:
-            // Blue LED on minute
+            // 1st Blue LED on minute - from 0 to 59
             gBcdBlueOnMinute = bcdAdjust(gBcdBlueOnMinute, 0x59, 0x00);
             break;
         case 7:
-            // Blue LED off hour
+            // 1st Blue LED off hour - from 0 to 23
             gBcdBlueOffHour = bcdAdjust(gBcdBlueOffHour, 0x23, 0x00);
             break;
         case 8:
-            // Blue LED off minute
+            // 1st Blue LED off minute - from 0 to 59
             gBcdBlueOffMinute = bcdAdjust(gBcdBlueOffMinute, 0x59, 0x00);
             break;
         case 9:
-            // Blue LED on hour
+            // 2nd Blue LED on hour - from 0 to 23
             gBcdBlue2OnHour = bcdAdjust(gBcdBlue2OnHour, 0x23, 0x00);
             break;
         case 10:
-            // Blue LED on minute
+            // 2nd Blue LED on minute - from 0 to 59
             gBcdBlue2OnMinute = bcdAdjust(gBcdBlue2OnMinute, 0x59, 0x00);
             break;
         case 11:
-            // Blue LED off hour
+            // 2nd Blue LED off hour - from 0 to 23
             gBcdBlue2OffHour = bcdAdjust(gBcdBlue2OffHour, 0x23, 0x00);
             break;
         case 12:
-            // Blue LED off minute
+            // 2nd Blue LED off minute - from 0 to 59
             gBcdBlue2OffMinute = bcdAdjust(gBcdBlue2OffMinute, 0x59, 0x00);
             break;
         case 13:
@@ -928,6 +947,7 @@ void adjustTrigger() {
   Action a key press
 *********************************************************************************************/
 void processKeys() {
+    // Key hex codes based on result from tm1638ReadKeys, from http://www.piclearning.net/280/pic-and-tm1638-ledkey-module.php
     switch (tm1638Keys) {
         case 0x1F:
             // Toggle white light on/off
@@ -1070,7 +1090,7 @@ void initialise() {
     option_reg.NOT_RBPU = 1; // disable port b pull ups
 
     // ADC setup
-    // PIC16F73 doesn't have comparators
+    // PIC16F73 doesn't have comparators, setting cmcon may be needed for some PICs
     //cmcon = 7; // disable all comparators so port a is usable as digital io
     adcon1 = 7; // Set RA0,RA1,RA2,RA5,RA3 all to digital I/O
 
@@ -1117,6 +1137,7 @@ void initialise() {
     // Check if the DS3231 needs initilising
     char cStatus = ds3231ReadRegister(0x0F); // Read the status register
     // If the oscillator (OSF bit in status register) has stopped, then init and write a default date/time
+    // This is only expected first time, or backup battery not present/empty in DS3231M module
     if (cStatus.7) {
         ds3231Init();
         ds3231WriteDateTime();
@@ -1235,7 +1256,8 @@ void main() {
                 cTask.TASK_TIMER1 = 0;
             }
             if (cTask.TASK_TIMER0) {
-				// ~half second count
+				// Task should happen about every 50ms
+                // Digit flashing - see if 10 counts has happened for an ~half second count
 				if (iTimer0Counts > 9) {
 					iFlashDigitOff++;
 					iTimer0Counts = 0;					
@@ -1243,13 +1265,12 @@ void main() {
 					if (gcSetMode || gcTriggerMode)
 						tm1638UpdateDisplay();
 				}
-				// Poll keys every 50ms
+				// Poll keys
 				tm1638ReadKeys();
-				if (tm1638Keys != tm1638KeysOld) {
-					//if (tm1638Keys != 0) {
-						processKeys();
-						tm1638UpdateDisplay();
-					//}
+				// This isn't handling button holds for now
+                if (tm1638Keys != tm1638KeysOld) {
+					processKeys();
+					tm1638UpdateDisplay();
 					tm1638KeysOld = tm1638Keys;
 				}
                 cTask.TASK_TIMER0 = 0;

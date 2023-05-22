@@ -1,9 +1,11 @@
 #ifndef _PIC16F_TM1638_AquariumControl_H_
 #define _PIC16F_TM1638_AquariumControl_H_
 
+// Tasks
 #define TASK_TIMER0 1
 #define TASK_TIMER1 2
 
+// Port bits
 #define oneWireBus (portc.5)
 #define oneWireTris (trisc.5)
 #define tm1638dio (portb.1)
@@ -16,12 +18,12 @@
 #define HEATER (porta.0)
 
 // Timer 0 preload
-
 #define TMR0PRELOAD 61
 // This means timer 1 will overflow when 1 cycle completes, generating the interrupt
 #define TMR1HV 0xFF
 #define TMR1LV 0xFF
 
+// I2C initialisation for built in software handling
 // i2c options
 #define use_i2c_SW
 // clock SCL on RA3, data SDA on RA4
@@ -46,6 +48,8 @@ unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
 #define e_SSPIF_BIT	3
 #define e_BCLIF_BIT	3
 
+
+// I2C addresses (8 bit)
 #define ds3231Addr 0xD0 // Left shifted 7 bit address 0x68
 #define at24c32Addr 0xAE // Left shifted 7 bit address 0x57
 
@@ -57,8 +61,10 @@ char gDayOfWeek = 1; // 1 to 7
 char gBcdDayOfMonth = 1; // 1 to 0x31
 char gBcdMonth = 1; // 1 to 0x12 + century at bit 7
 char gBcdYear = 0x23; // Init to 0x23
-rom char *gDaysInMonth = {0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31}; // Days in each month
-rom char *gLeapYears = {0x04, 0x08, 0x12, 0x16, 0x20, 0x24, 0x28, 0x32, 0x36, 0x40, 0x44, 0x48, 0x52, 0x56, 0x60, 0x64, 0x68, 0x72, 0x76, 0x80, 0x84, 0x88, 0x92, 0x96}; // List of leap years
+// Days in each month
+rom char *gDaysInMonth = {0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31};
+// List of leap years, where the Feb days will be 29 instead
+rom char *gLeapYears = {0x04, 0x08, 0x12, 0x16, 0x20, 0x24, 0x28, 0x32, 0x36, 0x40, 0x44, 0x48, 0x52, 0x56, 0x60, 0x64, 0x68, 0x72, 0x76, 0x80, 0x84, 0x88, 0x92, 0x96};
 
 // Timer variables
 char iTimer0Counts = 0;
@@ -77,11 +83,8 @@ char gbDS3231IsMinus = 0;
 char cTask = 0; // Used for task scheduler
 
 // States
-bool gbWhiteOn = 0;
-bool gbBlueOn = 0;
 bool gbFanOn = 0;
 bool gbHeaterOn = 0;
-bool gbFlashOff = 0;
 char gcDisplayMode = 0;
 char gcSetMode = 0;
 char gcHourMode = 0;
@@ -144,11 +147,9 @@ void oneWireTxByte(char data);
 void oneWireTxBytes(char data, char data2);
 char oneWireRxByte();
 
-// EEPROM functions
-void eepromWriteAll();
-char eepromWrite(char address, char data);
-void eepromReadAll();
-char eepromRead(char address);
+// AT24C32 (EEPROM)
+void at24c32WriteAll();
+void at24c32ReadAll();
 
 // DS3231 functions
 void ds3231Write(char ds3231Reg, char bWrite);
@@ -161,13 +162,16 @@ char ds3231ReadRegister(char cRegAddress);
 
 // TM1638 functions
 void tm1638ByteWrite(char bWrite);
-void bcdTo7Seg(char iBcdIn);
 void tm1638DisplayOn();
+void nibbleTo7Seg(char bNibble);
+void bcdTo7Seg(char iBcdIn);
+void zeroToBlank(char iDigit);
 void tm1638UpdateDisplay();
 void tm1638ReadKeys();
 
 // General functions
 int binToBcd(int iBin);
+void convertTemp();
 void startTemp();
 void readTemp();
 
