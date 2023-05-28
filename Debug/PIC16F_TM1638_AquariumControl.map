@@ -48,14 +48,14 @@ Address  Length   Unique Name      Name
 000007BC:00000023 tm1638Read_00025 tm1638ReadKeys(void)  
 000007DF:00000008 startTemp_00000  startTemp(void)  
 000007E7:0000000E readTemp_00000   readTemp(void)  
-000007F5:0000006C processKey_0002A processKeys(void)  
-00000861:00000019 oneWireBus_00014 oneWireBusReset(void)  
-0000087A:0000003C initialise_00000 initialise(void)  
-000008B6:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
-000008E1:000000D8 main             main(void)  
-000009B9:00000064 _startup_00000   _startup(void)  
-00000A1D:0000001B interrupt        interrupt(void)  
-00000A38:000005C8 *Unused Block 
+000007F5:0000006F processKey_0002A processKeys(void)  
+00000864:00000019 oneWireBus_00014 oneWireBusReset(void)  
+0000087D:0000003F initialise_00000 initialise(void)  
+000008BC:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
+000008E7:000000D8 main             main(void)  
+000009BF:00000064 _startup_00000   _startup(void)  
+00000A23:0000001B interrupt        interrupt(void)  
+00000A3E:000005C2 *Unused Block 
 
 Register usage
 ==============
@@ -156,8 +156,8 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 0000006F:00000008             gbl_iBcdAdjustment               iBcdAdjustment
 00000070:00000008             gbl_oneWireIsPresent             oneWireIsPresent
 00000071:00000008             gbl_oneWireResetStage            oneWireResetStage
-00000072:00000008             delay_ms_00000_arg_del           del
-00000073:00000008             i2c_INIT_00000_arg_i2c_divisor   i2c_divisor
+00000072:00000008             initialise_00000_1_cStatus       cStatus
+00000073:00000008             delay_ms_00000_arg_del           del
 00000074:00000008             adjustDate_00028_16_i            i
 00000075:00000008             i2c_READ_00000_arg_ack_status    ack_status
 00000076:00000008             i2c_READ_00000_1_BitMask         BitMask
@@ -196,4 +196,4 @@ Memory Usage Report
 ===================
 RAM available:192 bytes, used:101 bytes (52.7%), free:91 bytes (47.3%), 
 Heap size:91 bytes, Heap max single alloc:90 bytes
-ROM available:4096 words, used:2616 words (63.9%), free:1480 words (36.1%)
+ROM available:4096 words, used:2622 words (64.1%), free:1474 words (35.9%)

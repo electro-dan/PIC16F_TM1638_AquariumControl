@@ -31,11 +31,11 @@ readTemp(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_Aqua
 bcdAdjust(unsigned char,unsigned char,unsigned char):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 790,ram = 4.0,rom = 42;
 adjustDateTime(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 818,ram = 4.0,rom = 133;
 adjustTrigger(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 873,ram = 0.0,rom = 211;
-processKeys(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 951,ram = 1.0,rom = 108;
-interrupt(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1021,ram = 0.0,rom = 27;
-initialise(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1058,ram = 1.1,rom = 60;
+processKeys(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 951,ram = 1.0,rom = 111;
+interrupt(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1023,ram = 0.0,rom = 27;
+initialise(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1060,ram = 1.1,rom = 63;
 i2c_INIT(unsigned char):"C:\Program Files\SourceBoost\include\i2c_driver.h",line = 660,ram = 1.0,rom = 19;
-main(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1155,ram = 0.0,rom = 216;
+main(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1160,ram = 0.0,rom = 216;
 delay_us(unsigned char):"NoSourceFile",line = 0,ram = 0.0,rom = 10;
 delay_10us(unsigned char):"NoSourceFile",line = 0,ram = 0.0,rom = 10;
 delay_ms(unsigned char):"NoSourceFile",line = 0,ram = 0.0,rom = 12;

@@ -768,7 +768,7 @@ void startTemp() {
 }
 
 /*********************************************************************************************
-  void startTemp()
+  void readTemp()
   Sends the Read Scratchpad [BEh] function command to the ds18b20
 *********************************************************************************************/
 void readTemp() {
@@ -963,6 +963,8 @@ void processKeys() {
             break;
         case 0x07:
             // Exit other modes
+            if (gcTriggerMode)
+                at24c32WriteAll(); // Exiting trigger mode, save the new triggers to EEPROM chip
             gcSetMode = 0;
             gcTriggerMode = 0;
             // Display temp C/temp F/date
@@ -1005,8 +1007,8 @@ void processKeys() {
             // Adjust timer mode
             gcTriggerMode++;
             if (gcTriggerMode > 16) {
-                gcTriggerMode = 0;
                 at24c32WriteAll(); // Exiting trigger mode, save the new triggers to EEPROM chip
+                gcTriggerMode = 0;
             }
             break;
     }
@@ -1124,12 +1126,11 @@ void initialise() {
     // No task at initialisation
     cTask = 0;
     
-    // Enable interrupts
-    intcon.GIE = 1;
-    intcon.PEIE = 1;
-
 	// I2C Bus initialisation - baud rate divisor not applicable for software implementation
-	i2c_init(1); 
+	i2c_init(1);
+	
+	// Startup delay
+	delay_ms(500);
 
     // Read in variables from EEPROM
     at24c32ReadAll();
@@ -1145,6 +1146,10 @@ void initialise() {
     
 	tm1638DisplayOn();
     tm1638UpdateDisplay();
+
+    // Enable interrupts
+    intcon.GIE = 1;
+    intcon.PEIE = 1;
 }
 
 /*********************************************************************************************

@@ -280,7 +280,7 @@ i2c_INIT_00000_1_l_sspen         EQU	0x00000040 ; bit:5
 i2c_INIT_00000_1_l_smp           EQU	0x00000042 ; bit:7
 delay_us_00000_arg_del           EQU	0x00000078 ; bytes:1
 delay_10us_00000_arg_del         EQU	0x00000077 ; bytes:1
-delay_ms_00000_arg_del           EQU	0x00000072 ; bytes:1
+delay_ms_00000_arg_del           EQU	0x00000073 ; bytes:1
 __rom_get_00000_arg_objNumb      EQU	0x0000007B ; bytes:1
 __rom_get_00000_arg_idx          EQU	0x0000007C ; bytes:1
 __rom_get_00000_1_romAddr        EQU	0x0000007D ; bytes:2
@@ -2684,6 +2684,10 @@ label139
 	BSF gbl_gbFanOn,0
 	RETURN
 label140
+	MOVF gbl_gcTriggerMode, F
+	BCF PCLATH,3
+	BTFSS STATUS,Z
+	CALL at24c32Wri_00018
 	CLRF gbl_gcSetMode
 	CLRF gbl_gcTriggerMode
 	INCF gbl_gcDisplayMode, F
@@ -2691,7 +2695,6 @@ label140
 	SUBLW 0x03
 	BTFSS STATUS,C
 	CLRF gbl_gcDisplayMode
-	BCF PCLATH,3
 	CALL convertTem_00027
 	RETURN
 label141
@@ -2741,13 +2744,13 @@ label146
 	SUBLW 0x10
 	BTFSC STATUS,C
 	RETURN
-	CLRF gbl_gcTriggerMode
 	BCF PCLATH,3
 	CALL at24c32Wri_00018
+	CLRF gbl_gcTriggerMode
 	RETURN
 ; } processKeys function end
 
-	ORG 0x00000861
+	ORG 0x00000864
 oneWireBus_00014
 ; { oneWireBusReset ; function begin
 	BSF STATUS, RP0
@@ -2777,7 +2780,7 @@ oneWireBus_00014
 	RETURN
 ; } oneWireBusReset function end
 
-	ORG 0x0000087A
+	ORG 0x0000087D
 initialise_00000
 ; { initialise ; function begin
 	BSF STATUS, RP0
@@ -2818,12 +2821,13 @@ initialise_00000
 	BSF gbl_pie1,0
 	BCF STATUS, RP0
 	CLRF gbl_cTask
-	BSF gbl_intcon,7
-	BSF gbl_intcon,6
 	MOVLW 0x01
 	MOVWF i2c_INIT_00000_arg_i2c_divisor
 	BCF PCLATH,3
 	CALL i2c_INIT_00000
+	MOVLW 0xF4
+	MOVWF delay_ms_00000_arg_del
+	CALL delay_ms_00000
 	CALL at24c32Rea_00019
 	MOVLW 0x0F
 	MOVWF ds3231Read_0001D_arg_cRegAddress
@@ -2840,10 +2844,12 @@ label147
 	BCF PCLATH,3
 	CALL tm1638Disp_0001F
 	CALL tm1638Upda_00022
+	BSF gbl_intcon,7
+	BSF gbl_intcon,6
 	RETURN
 ; } initialise function end
 
-	ORG 0x000008B6
+	ORG 0x000008BC
 ds3231Read_0001C
 ; { ds3231ReadDateTime ; function begin
 	BCF PCLATH,3
@@ -2891,7 +2897,7 @@ ds3231Read_0001C
 	RETURN
 ; } ds3231ReadDateTime function end
 
-	ORG 0x000008E1
+	ORG 0x000008E7
 main
 ; { main ; function begin
 	CALL initialise_00000
@@ -3136,7 +3142,7 @@ label171
 	GOTO	label148
 ; } main function end
 
-	ORG 0x000009B9
+	ORG 0x000009BF
 _startup
 	BCF STATUS, RP0
 	BCF STATUS, RP1
@@ -3238,7 +3244,7 @@ _startup
 	BSF PCLATH,3
 	BCF PCLATH,4
 	GOTO	main
-	ORG 0x00000A1D
+	ORG 0x00000A23
 interrupt
 ; { interrupt ; function begin
 	BTFSS gbl_intcon,2
