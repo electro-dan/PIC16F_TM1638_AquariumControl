@@ -8,7 +8,7 @@
 //Set clock frequency (for software delays) - 4MHz
 #pragma CLOCK_FREQ	4000000
 
-    
+
 /*********************************************************************************************
   void oneWireBusReset()
   First part of the reset routine - drive the bus low for 500us
@@ -18,7 +18,7 @@ void oneWireBusReset() {
     oneWireTris = 1; // start with high
     isPresent = 0;
     // Send the reset pulse - drive low for 500us
-    oneWireBus = 0;      
+    oneWireBus = 0;
     oneWireTris = 0;
     delay_10us(50);
     // Release line and wait 70us for PD Pulse
@@ -47,14 +47,14 @@ void oneWireTxByte(char cData) {
 
         // Delay not needed for 4MHz PIC
         //delay_us(3); // Delay 3us
-        
+
         if (cData & cTemp) {
             oneWireTris = 1; // Release the bus
         }
-        
+
         delay_10us(5); // Delay 60us - 50us works fine with code delays
         oneWireTris = 1; // Release the bus
-        
+
         // move the test bit
         cTemp <<= 1;
     }
@@ -91,18 +91,18 @@ char oneWireRxByte() {
         // Release bus for 6us, this is enough time for the slave to respond
         oneWireTris = 1;
         delay_us(3); // Delay 6us
-        
+
         // Shift data already received left
         cDataIn >>= 1;
-        
+
         // Check the value of the onewire bus - set the MSB of cDataIn if so
         if (oneWireBus)
             cDataIn.7 = 1;
 
         // To finish time slot
         delay_10us(6); // 60us
-    } 
-    
+    }
+
     return cDataIn;
 }
 
@@ -118,7 +118,7 @@ void at24c32WriteAll() {
 	i2c_write(at24c32Addr); // address + write
 	// start at address 0
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
-	i2c_write(0); // Second word address 
+	i2c_write(0); // Second word address
 	// Write data bytes
 	// We're only writing 18 bytes here, so no need to worry about row rollover after 32 bytes
 	i2c_write(0x44); // To indicate AT24C32 has been written to
@@ -152,9 +152,9 @@ void at24c32ReadAll() {
 	i2c_write(at24c32Addr); // address + write
 	// start at address 0
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
-	i2c_write(0); // Second word address 
+	i2c_write(0); // Second word address
 	i2c_stop(); // Don't actually write a byte, just stop
-	
+
 	i2c_start();
 	i2c_write(at24c32Addr + 1); // address + read
 	char hasWritten = i2c_read(0); // ack
@@ -249,7 +249,7 @@ void ds3231ReadDateTime() {
 	i2c_write(ds3231Addr); // address + write
 	i2c_write(0); // start at address 0
 	i2c_stop();
-	
+
 	i2c_start();
 	i2c_write(ds3231Addr + 1); // address + read
 	gBcdSecond = i2c_read(0); // ack
@@ -272,7 +272,7 @@ char ds3231ReadRegister(char cRegAddress) {
 	i2c_write(ds3231Addr); // address + write
 	i2c_write(cRegAddress); // start at requested address
 	i2c_stop();
-	
+
 	i2c_start();
 	i2c_write(ds3231Addr + 1); // address + read
 	cStatus = i2c_read(1); // read the byte, then nack
@@ -348,7 +348,7 @@ void zeroToBlank(char iDigit) {
   Publish the tm1638Data and tm1638LEDs arrays to the display
 *********************************************************************************************/
 void tm1638UpdateDisplay() {
-    
+
     // Display current temperature unless set, trigger or alt display mode is active
     if ((gcDisplayMode == 2) | gcSetMode | gcTriggerMode) {
         if (gcSetMode == 1) {
@@ -407,7 +407,7 @@ void tm1638UpdateDisplay() {
                     iDigitToFlash = 5;
                     // Start printing from digit 4
                     iPrintStartDigit = 4;
-                    bcdTo7Seg(gBcdWhiteOffHour); 
+                    bcdTo7Seg(gBcdWhiteOffHour);
                     bcdTo7Seg(gBcdWhiteOffMinute); // Display minute in digits 6 and 7 (no dot)
                     break;
                 case 4:
@@ -591,7 +591,7 @@ void tm1638UpdateDisplay() {
 			iPrintDotDigit = 5;
 		else
 			iPrintDotDigit = 8;
-        
+
         char cBcdHourDisp = gBcdHour;
         // 12h clock handling - convert from 24h
         if (gcHourMode && (gBcdHour > 0x12)) {
@@ -632,7 +632,7 @@ void tm1638UpdateDisplay() {
     tm1638strobe = 0;
     tm1638ByteWrite(tm1638ByteSetData);
     tm1638strobe = 1;
-    
+
     // Specify the display address 0xC0 [11000000] (table 5.2) [Display address 00H] then write out all 16 bytes
     tm1638strobe = 0;
     tm1638ByteWrite(tm1638ByteSetAddr);
@@ -658,7 +658,7 @@ void tm1638ReadKeys() {
     // Write 0x42 [01000010] to indicate command to read data
     tm1638strobe = 0;
     tm1638ByteWrite(tm1638ByteReadData);
-    
+
     tm1638dioTris = 1; // Set data pin to input
     char tm1638KeysTemp = 32;
     // Read 4 bytes
@@ -730,7 +730,7 @@ void convertTemp() {
     // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
     signed int iTemp = (cTempH << 8) | cTempL;
     signed int iTemp2 = iTemp;
-    
+
     // this gets celcius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
     // Celcius value is always required for triggering
 	gbDS3231IsMinus = (iTemp2 < 0);
@@ -742,7 +742,7 @@ void convertTemp() {
     giDS3231ValueBCD = intToBcd(iValueC);
     // Truncated value for triggering heater/fans
     giDS3231ValueTruncCBCD = giDS3231ValueBCD >> 8;
-    
+
     if (gcDisplayMode == 1) {
 		// -17.8125 (-285/65251) results in minus fahrenheit (-0.125), -17.75 (-284/65250) results in positive fahrenheit (1)
         // this gets Fahrenheit * 10 - https://www.electro-tech-online.com/threads/temperature-sensor-ds18b20-display-fahrenhiet.117377/
@@ -830,7 +830,7 @@ void adjustDateTime() {
             if (iMonth & 0xF0)
                 iMonth += (gBcdMonth >> 4);
             iMonth--; // Make 0 to 11 index based
-            char bcdMaxDay = gDaysInMonth[iMonth]; 
+            char bcdMaxDay = gDaysInMonth[iMonth];
             // If February(1), adjust max days for leap years
             if (iMonth == 1) {
                 // See if the 24 leap years since 2000 match the current year
@@ -1021,11 +1021,10 @@ void processKeys() {
 void interrupt() {
     // Interrupt on timer0 - flash digit delay
     if (intcon.T0IF) {
-        iTimer0Counts++;
         tmr0 = TMR0PRELOAD;
         cTask.TASK_TIMER0 = 1;
         // Clear interrupt flag
-        intcon.T0IF = 0; 
+        intcon.T0IF = 0;
     }
     // Handle timer1 interrupt - delay counter from DS3231
     if (pir1.TMR1IF) {
@@ -1050,34 +1049,34 @@ void initialise() {
     /*
     RA7     Doesn't exist
     RA6     Doesn't exist
-    RA5     
-    RA4     
-    RA3     
-    RA2     
+    RA5
+    RA4
+    RA3
+    RA2
     RA1     OUT FANS
     RA0     OUT HEATER
     */
     trisa = 0x00; // all outputs
     porta = 0x00; // All off
-    
+
     // Configure port B
-    /*      
+    /*
     RB7     ICSP PGD
     RB6     ICSP PGC
-    RB5     
-    RB4     
+    RB5
+    RB4
     RB3     OUT TM1638 STB
     RB2     OUT TM1638 CLK
     RB1     IN/OUT TM1638 DIO
-    RB0     
+    RB0
     */
     trisb = 0x00; // all outputs by default
     portb = 0x0E; // default TM1638 pins high
 
     // Configure port C
-    /*      
-    RC7     
-    RC6     
+    /*
+    RC7
+    RC6
     RC5     IN/OUT DS18B20
     RC4     IN/OUT DS3231M I2C SDA
     RC3     IN/OUT DS3231M I2C CLK
@@ -1122,13 +1121,13 @@ void initialise() {
     tmr1h = TMR1HV;      // preset for timer1 MSB register
     tmr1l = TMR1LV;      // preset for timer1 LSB register
     pie1.TMR1IE = 1;     // Timer 1 interrupt
-    
+
     // No task at initialisation
     cTask = 0;
-    
+
 	// I2C Bus initialisation - baud rate divisor not applicable for software implementation
 	i2c_init(1);
-	
+
 	// Startup delay
 	delay_ms(500);
 
@@ -1143,7 +1142,7 @@ void initialise() {
         ds3231Init();
         ds3231WriteDateTime();
     }
-    
+
 	tm1638DisplayOn();
     tm1638UpdateDisplay();
 
@@ -1158,7 +1157,7 @@ void initialise() {
 *********************************************************************************************/
 void main() {
     initialise();
-    
+
     // Endless loop
     while(1) {
         // Task scheduler
@@ -1176,13 +1175,13 @@ void main() {
                     } else if ((gBcdSecond == 0) || (gBcdSecond == 0x30)) {
                         // 1 second later, read the converted temperature
                         oneWireBusReset();
-                        readTemp(); 
+                        readTemp();
                         // store it in the array, next display refresh will pick it up
                         convertTemp();
                     }
                     // daylight savings time handling (UK/europe) - last sunday of March or October (this can fall between the 25th and the 31st)
                     if ((gBcdSecond == 0) && (gDayOfWeek == 7) && (gBcdDayOfMonth > 0x24)) {
-						// In March, at 1AM, apply daylight savings time if appropriate 
+						// In March, at 1AM, apply daylight savings time if appropriate
 						if ((gBcdHour == 1) && (gBcdMonth == 3)) {
 							gBcdHour++; // one hour forwards
 							ds3231WriteDateTime();
@@ -1257,27 +1256,40 @@ void main() {
 				if (!gcTriggerMode && !gcSetMode) {
 					tm1638UpdateDisplay();
                 }
-                
+
                 cTask.TASK_TIMER1 = 0;
             }
             if (cTask.TASK_TIMER0) {
 				// Task should happen about every 50ms
                 // Digit flashing - see if 10 counts has happened for an ~half second count
-				if (iTimer0Counts > 9) {
+                iTimer0FlashCounts++;
+				if (iTimer0FlashCounts > 9) {
 					iFlashDigitOff++;
-					iTimer0Counts = 0;					
+					iTimer0FlashCounts = 0;
 					// If in set or trigger mode, update the display every ~half second to flash a digit
 					if (gcSetMode || gcTriggerMode)
 						tm1638UpdateDisplay();
 				}
 				// Poll keys
 				tm1638ReadKeys();
-				// This isn't handling button holds for now
+				// Button state changed
+                char processKeys = 0;
                 if (tm1638Keys != tm1638KeysOld) {
+                    processKeys = 1;
+                } else if (tm1638Keys != 0) {
+                    // Button held
+                    iTimer0KeyCounts++;
+                    // If button held more than 250ms
+                    if (iTimer0KeyCounts > 4) {
+                        processKeys = 1;
+                    }
+                }
+                if (processKeys) {
 					processKeys();
 					tm1638UpdateDisplay();
 					tm1638KeysOld = tm1638Keys;
-				}
+                    iTimer0KeyCounts = 0;
+                }
                 cTask.TASK_TIMER0 = 0;
             }
         }
