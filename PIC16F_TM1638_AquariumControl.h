@@ -75,6 +75,7 @@ char iDigitToFlash = 8; // 8 = no digit to flash
 // Hold the upper and lower bytes from the ds18b20
 char cTempH = 1;
 char cTempL = 70;
+signed int iTempOld = 0;
 //char iDecimalPosition = 2;
 
 int giDS3231ValueBCD = 0x0000;

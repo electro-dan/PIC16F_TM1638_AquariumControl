@@ -498,14 +498,14 @@ void tm1638UpdateDisplay() {
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    bcdTo7Seg(gBcdFanOnTemp); // Display celcius in digits 6 and 7 (no dot)
+                    bcdTo7Seg(gBcdFanOnTemp); // Display celsius in digits 6 and 7 (no dot)
                     break;
                 case 14:
                     // Fan off temperature, shows as 'Fan OF' followed by nn (temperature in degrees C) with 8th digit flashing
                     tm1638Data[5] = 0x71; // F
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    bcdTo7Seg(gBcdFanOffTemp); // Display celcius in digits 6 and 7 (no dot)
+                    bcdTo7Seg(gBcdFanOffTemp); // Display celsius in digits 6 and 7 (no dot)
                     break;
                 case 15:
                     // Heater on temperature, shows as 'HeatOn' followed by nn (temperature in degrees C) with 8th digit flashing
@@ -518,14 +518,14 @@ void tm1638UpdateDisplay() {
                     iDigitToFlash = 7;
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    bcdTo7Seg(gBcdHeaterOnTemp); // Display celcius in digits 6 and 7 (no dot)
+                    bcdTo7Seg(gBcdHeaterOnTemp); // Display celsius in digits 6 and 7 (no dot)
                     break;
                 case 16:
                     // Heater off temperature, shows as 'HeatOF' followed by nn (temperature in degrees C) with 8th digit flashing
                     tm1638Data[5] = 0x71; // f
                     // Start printing from digit 6
                     iPrintStartDigit = 6;
-                    bcdTo7Seg(gBcdHeaterOffTemp); // Display celcius in digits 6 and 7 (no dot)
+                    bcdTo7Seg(gBcdHeaterOffTemp); // Display celsius in digits 6 and 7 (no dot)
                     break;
             }
         } else {
@@ -730,9 +730,21 @@ void convertTemp() {
     // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
     signed int iTemp = (cTempH << 8) | cTempL;
     signed int iTemp2 = iTemp;
+    // Compare to previous and ignore erroneous readings
+    // Ignore startup reading (85 degrees - 1360) or anything greater
+    if (iTemp > 1359)
+        return;
+    if (iTempOld != 0) {
+        // If the temperature difference exceeds 10 degrees (160) in either direction, ignore reading
+        if ((iTemp + 160) > iTempOld)
+            return;
+        if ((iTemp - 160) < iTempOld)
+            return;
+    }
+    iTempOld = iTemp;
 
-    // this gets celcius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
-    // Celcius value is always required for triggering
+    // this gets celsius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
+    // celsius value is always required for triggering
 	gbDS3231IsMinus = (iTemp2 < 0);
 	if (gbDS3231IsMinus) {
 		iTemp2 = ~iTemp2 + 1;
