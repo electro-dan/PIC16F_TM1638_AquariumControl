@@ -1739,18 +1739,18 @@ label99
 	SUBWF oneWireRxB_00017_2_i, W
 	BTFSC STATUS,C
 	GOTO	label100
+	BCF STATUS,C
+	RRF oneWireRxB_00017_1_cDataIn, F
 	BSF STATUS, RP0
 	BCF gbl_trisc,5
 	BCF STATUS, RP0
 	BCF gbl_portc,5
 	BSF STATUS, RP0
 	BSF gbl_trisc,5
-	MOVLW 0x03
+	MOVLW 0x04
 	BCF STATUS, RP0
 	MOVWF delay_us_00000_arg_del
 	CALL delay_us_00000
-	BCF STATUS,C
-	RRF oneWireRxB_00017_1_cDataIn, F
 	BTFSC gbl_portc,5
 	BSF oneWireRxB_00017_1_cDataIn,7
 	MOVLW 0x06
@@ -2701,11 +2701,7 @@ label141
 	GOTO	label143
 	DECF tm1638Read_00025_1_tm1638K_00026, F
 	BCF gbl_portb,2
-	MOVLW 0x01
-	MOVWF delay_us_00000_arg_del
-	BCF PCLATH,3
-	CALL delay_us_00000
-	BSF PCLATH,3
+	NOP
 	BTFSS gbl_portb,1
 	GOTO	label142
 	BCF STATUS,C
@@ -2724,7 +2720,7 @@ label143
 	RETURN
 ; } tm1638ReadKeys function end
 
-	ORG 0x00000853
+	ORG 0x0000084F
 startTemp_00000
 ; { startTemp ; function begin
 	MOVLW 0xCC
@@ -2738,7 +2734,7 @@ startTemp_00000
 	RETURN
 ; } startTemp function end
 
-	ORG 0x0000085C
+	ORG 0x00000858
 readTemp_00000
 ; { readTemp ; function begin
 	MOVLW 0xCC
@@ -2758,7 +2754,7 @@ readTemp_00000
 	RETURN
 ; } readTemp function end
 
-	ORG 0x0000086B
+	ORG 0x00000867
 processKey_0002A
 ; { processKeys ; function begin
 	BCF STATUS, RP0
@@ -2883,7 +2879,7 @@ label153
 	RETURN
 ; } processKeys function end
 
-	ORG 0x000008D9
+	ORG 0x000008D5
 oneWireBus_00014
 ; { oneWireBusReset ; function begin
 	BSF STATUS, RP0
@@ -2913,7 +2909,7 @@ oneWireBus_00014
 	RETURN
 ; } oneWireBusReset function end
 
-	ORG 0x000008F2
+	ORG 0x000008EE
 initialise_00000
 ; { initialise ; function begin
 	BSF STATUS, RP0
@@ -2982,7 +2978,7 @@ label154
 	RETURN
 ; } initialise function end
 
-	ORG 0x00000931
+	ORG 0x0000092D
 ds3231Read_0001C
 ; { ds3231ReadDateTime ; function begin
 	BCF PCLATH,3
@@ -3030,7 +3026,7 @@ ds3231Read_0001C
 	RETURN
 ; } ds3231ReadDateTime function end
 
-	ORG 0x0000095C
+	ORG 0x00000958
 main
 ; { main ; function begin
 	CALL initialise_00000
@@ -3297,7 +3293,7 @@ label180
 	GOTO	label155
 ; } main function end
 
-	ORG 0x00000A48
+	ORG 0x00000A44
 _startup
 	BCF STATUS, RP0
 	BCF STATUS, RP1
@@ -3402,7 +3398,7 @@ _startup
 	BSF PCLATH,3
 	BCF PCLATH,4
 	GOTO	main
-	ORG 0x00000AAF
+	ORG 0x00000AAB
 interrupt
 ; { interrupt ; function begin
 	BTFSS gbl_intcon,2

@@ -81,19 +81,19 @@ char oneWireRxByte() {
     char cDataIn = 0;
     // Loop through the eight bits in the byte
     for(char i = 0; i < 8; i++) {
-        // Bring bus low for 15us
-        oneWireTris = 0;
-        oneWireBus = 0;
-
-        // Delay not needed for 4MHz PIC
-        //delay_us(15); // Delay 15us
-
-        // Release bus for 6us, this is enough time for the slave to respond
-        oneWireTris = 1;
-        delay_us(3); // Delay 6us
-
         // Shift data already received left
         cDataIn >>= 1;
+
+        // Bring bus low for 1us
+        oneWireTris = 0;
+        oneWireBus = 0;
+        // no delay needed here for 4MHz PIC
+        // Release bus
+        oneWireTris = 1;
+
+        // Sample within 15us
+        // delay overhead 10us, unit delay 1us, resolution 4 units
+        delay_us(4); // Delay 15us
 
         // Check the value of the onewire bus - set the MSB of cDataIn if so
         if (oneWireBus)
@@ -665,7 +665,8 @@ void tm1638ReadKeys() {
     for (char i = 0; i < 32; i++) {
         tm1638KeysTemp--;
         tm1638clk = 0;
-        delay_us(1);
+        //delay_us(1);
+        nop();
         if(tm1638dio)
             tm1638KeysTemp <<= 1;
         tm1638clk = 1;

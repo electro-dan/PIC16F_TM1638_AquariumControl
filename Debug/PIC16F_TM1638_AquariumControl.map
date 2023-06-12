@@ -45,17 +45,17 @@ Address  Length   Unique Name      Name
 0000066C:00000060 at24c32Rea_00019 at24c32ReadAll(void)  
 000006CC:000000D3 adjustTrig_00029 adjustTrigger(void)  
 0000079F:0000008D adjustDate_00028 adjustDateTime(void)  
-0000082C:00000027 tm1638Read_00025 tm1638ReadKeys(void)  
-00000853:00000009 startTemp_00000  startTemp(void)  
-0000085C:0000000F readTemp_00000   readTemp(void)  
-0000086B:0000006E processKey_0002A processKeys(void)  
-000008D9:00000019 oneWireBus_00014 oneWireBusReset(void)  
-000008F2:0000003F initialise_00000 initialise(void)  
-00000931:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
-0000095C:000000EC main             main(void)  
-00000A48:00000067 _startup_00000   _startup(void)  
-00000AAF:0000001A interrupt        interrupt(void)  
-00000AC9:00000537 *Unused Block 
+0000082C:00000023 tm1638Read_00025 tm1638ReadKeys(void)  
+0000084F:00000009 startTemp_00000  startTemp(void)  
+00000858:0000000F readTemp_00000   readTemp(void)  
+00000867:0000006E processKey_0002A processKeys(void)  
+000008D5:00000019 oneWireBus_00014 oneWireBusReset(void)  
+000008EE:0000003F initialise_00000 initialise(void)  
+0000092D:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
+00000958:000000EC main             main(void)  
+00000A44:00000067 _startup_00000   _startup(void)  
+00000AAB:0000001A interrupt        interrupt(void)  
+00000AC5:0000053B *Unused Block 
 
 Register usage
 ==============
@@ -200,4 +200,4 @@ Memory Usage Report
 ===================
 RAM available:192 bytes, used:106 bytes (55.3%), free:86 bytes (44.7%), 
 Heap size:86 bytes, Heap max single alloc:85 bytes
-ROM available:4096 words, used:2761 words (67.5%), free:1335 words (32.5%)
+ROM available:4096 words, used:2757 words (67.4%), free:1339 words (32.6%)
