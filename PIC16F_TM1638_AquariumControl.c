@@ -735,14 +735,6 @@ void convertTemp() {
     // Ignore startup reading (85 degrees - 1360) or anything greater
     if (iTemp > 1359)
         return;
-    if (iTempOld != 0) {
-        // If the temperature difference exceeds 10 degrees (160) in either direction, ignore reading
-        if ((iTemp + 160) > iTempOld)
-            return;
-        if ((iTemp - 160) < iTempOld)
-            return;
-    }
-    iTempOld = iTemp;
 
     // this gets celsius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
     // celsius value is always required for triggering
