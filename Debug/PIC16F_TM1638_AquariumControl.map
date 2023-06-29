@@ -35,27 +35,27 @@ Address  Length   Unique Name      Name
 000002B4:00000225 tm1638Upda_00022 tm1638UpdateDisplay(void)  
 000004D9:00000008 tm1638Disp_0001F tm1638DisplayOn(void)  
 000004E1:00000007 oneWireTxB_00016 oneWireTxBytes(unsigned char,unsigned char)  
-000004E8:0000001E oneWireRxB_00017 oneWireRxByte(void)  
-00000506:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
-00000519:0000001C ds3231Writ_0001B ds3231WriteDateTime(void)  
-00000535:00000015 ds3231Read_0001D ds3231ReadRegister(unsigned char)  
-0000054A:0000000B ds3231Init_00000 ds3231Init(void)  
-00000555:00000097 convertTem_00027 convertTemp(void)  
-000005EC:00000043 at24c32Wri_00018 at24c32WriteAll(void)  
-0000062F:00000060 at24c32Rea_00019 at24c32ReadAll(void)  
-0000068F:000000D3 adjustTrig_00029 adjustTrigger(void)  
-00000762:00000087 adjustDate_00028 adjustDateTime(void)  
-000007E9:00000023 tm1638Read_00025 tm1638ReadKeys(void)  
-0000080C:00000009 startTemp_00000  startTemp(void)  
-00000815:0000000F readTemp_00000   readTemp(void)  
-00000824:0000006E processKey_0002A processKeys(void)  
-00000892:00000019 oneWireBus_00014 oneWireBusReset(void)  
-000008AB:0000003F initialise_00000 initialise(void)  
-000008EA:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
-00000915:000000EB main             main(void)  
-00000A00:00000065 _startup_00000   _startup(void)  
-00000A65:0000001A interrupt        interrupt(void)  
-00000A7F:00000581 *Unused Block 
+000004E8:0000001F oneWireRxB_00017 oneWireRxByte(void)  
+00000507:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
+0000051A:0000001C ds3231Writ_0001B ds3231WriteDateTime(void)  
+00000536:00000015 ds3231Read_0001D ds3231ReadRegister(unsigned char)  
+0000054B:0000000B ds3231Init_00000 ds3231Init(void)  
+00000556:00000093 convertTem_00027 convertTemp(void)  
+000005E9:00000043 at24c32Wri_00018 at24c32WriteAll(void)  
+0000062C:00000060 at24c32Rea_00019 at24c32ReadAll(void)  
+0000068C:000000D3 adjustTrig_00029 adjustTrigger(void)  
+0000075F:00000087 adjustDate_00028 adjustDateTime(void)  
+000007E6:00000023 tm1638Read_00025 tm1638ReadKeys(void)  
+00000809:00000009 startTemp_00000  startTemp(void)  
+00000812:0000000F readTemp_00000   readTemp(void)  
+00000821:0000006E processKey_0002A processKeys(void)  
+0000088F:00000019 oneWireBus_00014 oneWireBusReset(void)  
+000008A8:0000003F initialise_00000 initialise(void)  
+000008E7:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
+00000912:000000EB main             main(void)  
+000009FD:00000065 _startup_00000   _startup(void)  
+00000A62:0000001A interrupt        interrupt(void)  
+00000A7C:00000584 *Unused Block 
 
 Register usage
 ==============
@@ -168,7 +168,7 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 0000007B:00000008             CompTempVar617                  
 0000007C:00000008             __rom_get_00000_arg_objNumb      objNumb
 0000007D:00000008             __rom_get_00000_arg_idx          idx
-0000007E:00000008             CompTempVar630                  
+0000007E:00000008             CompTempVar629                  
 0000007F:00000008             Int1Context                      Int1Context
 00000081:00000008             gbl_option_reg                   option_reg
 00000085:00000008             gbl_trisa                        trisa
@@ -184,7 +184,7 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 00000099:00000008             gbl_spbrg                        spbrg
 0000009F:00000008             gbl_adcon1                       adcon1
 000000A0:00000010             __rom_get_00000_1_romAddr        romAddr
-000000A2:00000008             CompTempVar640                  
+000000A2:00000008             CompTempVar638                  
 000000A3:00000010             __mul_16s__0000F_1_t             t
 000000A5:00000010             CompTempVarRet387                $ret
 0000010C:00000008             gbl_pmdata                       pmdata
@@ -198,4 +198,4 @@ Memory Usage Report
 ===================
 RAM available:192 bytes, used:104 bytes (54.2%), free:88 bytes (45.8%), 
 Heap size:88 bytes, Heap max single alloc:87 bytes
-ROM available:4096 words, used:2687 words (65.7%), free:1409 words (34.3%)
+ROM available:4096 words, used:2684 words (65.6%), free:1412 words (34.4%)

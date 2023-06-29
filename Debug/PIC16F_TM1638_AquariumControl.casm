@@ -62,249 +62,249 @@ unsigned short swi2c_SSPADD@0x46;	// define location for the emulated SSPADD
 
 // Time and date variables
 char gBcdSecond = 0; // 0 to 0x59
-0A00  1283  	BCF STATUS, RP0
-0A01  1303  	BCF STATUS, RP1
-0A02  01B5  	CLRF gbl_gBcdSecond
+09FD  1283  	BCF STATUS, RP0
+09FE  1303  	BCF STATUS, RP1
+09FF  01B5  	CLRF gbl_gBcdSecond
 
 char gBcdMinute = 0; // 0 to 0x59
-0A03  01B6  	CLRF gbl_gBcdMinute
+0A00  01B6  	CLRF gbl_gBcdMinute
 
 char gBcdHour = 0; // 0 to 0x23 or 1 to 0x12. Also contains 12/24 setting at bit 6. If 12 hour, AM/PM uses bit 5
-0A04  01B7  	CLRF gbl_gBcdHour
+0A01  01B7  	CLRF gbl_gBcdHour
 
 char gDayOfWeek = 1; // 1 to 7
-0A05  3001  	MOVLW 0x01
-0A06  00B8  	MOVWF gbl_gDayOfWeek
+0A02  3001  	MOVLW 0x01
+0A03  00B8  	MOVWF gbl_gDayOfWeek
 
 char gBcdDayOfMonth = 1; // 1 to 0x31
-0A07  3001  	MOVLW 0x01
-0A08  00B9  	MOVWF gbl_gBcdDayOfMonth
+0A04  3001  	MOVLW 0x01
+0A05  00B9  	MOVWF gbl_gBcdDayOfMonth
 
 char gBcdMonth = 1; // 1 to 0x12 + century at bit 7
-0A09  3001  	MOVLW 0x01
-0A0A  00BA  	MOVWF gbl_gBcdMonth
+0A06  3001  	MOVLW 0x01
+0A07  00BA  	MOVWF gbl_gBcdMonth
 
 char gBcdYear = 0x23; // Init to 0x23
-0A0B  3023  	MOVLW 0x23
-0A0C  00BB  	MOVWF gbl_gBcdYear
+0A08  3023  	MOVLW 0x23
+0A09  00BB  	MOVWF gbl_gBcdYear
 
 // Days in each month
 rom char *gDaysInMonth = {0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31};
-0A0D  3000  	MOVLW 0x00
-0A0E  00BC  	MOVWF gbl_gDaysInMonth
+0A0A  3000  	MOVLW 0x00
+0A0B  00BC  	MOVWF gbl_gDaysInMonth
 
 // List of leap years, where the Feb days will be 29 instead
 rom char *gLeapYears = {0x04, 0x08, 0x12, 0x16, 0x20, 0x24, 0x28, 0x32, 0x36, 0x40, 0x44, 0x48, 0x52, 0x56, 0x60, 0x64, 0x68, 0x72, 0x76, 0x80, 0x84, 0x88, 0x92, 0x96};
-0A0F  3001  	MOVLW 0x01
-0A10  00BD  	MOVWF gbl_gLeapYears
+0A0C  3001  	MOVLW 0x01
+0A0D  00BD  	MOVWF gbl_gLeapYears
 
 
 // Timer variables
 char iTimer0FlashCounts = 0;
-0A11  01BE  	CLRF gbl_iTimer0FlashCounts
+0A0E  01BE  	CLRF gbl_iTimer0FlashCounts
 
 char iTimer0KeyCounts = 0;
-0A12  01BF  	CLRF gbl_iTimer0KeyCounts
+0A0F  01BF  	CLRF gbl_iTimer0KeyCounts
 
 char iFlashDigitOff = 0;
-0A13  01C8  	CLRF gbl_iFlashDigitOff
+0A10  01C8  	CLRF gbl_iFlashDigitOff
 
 char iDigitToFlash = 8; // 8 = no digit to flash
-0A14  3008  	MOVLW 0x08
-0A15  00C9  	MOVWF gbl_iDigitToFlash
+0A11  3008  	MOVLW 0x08
+0A12  00C9  	MOVWF gbl_iDigitToFlash
 
 
 // Hold the upper and lower bytes from the ds18b20
 char cTempH = 1;
-0A16  3001  	MOVLW 0x01
-0A17  00CA  	MOVWF gbl_cTempH
+0A13  3001  	MOVLW 0x01
+0A14  00CA  	MOVWF gbl_cTempH
 
 char cTempL = 70;
-0A18  3046  	MOVLW 0x46
-0A19  00CB  	MOVWF gbl_cTempL
+0A15  3046  	MOVLW 0x46
+0A16  00CB  	MOVWF gbl_cTempL
 
 //char iDecimalPosition = 2;
 
 int giDS3231ValueBCD = 0x0000;
-0A1A  01B3  	CLRF gbl_giDS3231ValueBCD
-0A1B  01B4  	CLRF gbl_giDS3231ValueBCD+D'1'
+0A17  01B3  	CLRF gbl_giDS3231ValueBCD
+0A18  01B4  	CLRF gbl_giDS3231ValueBCD+D'1'
 
 char giDS3231ValueTruncCBCD = 0x00;
-0A1C  01CC  	CLRF gbl_giDS3231ValueTruncCBCD
+0A19  01CC  	CLRF gbl_giDS3231ValueTruncCBCD
 
 char gbDS3231IsMinus = 0;
-0A1D  01CD  	CLRF gbl_gbDS3231IsMinus
+0A1A  01CD  	CLRF gbl_gbDS3231IsMinus
 
 
 char cTask = 0; // Used for task scheduler
-0A1E  01CE  	CLRF gbl_cTask
+0A1B  01CE  	CLRF gbl_cTask
 
 
 // States
 bool gbFanOn = 0;
-0A1F  104F  	BCF gbl_gbFanOn,0
+0A1C  104F  	BCF gbl_gbFanOn,0
 
 bool gbHeaterOn = 0;
-0A20  10CF  	BCF gbl_gbHeaterOn,1
+0A1D  10CF  	BCF gbl_gbHeaterOn,1
 
 char gcDisplayMode = 0;
-0A21  01D0  	CLRF gbl_gcDisplayMode
+0A1E  01D0  	CLRF gbl_gcDisplayMode
 
 char gcSetMode = 0;
-0A22  01D1  	CLRF gbl_gcSetMode
+0A1F  01D1  	CLRF gbl_gcSetMode
 
 char gcHourMode = 0;
-0A23  01D2  	CLRF gbl_gcHourMode
+0A20  01D2  	CLRF gbl_gcHourMode
 
 char gcTriggerMode = 0;
-0A24  01D3  	CLRF gbl_gcTriggerMode
+0A21  01D3  	CLRF gbl_gcTriggerMode
 
 
 // Triggers
 char gBcdWhiteOnMinute = 0; // 0 to 59
-0A25  01D4  	CLRF gbl_gBcdWhiteOnMinute
+0A22  01D4  	CLRF gbl_gBcdWhiteOnMinute
 
 char gBcdWhiteOnHour = 0; // 0 to 23
-0A26  01D5  	CLRF gbl_gBcdWhiteOnHour
+0A23  01D5  	CLRF gbl_gBcdWhiteOnHour
 
 char gBcdWhiteOffMinute = 0; // 0 to 59
-0A27  01D6  	CLRF gbl_gBcdWhiteOffMinute
+0A24  01D6  	CLRF gbl_gBcdWhiteOffMinute
 
 char gBcdWhiteOffHour = 0; // 0 to 23
-0A28  01D7  	CLRF gbl_gBcdWhiteOffHour
+0A25  01D7  	CLRF gbl_gBcdWhiteOffHour
 
 
 char gBcdBlueOnMinute = 0; // 0 to 59
-0A29  01D8  	CLRF gbl_gBcdBlueOnMinute
+0A26  01D8  	CLRF gbl_gBcdBlueOnMinute
 
 char gBcdBlueOnHour = 0; // 0 to 23
-0A2A  01D9  	CLRF gbl_gBcdBlueOnHour
+0A27  01D9  	CLRF gbl_gBcdBlueOnHour
 
 char gBcdBlueOffMinute = 0; // 0 to 59
-0A2B  01DA  	CLRF gbl_gBcdBlueOffMinute
+0A28  01DA  	CLRF gbl_gBcdBlueOffMinute
 
 char gBcdBlueOffHour = 0; // 0 to 23
-0A2C  01DB  	CLRF gbl_gBcdBlueOffHour
+0A29  01DB  	CLRF gbl_gBcdBlueOffHour
 
 
 char gBcdBlue2OnMinute = 0; // 0 to 59
-0A2D  01DC  	CLRF gbl_gBcdBlue2OnMinute
+0A2A  01DC  	CLRF gbl_gBcdBlue2OnMinute
 
 char gBcdBlue2OnHour = 0; // 0 to 23
-0A2E  01DD  	CLRF gbl_gBcdBlue2OnHour
+0A2B  01DD  	CLRF gbl_gBcdBlue2OnHour
 
 char gBcdBlue2OffMinute = 0; // 0 to 59
-0A2F  01DE  	CLRF gbl_gBcdBlue2OffMinute
+0A2C  01DE  	CLRF gbl_gBcdBlue2OffMinute
 
 char gBcdBlue2OffHour = 0; // 0 to 23
-0A30  01DF  	CLRF gbl_gBcdBlue2OffHour
+0A2D  01DF  	CLRF gbl_gBcdBlue2OffHour
 
 
 char gBcdFanOnTemp = 0x28; // Degrees C
-0A31  3028  	MOVLW 0x28
-0A32  00E0  	MOVWF gbl_gBcdFanOnTemp
+0A2E  3028  	MOVLW 0x28
+0A2F  00E0  	MOVWF gbl_gBcdFanOnTemp
 
 char gBcdFanOffTemp = 0x27; // Degrees C
-0A33  3027  	MOVLW 0x27
-0A34  00E1  	MOVWF gbl_gBcdFanOffTemp
+0A30  3027  	MOVLW 0x27
+0A31  00E1  	MOVWF gbl_gBcdFanOffTemp
 
 
 char gBcdHeaterOnTemp = 0x24; // Degrees C
-0A35  3024  	MOVLW 0x24
-0A36  00E2  	MOVWF gbl_gBcdHeaterOnTemp
+0A32  3024  	MOVLW 0x24
+0A33  00E2  	MOVWF gbl_gBcdHeaterOnTemp
 
 char gBcdHeaterOffTemp = 0x25; // Degrees C
-0A37  3025  	MOVLW 0x25
-0A38  00E3  	MOVWF gbl_gBcdHeaterOffTemp
+0A34  3025  	MOVLW 0x25
+0A35  00E3  	MOVWF gbl_gBcdHeaterOffTemp
 
 
 // Used to output the segments from numbers
 char tm1638MaxDigits = 8;
-0A39  3008  	MOVLW 0x08
-0A3A  00E4  	MOVWF gbl_tm1638MaxDigits
+0A36  3008  	MOVLW 0x08
+0A37  00E4  	MOVWF gbl_tm1638MaxDigits
 
 rom char *tm1638DisplayNumtoSeg = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
-0A3B  3002  	MOVLW 0x02
-0A3C  00E5  	MOVWF gbl_tm1638DisplayNumtoSeg
+0A38  3002  	MOVLW 0x02
+0A39  00E5  	MOVWF gbl_tm1638DisplayNumtoSeg
 
 char tm1638Dot = 0x80;
-0A3D  3080  	MOVLW 0x80
-0A3E  00E6  	MOVWF gbl_tm1638Dot
+0A3A  3080  	MOVLW 0x80
+0A3B  00E6  	MOVWF gbl_tm1638Dot
 
 char tm1638Brightness = 7; // 0 to 7
-0A3F  3007  	MOVLW 0x07
-0A40  00E7  	MOVWF gbl_tm1638Brightness
+0A3C  3007  	MOVLW 0x07
+0A3D  00E7  	MOVWF gbl_tm1638Brightness
 
 // 0x40 [01000000] = indicate command to display data
 char tm1638ByteSetData = 0x40;
-0A41  3040  	MOVLW 0x40
-0A42  00E8  	MOVWF gbl_tm1638ByteSetData
+0A3E  3040  	MOVLW 0x40
+0A3F  00E8  	MOVWF gbl_tm1638ByteSetData
 
 // 0x42 [01000010] = indicate command to read data
 char tm1638ByteReadData = 0x42;
-0A43  3042  	MOVLW 0x42
-0A44  00E9  	MOVWF gbl_tm1638ByteReadData
+0A40  3042  	MOVLW 0x42
+0A41  00E9  	MOVWF gbl_tm1638ByteReadData
 
 // 0xC0 [11000000] = write out all bytes
 char tm1638ByteSetAddr = 0xC0;
-0A45  30C0  	MOVLW 0xC0
-0A46  00EA  	MOVWF gbl_tm1638ByteSetAddr
+0A42  30C0  	MOVLW 0xC0
+0A43  00EA  	MOVWF gbl_tm1638ByteSetAddr
 
 // 0x88 [10001000] - Display ON, plus brightness
 char tm1638ByteSetOn = 0x88;
-0A47  3088  	MOVLW 0x88
-0A48  00EB  	MOVWF gbl_tm1638ByteSetOn
+0A44  3088  	MOVLW 0x88
+0A45  00EB  	MOVWF gbl_tm1638ByteSetOn
 
 
 // Copy of the data to write / on the display
 char tm1638Data[] = {0, 0, 0, 0, 0, 0, 0, 0};
-0A49  01A0  	CLRF gbl_tm1638Data
-0A4A  01A1  	CLRF gbl_tm1638Data+D'1'
-0A4B  01A2  	CLRF gbl_tm1638Data+D'2'
-0A4C  01A3  	CLRF gbl_tm1638Data+D'3'
-0A4D  01A4  	CLRF gbl_tm1638Data+D'4'
-0A4E  01A5  	CLRF gbl_tm1638Data+D'5'
-0A4F  01A6  	CLRF gbl_tm1638Data+D'6'
-0A50  01A7  	CLRF gbl_tm1638Data+D'7'
+0A46  01A0  	CLRF gbl_tm1638Data
+0A47  01A1  	CLRF gbl_tm1638Data+D'1'
+0A48  01A2  	CLRF gbl_tm1638Data+D'2'
+0A49  01A3  	CLRF gbl_tm1638Data+D'3'
+0A4A  01A4  	CLRF gbl_tm1638Data+D'4'
+0A4B  01A5  	CLRF gbl_tm1638Data+D'5'
+0A4C  01A6  	CLRF gbl_tm1638Data+D'6'
+0A4D  01A7  	CLRF gbl_tm1638Data+D'7'
 
 // Copy of the LED status
 char tm1638LEDs[] = {0, 0, 0, 0, 0, 0, 0, 0};
-0A51  01A8  	CLRF gbl_tm1638LEDs
-0A52  01A9  	CLRF gbl_tm1638LEDs+D'1'
-0A53  01AA  	CLRF gbl_tm1638LEDs+D'2'
-0A54  01AB  	CLRF gbl_tm1638LEDs+D'3'
-0A55  01AC  	CLRF gbl_tm1638LEDs+D'4'
-0A56  01AD  	CLRF gbl_tm1638LEDs+D'5'
-0A57  01AE  	CLRF gbl_tm1638LEDs+D'6'
-0A58  01AF  	CLRF gbl_tm1638LEDs+D'7'
+0A4E  01A8  	CLRF gbl_tm1638LEDs
+0A4F  01A9  	CLRF gbl_tm1638LEDs+D'1'
+0A50  01AA  	CLRF gbl_tm1638LEDs+D'2'
+0A51  01AB  	CLRF gbl_tm1638LEDs+D'3'
+0A52  01AC  	CLRF gbl_tm1638LEDs+D'4'
+0A53  01AD  	CLRF gbl_tm1638LEDs+D'5'
+0A54  01AE  	CLRF gbl_tm1638LEDs+D'6'
+0A55  01AF  	CLRF gbl_tm1638LEDs+D'7'
 
 // Copy of the keys
 char tm1638Keys = 0;
-0A59  01EC  	CLRF gbl_tm1638Keys
+0A56  01EC  	CLRF gbl_tm1638Keys
 
 char tm1638KeysOld = 0;
-0A5A  01ED  	CLRF gbl_tm1638KeysOld
+0A57  01ED  	CLRF gbl_tm1638KeysOld
 
 // For printing
 char iPrintStartDigit = 0;
-0A5B  01EE  	CLRF gbl_iPrintStartDigit
+0A58  01EE  	CLRF gbl_iPrintStartDigit
 
 char iPrintDotDigit = 8;
-0A5C  3008  	MOVLW 0x08
-0A5D  00EF  	MOVWF gbl_iPrintDotDigit
+0A59  3008  	MOVLW 0x08
+0A5A  00EF  	MOVWF gbl_iPrintDotDigit
 
 // For adjusting bcd numbers up 1 or down !1
 char iBcdAdjustment = 1;
-0A5E  3001  	MOVLW 0x01
-0A5F  00F0  	MOVWF gbl_iBcdAdjustment
+0A5B  3001  	MOVLW 0x01
+0A5C  00F0  	MOVWF gbl_iBcdAdjustment
 
 
 // DS18B20 functions
 char oneWireIsPresent = 0;
-0A60  01F1  	CLRF gbl_oneWireIsPresent
+0A5D  01F1  	CLRF gbl_oneWireIsPresent
 
 char oneWireResetStage = 0;
-0A61  01F2  	CLRF gbl_oneWireResetStage
+0A5E  01F2  	CLRF gbl_oneWireResetStage
 
 void oneWireBusReset();
 void oneWireTxByte(char data);
@@ -365,55 +365,55 @@ void oneWireBusReset() {
 
     char isPresent;
     oneWireTris = 1; // start with high
-0892  1683  	BSF STATUS, RP0
-0893  1303  	BCF STATUS, RP1
-0894  1687  	BSF gbl_trisc,5
+088F  1683  	BSF STATUS, RP0
+0890  1303  	BCF STATUS, RP1
+0891  1687  	BSF gbl_trisc,5
 
     isPresent = 0;
-0895  1283  	BCF STATUS, RP0
-0896  01F3  	CLRF oneWireBus_00014_1_isPresent
+0892  1283  	BCF STATUS, RP0
+0893  01F3  	CLRF oneWireBus_00014_1_isPresent
 
     // Send the reset pulse - drive low for 500us
     oneWireBus = 0;
-0897  1287  	BCF gbl_portc,5
+0894  1287  	BCF gbl_portc,5
 
     oneWireTris = 0;
-0898  1683  	BSF STATUS, RP0
-0899  1287  	BCF gbl_trisc,5
+0895  1683  	BSF STATUS, RP0
+0896  1287  	BCF gbl_trisc,5
 
     delay_10us(50);
-089A  3032  	MOVLW 0x32
-089B  1283  	BCF STATUS, RP0
-089C  00F8  	MOVWF delay_10us_00000_arg_del
-089D  118A  	BCF PCLATH,3
-089E  207A  	CALL delay_10us_00000
+0897  3032  	MOVLW 0x32
+0898  1283  	BCF STATUS, RP0
+0899  00F8  	MOVWF delay_10us_00000_arg_del
+089A  118A  	BCF PCLATH,3
+089B  207A  	CALL delay_10us_00000
 
     // Release line and wait 70us for PD Pulse
     oneWireTris = 1;
-089F  1683  	BSF STATUS, RP0
-08A0  1687  	BSF gbl_trisc,5
+089C  1683  	BSF STATUS, RP0
+089D  1687  	BSF gbl_trisc,5
 
     delay_10us(7);
-08A1  3007  	MOVLW 0x07
-08A2  1283  	BCF STATUS, RP0
-08A3  00F8  	MOVWF delay_10us_00000_arg_del
-08A4  207A  	CALL delay_10us_00000
+089E  3007  	MOVLW 0x07
+089F  1283  	BCF STATUS, RP0
+08A0  00F8  	MOVWF delay_10us_00000_arg_del
+08A1  207A  	CALL delay_10us_00000
 
     // Now sample, if there is a sensor on the bus, the line should be low
     if (oneWireBus) {
-08A5  1A87  	BTFSC gbl_portc,5
+08A2  1A87  	BTFSC gbl_portc,5
 
         oneWireIsPresent = 0; // no devices
-08A6  01F1  	CLRF gbl_oneWireIsPresent
+08A3  01F1  	CLRF gbl_oneWireIsPresent
 
     }
     delay_10us(50);
-08A7  3032  	MOVLW 0x32
-08A8  00F8  	MOVWF delay_10us_00000_arg_del
-08A9  207A  	CALL delay_10us_00000
+08A4  3032  	MOVLW 0x32
+08A5  00F8  	MOVWF delay_10us_00000_arg_del
+08A6  207A  	CALL delay_10us_00000
 
 }
-08AA  0008  	RETURN
+08A7  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -527,10 +527,10 @@ char oneWireRxByte() {
 04EC  3008  	MOVLW 0x08
 04ED  0274  	SUBWF oneWireRxB_00017_2_i, W
 04EE  1803  	BTFSC STATUS,C
-04EF  2D03  	GOTO	label101
-0501  0AF4  	INCF oneWireRxB_00017_2_i, F
-0502  2CEC  	GOTO	label100
-0503        label101
+04EF  2D04  	GOTO	label101
+0502  0AF4  	INCF oneWireRxB_00017_2_i, F
+0503  2CEC  	GOTO	label100
+0504        label101
 
         // Shift data already received left
         cDataIn >>= 1;
@@ -555,36 +555,45 @@ char oneWireRxByte() {
 
 
         // Sample within 15us
-        // delay overhead 10us, unit delay 1us, resolution 4 units
-        delay_us(4); // Delay 15us
-04F8  3004  	MOVLW 0x04
-04F9  1283  	BCF STATUS, RP0
-04FA  00F9  	MOVWF delay_us_00000_arg_del
-04FB  2010  	CALL delay_us_00000
+        // At 4MHz, delay overhead 10us, unit delay 1us, resolution 4 units
+        // 4us using delay_us is too slow as sometimes reads all 1s, use nops instead
+        //delay_us(4); // Delay 16us
+        nop();
+04F8  0000  	NOP
+
+        nop();
+04F9  0000  	NOP
+
+        nop();
+04FA  0000  	NOP
+
+        nop();
+04FB  0000  	NOP
 
 
         // Check the value of the onewire bus - set the MSB of cDataIn if so
-        if (oneWireBus)
-04FC  1A87  	BTFSC gbl_portc,5
+        if (oneWireBus) // check takes 2us
+04FC  1283  	BCF STATUS, RP0
+04FD  1A87  	BTFSC gbl_portc,5
 
             cDataIn.7 = 1;
-04FD  17F3  	BSF oneWireRxB_00017_1_cDataIn,7
+04FE  17F3  	BSF oneWireRxB_00017_1_cDataIn,7
 
 
         // To finish time slot
-        delay_10us(6); // 60us
-04FE  3006  	MOVLW 0x06
-04FF  00F8  	MOVWF delay_10us_00000_arg_del
-0500  207A  	CALL delay_10us_00000
+        delay_10us(6); // 60us (really 65us at 4MHz)
+04FF  3006  	MOVLW 0x06
+0500  00F8  	MOVWF delay_10us_00000_arg_del
+0501  207A  	CALL delay_10us_00000
 
     }
 
     return cDataIn;
-0503  0873  	MOVF oneWireRxB_00017_1_cDataIn, W
-0504  00F4  	MOVWF CompTempVarRet549
+0504  0873  	MOVF oneWireRxB_00017_1_cDataIn, W
+0505  00F4  	MOVWF CompTempVarRet549
 
 }
-0505  0008  	RETURN
+0506  0008  	RETURN
 
 
 
@@ -597,124 +606,124 @@ char oneWireRxByte() {
 void at24c32WriteAll() {
 
 	i2c_start();
-05EC  212A  	CALL i2c_START_00000
+05E9  212A  	CALL i2c_START_00000
 
 	i2c_write(at24c32Addr); // address + write
-05ED  30AE  	MOVLW 0xAE
-05EE  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-05EF  20A9  	CALL i2c_WRITE_00000
+05EA  30AE  	MOVLW 0xAE
+05EB  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+05EC  20A9  	CALL i2c_WRITE_00000
 
 	// start at address 0
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
-05F0  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
-05F1  20A9  	CALL i2c_WRITE_00000
+05ED  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
+05EE  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(0); // Second word address
-05F2  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
-05F3  20A9  	CALL i2c_WRITE_00000
+05EF  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
+05F0  20A9  	CALL i2c_WRITE_00000
 
 	// Write data bytes
 	// We're only writing 18 bytes here, so no need to worry about row rollover after 32 bytes
 	i2c_write(0x44); // To indicate AT24C32 has been written to
-05F4  3044  	MOVLW 0x44
+05F1  3044  	MOVLW 0x44
+05F2  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+05F3  20A9  	CALL i2c_WRITE_00000
+
+	i2c_write(gBcdWhiteOnMinute);
+05F4  0854  	MOVF gbl_gBcdWhiteOnMinute, W
 05F5  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 05F6  20A9  	CALL i2c_WRITE_00000
 
-	i2c_write(gBcdWhiteOnMinute);
-05F7  0854  	MOVF gbl_gBcdWhiteOnMinute, W
+    i2c_write(gBcdWhiteOnHour);
+05F7  0855  	MOVF gbl_gBcdWhiteOnHour, W
 05F8  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 05F9  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdWhiteOnHour);
-05FA  0855  	MOVF gbl_gBcdWhiteOnHour, W
+    i2c_write(gBcdWhiteOffMinute);
+05FA  0856  	MOVF gbl_gBcdWhiteOffMinute, W
 05FB  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 05FC  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdWhiteOffMinute);
-05FD  0856  	MOVF gbl_gBcdWhiteOffMinute, W
+    i2c_write(gBcdWhiteOffHour);
+05FD  0857  	MOVF gbl_gBcdWhiteOffHour, W
 05FE  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 05FF  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdWhiteOffHour);
-0600  0857  	MOVF gbl_gBcdWhiteOffHour, W
+    i2c_write(gBcdBlueOnMinute);
+0600  0858  	MOVF gbl_gBcdBlueOnMinute, W
 0601  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0602  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdBlueOnMinute);
-0603  0858  	MOVF gbl_gBcdBlueOnMinute, W
+    i2c_write(gBcdBlueOnHour);
+0603  0859  	MOVF gbl_gBcdBlueOnHour, W
 0604  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0605  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdBlueOnHour);
-0606  0859  	MOVF gbl_gBcdBlueOnHour, W
+    i2c_write(gBcdBlueOffMinute);
+0606  085A  	MOVF gbl_gBcdBlueOffMinute, W
 0607  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0608  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdBlueOffMinute);
-0609  085A  	MOVF gbl_gBcdBlueOffMinute, W
+    i2c_write(gBcdBlueOffHour);
+0609  085B  	MOVF gbl_gBcdBlueOffHour, W
 060A  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 060B  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdBlueOffHour);
-060C  085B  	MOVF gbl_gBcdBlueOffHour, W
+    i2c_write(gBcdFanOnTemp);
+060C  0860  	MOVF gbl_gBcdFanOnTemp, W
 060D  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 060E  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdFanOnTemp);
-060F  0860  	MOVF gbl_gBcdFanOnTemp, W
+    i2c_write(gBcdFanOffTemp);
+060F  0861  	MOVF gbl_gBcdFanOffTemp, W
 0610  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0611  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdFanOffTemp);
-0612  0861  	MOVF gbl_gBcdFanOffTemp, W
+    i2c_write(gBcdHeaterOnTemp);
+0612  0862  	MOVF gbl_gBcdHeaterOnTemp, W
 0613  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0614  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdHeaterOnTemp);
-0615  0862  	MOVF gbl_gBcdHeaterOnTemp, W
+    i2c_write(gBcdHeaterOffTemp);
+0615  0863  	MOVF gbl_gBcdHeaterOffTemp, W
 0616  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0617  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdHeaterOffTemp);
-0618  0863  	MOVF gbl_gBcdHeaterOffTemp, W
+    i2c_write(gcHourMode);
+0618  0852  	MOVF gbl_gcHourMode, W
 0619  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 061A  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gcHourMode);
-061B  0852  	MOVF gbl_gcHourMode, W
+    i2c_write(gBcdBlue2OnMinute);
+061B  085C  	MOVF gbl_gBcdBlue2OnMinute, W
 061C  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 061D  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdBlue2OnMinute);
-061E  085C  	MOVF gbl_gBcdBlue2OnMinute, W
+    i2c_write(gBcdBlue2OnHour);
+061E  085D  	MOVF gbl_gBcdBlue2OnHour, W
 061F  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0620  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdBlue2OnHour);
-0621  085D  	MOVF gbl_gBcdBlue2OnHour, W
+    i2c_write(gBcdBlue2OffMinute);
+0621  085E  	MOVF gbl_gBcdBlue2OffMinute, W
 0622  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0623  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdBlue2OffMinute);
-0624  085E  	MOVF gbl_gBcdBlue2OffMinute, W
+    i2c_write(gBcdBlue2OffHour);
+0624  085F  	MOVF gbl_gBcdBlue2OffHour, W
 0625  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
 0626  20A9  	CALL i2c_WRITE_00000
 
-    i2c_write(gBcdBlue2OffHour);
-0627  085F  	MOVF gbl_gBcdBlue2OffHour, W
-0628  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-0629  20A9  	CALL i2c_WRITE_00000
-
 	i2c_stop();
-062A  20FA  	CALL i2c_STOP_00000
+0627  20FA  	CALL i2c_STOP_00000
 
 	delay_ms(10); // Write Cycle Time
-062B  300A  	MOVLW 0x0A
-062C  00F4  	MOVWF delay_ms_00000_arg_del
-062D  2084  	CALL delay_ms_00000
+0628  300A  	MOVLW 0x0A
+0629  00F4  	MOVWF delay_ms_00000_arg_del
+062A  2084  	CALL delay_ms_00000
 
 }
-062E  0008  	RETURN
+062B  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -724,165 +733,165 @@ void at24c32WriteAll() {
 void at24c32ReadAll() {
 
 	i2c_start();
-062F  212A  	CALL i2c_START_00000
+062C  212A  	CALL i2c_START_00000
 
 	i2c_write(at24c32Addr); // address + write
-0630  30AE  	MOVLW 0xAE
-0631  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-0632  20A9  	CALL i2c_WRITE_00000
+062D  30AE  	MOVLW 0xAE
+062E  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+062F  20A9  	CALL i2c_WRITE_00000
 
 	// start at address 0
 	i2c_write(0); // First word address (only 4 bits of the 12 bit byte address)
-0633  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
-0634  20A9  	CALL i2c_WRITE_00000
+0630  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
+0631  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(0); // Second word address
-0635  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
-0636  20A9  	CALL i2c_WRITE_00000
+0632  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
+0633  20A9  	CALL i2c_WRITE_00000
 
 	i2c_stop(); // Don't actually write a byte, just stop
-0637  20FA  	CALL i2c_STOP_00000
+0634  20FA  	CALL i2c_STOP_00000
 
 
 	i2c_start();
-0638  212A  	CALL i2c_START_00000
+0635  212A  	CALL i2c_START_00000
 
 	i2c_write(at24c32Addr + 1); // address + read
-0639  30AF  	MOVLW 0xAF
-063A  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-063B  20A9  	CALL i2c_WRITE_00000
+0636  30AF  	MOVLW 0xAF
+0637  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+0638  20A9  	CALL i2c_WRITE_00000
 
 	char hasWritten = i2c_read(0); // ack
-063C  01F6  	CLRF i2c_READ_00000_arg_ack_status
-063D  21F5  	CALL i2c_READ_00000
-063E  0879  	MOVF CompTempVarRet551, W
-063F  00F4  	MOVWF at24c32Rea_00019_1_hasWritten
+0639  01F6  	CLRF i2c_READ_00000_arg_ack_status
+063A  21F5  	CALL i2c_READ_00000
+063B  0879  	MOVF CompTempVarRet551, W
+063C  00F4  	MOVWF at24c32Rea_00019_1_hasWritten
 
 	if (hasWritten != 0x44) {
-0640  0874  	MOVF at24c32Rea_00019_1_hasWritten, W
-0641  3A44  	XORLW 0x44
-0642  1903  	BTFSC STATUS,Z
-0643  2E48  	GOTO	label106
-0648        label106
+063D  0874  	MOVF at24c32Rea_00019_1_hasWritten, W
+063E  3A44  	XORLW 0x44
+063F  1903  	BTFSC STATUS,Z
+0640  2E45  	GOTO	label104
+0645        label104
 
 		i2c_read(1); // nack
-0644  3001  	MOVLW 0x01
-0645  00F6  	MOVWF i2c_READ_00000_arg_ack_status
-0646  21F5  	CALL i2c_READ_00000
+0641  3001  	MOVLW 0x01
+0642  00F6  	MOVWF i2c_READ_00000_arg_ack_status
+0643  21F5  	CALL i2c_READ_00000
 
 	} else {
-0647  2E8D  	GOTO	label107
-068D        label107
+0644  2E8A  	GOTO	label105
+068A        label105
 
 		gBcdWhiteOnMinute = i2c_read(0); // ack
-0648  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0649  21F5  	CALL i2c_READ_00000
-064A  0879  	MOVF CompTempVarRet551, W
-064B  00D4  	MOVWF gbl_gBcdWhiteOnMinute
+0645  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0646  21F5  	CALL i2c_READ_00000
+0647  0879  	MOVF CompTempVarRet551, W
+0648  00D4  	MOVWF gbl_gBcdWhiteOnMinute
 
 		gBcdWhiteOnHour = i2c_read(0); // ack
-064C  01F6  	CLRF i2c_READ_00000_arg_ack_status
-064D  21F5  	CALL i2c_READ_00000
-064E  0879  	MOVF CompTempVarRet551, W
-064F  00D5  	MOVWF gbl_gBcdWhiteOnHour
+0649  01F6  	CLRF i2c_READ_00000_arg_ack_status
+064A  21F5  	CALL i2c_READ_00000
+064B  0879  	MOVF CompTempVarRet551, W
+064C  00D5  	MOVWF gbl_gBcdWhiteOnHour
 
 		gBcdWhiteOffMinute = i2c_read(0); // ack
-0650  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0651  21F5  	CALL i2c_READ_00000
-0652  0879  	MOVF CompTempVarRet551, W
-0653  00D6  	MOVWF gbl_gBcdWhiteOffMinute
+064D  01F6  	CLRF i2c_READ_00000_arg_ack_status
+064E  21F5  	CALL i2c_READ_00000
+064F  0879  	MOVF CompTempVarRet551, W
+0650  00D6  	MOVWF gbl_gBcdWhiteOffMinute
 
 		gBcdWhiteOffHour = i2c_read(0); // ack
-0654  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0655  21F5  	CALL i2c_READ_00000
-0656  0879  	MOVF CompTempVarRet551, W
-0657  00D7  	MOVWF gbl_gBcdWhiteOffHour
+0651  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0652  21F5  	CALL i2c_READ_00000
+0653  0879  	MOVF CompTempVarRet551, W
+0654  00D7  	MOVWF gbl_gBcdWhiteOffHour
 
 		gBcdBlueOnMinute = i2c_read(0); // ack
-0658  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0659  21F5  	CALL i2c_READ_00000
-065A  0879  	MOVF CompTempVarRet551, W
-065B  00D8  	MOVWF gbl_gBcdBlueOnMinute
+0655  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0656  21F5  	CALL i2c_READ_00000
+0657  0879  	MOVF CompTempVarRet551, W
+0658  00D8  	MOVWF gbl_gBcdBlueOnMinute
 
 		gBcdBlueOnHour = i2c_read(0); // ack
-065C  01F6  	CLRF i2c_READ_00000_arg_ack_status
-065D  21F5  	CALL i2c_READ_00000
-065E  0879  	MOVF CompTempVarRet551, W
-065F  00D9  	MOVWF gbl_gBcdBlueOnHour
+0659  01F6  	CLRF i2c_READ_00000_arg_ack_status
+065A  21F5  	CALL i2c_READ_00000
+065B  0879  	MOVF CompTempVarRet551, W
+065C  00D9  	MOVWF gbl_gBcdBlueOnHour
 
 		gBcdBlueOffMinute = i2c_read(0); // ack
-0660  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0661  21F5  	CALL i2c_READ_00000
-0662  0879  	MOVF CompTempVarRet551, W
-0663  00DA  	MOVWF gbl_gBcdBlueOffMinute
+065D  01F6  	CLRF i2c_READ_00000_arg_ack_status
+065E  21F5  	CALL i2c_READ_00000
+065F  0879  	MOVF CompTempVarRet551, W
+0660  00DA  	MOVWF gbl_gBcdBlueOffMinute
 
 		gBcdBlueOffHour = i2c_read(0); // ack
-0664  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0665  21F5  	CALL i2c_READ_00000
-0666  0879  	MOVF CompTempVarRet551, W
-0667  00DB  	MOVWF gbl_gBcdBlueOffHour
+0661  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0662  21F5  	CALL i2c_READ_00000
+0663  0879  	MOVF CompTempVarRet551, W
+0664  00DB  	MOVWF gbl_gBcdBlueOffHour
 
 		gBcdFanOnTemp = i2c_read(0); // ack
-0668  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0669  21F5  	CALL i2c_READ_00000
-066A  0879  	MOVF CompTempVarRet551, W
-066B  00E0  	MOVWF gbl_gBcdFanOnTemp
+0665  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0666  21F5  	CALL i2c_READ_00000
+0667  0879  	MOVF CompTempVarRet551, W
+0668  00E0  	MOVWF gbl_gBcdFanOnTemp
 
 		gBcdFanOffTemp = i2c_read(0); // ack
-066C  01F6  	CLRF i2c_READ_00000_arg_ack_status
-066D  21F5  	CALL i2c_READ_00000
-066E  0879  	MOVF CompTempVarRet551, W
-066F  00E1  	MOVWF gbl_gBcdFanOffTemp
+0669  01F6  	CLRF i2c_READ_00000_arg_ack_status
+066A  21F5  	CALL i2c_READ_00000
+066B  0879  	MOVF CompTempVarRet551, W
+066C  00E1  	MOVWF gbl_gBcdFanOffTemp
 
 		gBcdHeaterOnTemp = i2c_read(0); // ack
-0670  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0671  21F5  	CALL i2c_READ_00000
-0672  0879  	MOVF CompTempVarRet551, W
-0673  00E2  	MOVWF gbl_gBcdHeaterOnTemp
+066D  01F6  	CLRF i2c_READ_00000_arg_ack_status
+066E  21F5  	CALL i2c_READ_00000
+066F  0879  	MOVF CompTempVarRet551, W
+0670  00E2  	MOVWF gbl_gBcdHeaterOnTemp
 
 		gBcdHeaterOffTemp = i2c_read(0); // ack
-0674  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0675  21F5  	CALL i2c_READ_00000
-0676  0879  	MOVF CompTempVarRet551, W
-0677  00E3  	MOVWF gbl_gBcdHeaterOffTemp
+0671  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0672  21F5  	CALL i2c_READ_00000
+0673  0879  	MOVF CompTempVarRet551, W
+0674  00E3  	MOVWF gbl_gBcdHeaterOffTemp
 
 		gcHourMode = i2c_read(0); // ack
-0678  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0679  21F5  	CALL i2c_READ_00000
-067A  0879  	MOVF CompTempVarRet551, W
-067B  00D2  	MOVWF gbl_gcHourMode
+0675  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0676  21F5  	CALL i2c_READ_00000
+0677  0879  	MOVF CompTempVarRet551, W
+0678  00D2  	MOVWF gbl_gcHourMode
 
 		gBcdBlue2OnMinute = i2c_read(0); // ack
-067C  01F6  	CLRF i2c_READ_00000_arg_ack_status
-067D  21F5  	CALL i2c_READ_00000
-067E  0879  	MOVF CompTempVarRet551, W
-067F  00DC  	MOVWF gbl_gBcdBlue2OnMinute
+0679  01F6  	CLRF i2c_READ_00000_arg_ack_status
+067A  21F5  	CALL i2c_READ_00000
+067B  0879  	MOVF CompTempVarRet551, W
+067C  00DC  	MOVWF gbl_gBcdBlue2OnMinute
 
 		gBcdBlue2OnHour = i2c_read(0); // ack
-0680  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0681  21F5  	CALL i2c_READ_00000
-0682  0879  	MOVF CompTempVarRet551, W
-0683  00DD  	MOVWF gbl_gBcdBlue2OnHour
+067D  01F6  	CLRF i2c_READ_00000_arg_ack_status
+067E  21F5  	CALL i2c_READ_00000
+067F  0879  	MOVF CompTempVarRet551, W
+0680  00DD  	MOVWF gbl_gBcdBlue2OnHour
 
 		gBcdBlue2OffMinute = i2c_read(0); // ack
-0684  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0685  21F5  	CALL i2c_READ_00000
-0686  0879  	MOVF CompTempVarRet551, W
-0687  00DE  	MOVWF gbl_gBcdBlue2OffMinute
+0681  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0682  21F5  	CALL i2c_READ_00000
+0683  0879  	MOVF CompTempVarRet551, W
+0684  00DE  	MOVWF gbl_gBcdBlue2OffMinute
 
 		gBcdBlue2OffHour = i2c_read(1); // nack
-0688  3001  	MOVLW 0x01
-0689  00F6  	MOVWF i2c_READ_00000_arg_ack_status
-068A  21F5  	CALL i2c_READ_00000
-068B  0879  	MOVF CompTempVarRet551, W
-068C  00DF  	MOVWF gbl_gBcdBlue2OffHour
+0685  3001  	MOVLW 0x01
+0686  00F6  	MOVWF i2c_READ_00000_arg_ack_status
+0687  21F5  	CALL i2c_READ_00000
+0688  0879  	MOVF CompTempVarRet551, W
+0689  00DF  	MOVWF gbl_gBcdBlue2OffHour
 
 	}
 	i2c_stop();
-068D  20FA  	CALL i2c_STOP_00000
+068A  20FA  	CALL i2c_STOP_00000
 
 }
-068E  0008  	RETURN
+068B  0008  	RETURN
 
 
 
@@ -935,12 +944,12 @@ void ds3231Init() {
     bit0 A1IE   Alarm1 interrupt enable (1 to enable)
     */
 	ds3231Write(0x0E, 0x00);
-054A  300E  	MOVLW 0x0E
-054B  1283  	BCF STATUS, RP0
-054C  1303  	BCF STATUS, RP1
-054D  00F4  	MOVWF ds3231Writ_0001A_arg_ds3231Reg
-054E  01F5  	CLRF ds3231Writ_0001A_arg_bWrite
-054F  2249  	CALL ds3231Writ_0001A
+054B  300E  	MOVLW 0x0E
+054C  1283  	BCF STATUS, RP0
+054D  1303  	BCF STATUS, RP1
+054E  00F4  	MOVWF ds3231Writ_0001A_arg_ds3231Reg
+054F  01F5  	CLRF ds3231Writ_0001A_arg_bWrite
+0550  2249  	CALL ds3231Writ_0001A
 
 	/* Status Register 0Fh
     bit7 OSF     Oscillator stopped flag - clear oscillator stop flag at init
@@ -950,13 +959,13 @@ void ds3231Init() {
     bit0 A1F     Alarm 1 Flag
     */
 	ds3231Write(0x0F, 0x00);
-0550  300F  	MOVLW 0x0F
-0551  00F4  	MOVWF ds3231Writ_0001A_arg_ds3231Reg
-0552  01F5  	CLRF ds3231Writ_0001A_arg_bWrite
-0553  2249  	CALL ds3231Writ_0001A
+0551  300F  	MOVLW 0x0F
+0552  00F4  	MOVWF ds3231Writ_0001A_arg_ds3231Reg
+0553  01F5  	CLRF ds3231Writ_0001A_arg_bWrite
+0554  2249  	CALL ds3231Writ_0001A
 
 }
-0554  0008  	RETURN
+0555  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -966,56 +975,56 @@ void ds3231Init() {
 void ds3231WriteDateTime() {
 
 	i2c_start();
-0519  212A  	CALL i2c_START_00000
+051A  212A  	CALL i2c_START_00000
 
 	i2c_write(ds3231Addr); // address + write
-051A  30D0  	MOVLW 0xD0
-051B  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-051C  20A9  	CALL i2c_WRITE_00000
+051B  30D0  	MOVLW 0xD0
+051C  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+051D  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(0); // start at address 0
-051D  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
-051E  20A9  	CALL i2c_WRITE_00000
+051E  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
+051F  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(0); // seconds
-051F  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
-0520  20A9  	CALL i2c_WRITE_00000
+0520  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
+0521  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(gBcdMinute); // minutes
-0521  0836  	MOVF gbl_gBcdMinute, W
-0522  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-0523  20A9  	CALL i2c_WRITE_00000
+0522  0836  	MOVF gbl_gBcdMinute, W
+0523  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+0524  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(gBcdHour); // hours
-0524  0837  	MOVF gbl_gBcdHour, W
-0525  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-0526  20A9  	CALL i2c_WRITE_00000
+0525  0837  	MOVF gbl_gBcdHour, W
+0526  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+0527  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(gDayOfWeek); // day of week
-0527  0838  	MOVF gbl_gDayOfWeek, W
-0528  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-0529  20A9  	CALL i2c_WRITE_00000
+0528  0838  	MOVF gbl_gDayOfWeek, W
+0529  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+052A  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(gBcdDayOfMonth); // day of month
-052A  0839  	MOVF gbl_gBcdDayOfMonth, W
-052B  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-052C  20A9  	CALL i2c_WRITE_00000
+052B  0839  	MOVF gbl_gBcdDayOfMonth, W
+052C  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+052D  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(gBcdMonth); // month + century
-052D  083A  	MOVF gbl_gBcdMonth, W
-052E  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-052F  20A9  	CALL i2c_WRITE_00000
+052E  083A  	MOVF gbl_gBcdMonth, W
+052F  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+0530  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(gBcdYear); // year
-0530  083B  	MOVF gbl_gBcdYear, W
-0531  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-0532  20A9  	CALL i2c_WRITE_00000
+0531  083B  	MOVF gbl_gBcdYear, W
+0532  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+0533  20A9  	CALL i2c_WRITE_00000
 
 	i2c_stop();
-0533  20FA  	CALL i2c_STOP_00000
+0534  20FA  	CALL i2c_STOP_00000
 
 }
-0534  0008  	RETURN
+0535  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -1025,78 +1034,78 @@ void ds3231WriteDateTime() {
 void ds3231ReadDateTime() {
 
 	i2c_start();
-08EA  118A  	BCF PCLATH,3
-08EB  212A  	CALL i2c_START_00000
+08E7  118A  	BCF PCLATH,3
+08E8  212A  	CALL i2c_START_00000
 
 	i2c_write(ds3231Addr); // address + write
-08EC  30D0  	MOVLW 0xD0
-08ED  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-08EE  20A9  	CALL i2c_WRITE_00000
+08E9  30D0  	MOVLW 0xD0
+08EA  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+08EB  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(0); // start at address 0
-08EF  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
-08F0  20A9  	CALL i2c_WRITE_00000
+08EC  01F6  	CLRF i2c_WRITE_00000_arg_i2c_data
+08ED  20A9  	CALL i2c_WRITE_00000
 
 	i2c_stop();
-08F1  20FA  	CALL i2c_STOP_00000
+08EE  20FA  	CALL i2c_STOP_00000
 
 
 	i2c_start();
-08F2  212A  	CALL i2c_START_00000
+08EF  212A  	CALL i2c_START_00000
 
 	i2c_write(ds3231Addr + 1); // address + read
-08F3  30D1  	MOVLW 0xD1
-08F4  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-08F5  20A9  	CALL i2c_WRITE_00000
+08F0  30D1  	MOVLW 0xD1
+08F1  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+08F2  20A9  	CALL i2c_WRITE_00000
 
 	gBcdSecond = i2c_read(0); // ack
-08F6  01F6  	CLRF i2c_READ_00000_arg_ack_status
-08F7  21F5  	CALL i2c_READ_00000
-08F8  0879  	MOVF CompTempVarRet551, W
-08F9  00B5  	MOVWF gbl_gBcdSecond
+08F3  01F6  	CLRF i2c_READ_00000_arg_ack_status
+08F4  21F5  	CALL i2c_READ_00000
+08F5  0879  	MOVF CompTempVarRet551, W
+08F6  00B5  	MOVWF gbl_gBcdSecond
 
 	gBcdMinute = i2c_read(0); // ack
-08FA  01F6  	CLRF i2c_READ_00000_arg_ack_status
-08FB  21F5  	CALL i2c_READ_00000
-08FC  0879  	MOVF CompTempVarRet551, W
-08FD  00B6  	MOVWF gbl_gBcdMinute
+08F7  01F6  	CLRF i2c_READ_00000_arg_ack_status
+08F8  21F5  	CALL i2c_READ_00000
+08F9  0879  	MOVF CompTempVarRet551, W
+08FA  00B6  	MOVWF gbl_gBcdMinute
 
 	gBcdHour = i2c_read(0); // ack
-08FE  01F6  	CLRF i2c_READ_00000_arg_ack_status
-08FF  21F5  	CALL i2c_READ_00000
-0900  0879  	MOVF CompTempVarRet551, W
-0901  00B7  	MOVWF gbl_gBcdHour
+08FB  01F6  	CLRF i2c_READ_00000_arg_ack_status
+08FC  21F5  	CALL i2c_READ_00000
+08FD  0879  	MOVF CompTempVarRet551, W
+08FE  00B7  	MOVWF gbl_gBcdHour
 
 	gDayOfWeek = i2c_read(0); // ack
-0902  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0903  21F5  	CALL i2c_READ_00000
-0904  0879  	MOVF CompTempVarRet551, W
-0905  00B8  	MOVWF gbl_gDayOfWeek
+08FF  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0900  21F5  	CALL i2c_READ_00000
+0901  0879  	MOVF CompTempVarRet551, W
+0902  00B8  	MOVWF gbl_gDayOfWeek
 
 	gBcdDayOfMonth = i2c_read(0); // ack
-0906  01F6  	CLRF i2c_READ_00000_arg_ack_status
-0907  21F5  	CALL i2c_READ_00000
-0908  0879  	MOVF CompTempVarRet551, W
-0909  00B9  	MOVWF gbl_gBcdDayOfMonth
+0903  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0904  21F5  	CALL i2c_READ_00000
+0905  0879  	MOVF CompTempVarRet551, W
+0906  00B9  	MOVWF gbl_gBcdDayOfMonth
 
 	gBcdMonth = i2c_read(0); // ack
-090A  01F6  	CLRF i2c_READ_00000_arg_ack_status
-090B  21F5  	CALL i2c_READ_00000
-090C  0879  	MOVF CompTempVarRet551, W
-090D  00BA  	MOVWF gbl_gBcdMonth
+0907  01F6  	CLRF i2c_READ_00000_arg_ack_status
+0908  21F5  	CALL i2c_READ_00000
+0909  0879  	MOVF CompTempVarRet551, W
+090A  00BA  	MOVWF gbl_gBcdMonth
 
 	gBcdYear = i2c_read(1); // nack
-090E  3001  	MOVLW 0x01
-090F  00F6  	MOVWF i2c_READ_00000_arg_ack_status
-0910  21F5  	CALL i2c_READ_00000
-0911  0879  	MOVF CompTempVarRet551, W
-0912  00BB  	MOVWF gbl_gBcdYear
+090B  3001  	MOVLW 0x01
+090C  00F6  	MOVWF i2c_READ_00000_arg_ack_status
+090D  21F5  	CALL i2c_READ_00000
+090E  0879  	MOVF CompTempVarRet551, W
+090F  00BB  	MOVWF gbl_gBcdYear
 
 	i2c_stop();
-0913  20FA  	CALL i2c_STOP_00000
+0910  20FA  	CALL i2c_STOP_00000
 
 }
-0914  0008  	RETURN
+0911  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -1107,46 +1116,46 @@ char ds3231ReadRegister(char cRegAddress) {
 
 	char cStatus;
 	i2c_start();
-0535  212A  	CALL i2c_START_00000
+0536  212A  	CALL i2c_START_00000
 
 	i2c_write(ds3231Addr); // address + write
-0536  30D0  	MOVLW 0xD0
-0537  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-0538  20A9  	CALL i2c_WRITE_00000
+0537  30D0  	MOVLW 0xD0
+0538  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+0539  20A9  	CALL i2c_WRITE_00000
 
 	i2c_write(cRegAddress); // start at requested address
-0539  0874  	MOVF ds3231Read_0001D_arg_cRegAddress, W
-053A  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-053B  20A9  	CALL i2c_WRITE_00000
+053A  0874  	MOVF ds3231Read_0001D_arg_cRegAddress, W
+053B  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+053C  20A9  	CALL i2c_WRITE_00000
 
 	i2c_stop();
-053C  20FA  	CALL i2c_STOP_00000
+053D  20FA  	CALL i2c_STOP_00000
 
 
 	i2c_start();
-053D  212A  	CALL i2c_START_00000
+053E  212A  	CALL i2c_START_00000
 
 	i2c_write(ds3231Addr + 1); // address + read
-053E  30D1  	MOVLW 0xD1
-053F  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
-0540  20A9  	CALL i2c_WRITE_00000
+053F  30D1  	MOVLW 0xD1
+0540  00F6  	MOVWF i2c_WRITE_00000_arg_i2c_data
+0541  20A9  	CALL i2c_WRITE_00000
 
 	cStatus = i2c_read(1); // read the byte, then nack
-0541  3001  	MOVLW 0x01
-0542  00F6  	MOVWF i2c_READ_00000_arg_ack_status
-0543  21F5  	CALL i2c_READ_00000
-0544  0879  	MOVF CompTempVarRet551, W
-0545  00F5  	MOVWF ds3231Read_0001D_1_cStatus
+0542  3001  	MOVLW 0x01
+0543  00F6  	MOVWF i2c_READ_00000_arg_ack_status
+0544  21F5  	CALL i2c_READ_00000
+0545  0879  	MOVF CompTempVarRet551, W
+0546  00F5  	MOVWF ds3231Read_0001D_1_cStatus
 
     i2c_stop();
-0546  20FA  	CALL i2c_STOP_00000
+0547  20FA  	CALL i2c_STOP_00000
 
     return cStatus;
-0547  0875  	MOVF ds3231Read_0001D_1_cStatus, W
-0548  00F6  	MOVWF CompTempVarRet552
+0548  0875  	MOVF ds3231Read_0001D_1_cStatus, W
+0549  00F6  	MOVWF CompTempVarRet552
 
 }
-0549  0008  	RETURN
+054A  0008  	RETURN
 
 
 
@@ -2442,74 +2451,74 @@ void tm1638ReadKeys() {
 
     // Write 0x42 [01000010] to indicate command to read data
     tm1638strobe = 0;
-07E9  1283  	BCF STATUS, RP0
-07EA  1303  	BCF STATUS, RP1
-07EB  1186  	BCF gbl_portb,3
+07E6  1283  	BCF STATUS, RP0
+07E7  1303  	BCF STATUS, RP1
+07E8  1186  	BCF gbl_portb,3
 
     tm1638ByteWrite(tm1638ByteReadData);
-07EC  0869  	MOVF gbl_tm1638ByteReadData, W
-07ED  00F7  	MOVWF tm1638Byte_0001E_arg_bWrite
-07EE  2170  	CALL tm1638Byte_0001E
+07E9  0869  	MOVF gbl_tm1638ByteReadData, W
+07EA  00F7  	MOVWF tm1638Byte_0001E_arg_bWrite
+07EB  2170  	CALL tm1638Byte_0001E
 
 
     tm1638dioTris = 1; // Set data pin to input
-07EF  1683  	BSF STATUS, RP0
-07F0  1486  	BSF gbl_trisb,1
+07EC  1683  	BSF STATUS, RP0
+07ED  1486  	BSF gbl_trisb,1
 
     char tm1638KeysTemp = 32;
-07F1  3020  	MOVLW 0x20
-07F2  1283  	BCF STATUS, RP0
-07F3  00F4  	MOVWF tm1638Read_00025_1_tm1638K_00026
+07EE  3020  	MOVLW 0x20
+07EF  1283  	BCF STATUS, RP0
+07F0  00F4  	MOVWF tm1638Read_00025_1_tm1638K_00026
 
     // Read 4 bytes
     for (char i = 0; i < 32; i++) {
-07F4  01F5  	CLRF tm1638Read_00025_2_i
-07F5        label137
-07F5  3020  	MOVLW 0x20
-07F6  0275  	SUBWF tm1638Read_00025_2_i, W
-07F7  158A  	BSF PCLATH,3
-07F8  1803  	BTFSC STATUS,C
-07F9  2805  	GOTO	label139
-0802  0AF5  	INCF tm1638Read_00025_2_i, F
-0803  118A  	BCF PCLATH,3
-0804  2FF5  	GOTO	label137
-0805        label139
+07F1  01F5  	CLRF tm1638Read_00025_2_i
+07F2        label135
+07F2  3020  	MOVLW 0x20
+07F3  0275  	SUBWF tm1638Read_00025_2_i, W
+07F4  158A  	BSF PCLATH,3
+07F5  1803  	BTFSC STATUS,C
+07F6  2802  	GOTO	label137
+0800  0AF5  	INCF tm1638Read_00025_2_i, F
+0801  2FF2  	GOTO	label135
+0802        label137
 
         tm1638KeysTemp--;
-07FA  03F4  	DECF tm1638Read_00025_1_tm1638K_00026, F
+07F7  03F4  	DECF tm1638Read_00025_1_tm1638K_00026, F
 
         tm1638clk = 0;
-07FB  1106  	BCF gbl_portb,2
+07F8  1106  	BCF gbl_portb,2
 
         //delay_us(1);
         nop();
-07FC  0000  	NOP
+07F9  0000  	NOP
 
         if(tm1638dio)
-07FD  1C86  	BTFSS gbl_portb,1
-07FE  2801  	GOTO	label138
-0801        label138
+07FA  118A  	BCF PCLATH,3
+07FB  1C86  	BTFSS gbl_portb,1
+07FC  2FFF  	GOTO	label136
+07FF        label136
 
             tm1638KeysTemp <<= 1;
-07FF  1003  	BCF STATUS,C
-0800  0DF4  	RLF tm1638Read_00025_1_tm1638K_00026, F
+07FD  1003  	BCF STATUS,C
+07FE  0DF4  	RLF tm1638Read_00025_1_tm1638K_00026, F
 
         tm1638clk = 1;
-0801  1506  	BSF gbl_portb,2
+07FF  1506  	BSF gbl_portb,2
 
     }
     tm1638dioTris = 0; // Set data pin to output
-0805  1683  	BSF STATUS, RP0
-0806  1086  	BCF gbl_trisb,1
+0802  1683  	BSF STATUS, RP0
+0803  1086  	BCF gbl_trisb,1
 
     tm1638strobe = 1;
-0807  1283  	BCF STATUS, RP0
-0808  1586  	BSF gbl_portb,3
+0804  1283  	BCF STATUS, RP0
+0805  1586  	BSF gbl_portb,3
 
 
     tm1638Keys = tm1638KeysTemp;
-0809  0874  	MOVF tm1638Read_00025_1_tm1638K_00026, W
-080A  00EC  	MOVWF gbl_tm1638Keys
+0806  0874  	MOVF tm1638Read_00025_1_tm1638K_00026, W
+0807  00EC  	MOVWF gbl_tm1638Keys
 
     /*
     1F = 0001 1111
@@ -2522,7 +2531,7 @@ void tm1638ReadKeys() {
 	03 = 0000 0111
 	*/
 }
-080B  0008  	RETURN
+0808  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -2584,9 +2593,9 @@ int intToBcd(int iValue) {
 01BA  087D  	MOVF intToBcd_00000_arg_iValue+D'1', W
 01BB  3A80  	XORLW 0x80
 01BC  1683  	BSF STATUS, RP0
-01BD  00A2  	MOVWF CompTempVar639
+01BD  00A2  	MOVWF CompTempVar637
 01BE  3080  	MOVLW 0x80
-01BF  0222  	SUBWF CompTempVar639, W
+01BF  0222  	SUBWF CompTempVar637, W
 01C0  1D03  	BTFSS STATUS,Z
 01C1  29C5  	GOTO	label31
 01C2  3064  	MOVLW 0x64
@@ -2618,9 +2627,9 @@ int intToBcd(int iValue) {
 01D0  087D  	MOVF intToBcd_00000_arg_iValue+D'1', W
 01D1  3A80  	XORLW 0x80
 01D2  1683  	BSF STATUS, RP0
-01D3  00A2  	MOVWF CompTempVar640
+01D3  00A2  	MOVWF CompTempVar638
 01D4  3080  	MOVLW 0x80
-01D5  0222  	SUBWF CompTempVar640, W
+01D5  0222  	SUBWF CompTempVar638, W
 01D6  1D03  	BTFSS STATUS,Z
 01D7  29DB  	GOTO	label33
 01D8  300A  	MOVLW 0x0A
@@ -2675,208 +2684,201 @@ int intToBcd(int iValue) {
 void convertTemp() {
 
     // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
-    signed int iTemp = (cTempH << 8) | cTempL;
-0555  1283  	BCF STATUS, RP0
-0556  1303  	BCF STATUS, RP1
-0557  01F4  	CLRF convertTem_00027_1_iTemp
-0558  084A  	MOVF gbl_cTempH, W
-0559  00F5  	MOVWF convertTem_00027_1_iTemp+D'1'
-055A  084B  	MOVF gbl_cTempL, W
-055B  04F4  	IORWF convertTem_00027_1_iTemp, F
+    signed int iTemp16 = (cTempH << 8) | cTempL;
+0556  1283  	BCF STATUS, RP0
+0557  1303  	BCF STATUS, RP1
+0558  01F4  	CLRF convertTem_00027_1_iTemp16
+0559  084A  	MOVF gbl_cTempH, W
+055A  00F5  	MOVWF convertTem_00027_1_iTemp16+D'1'
+055B  084B  	MOVF gbl_cTempL, W
+055C  04F4  	IORWF convertTem_00027_1_iTemp16, F
 
-    signed int iTemp2 = iTemp;
-055C  0874  	MOVF convertTem_00027_1_iTemp, W
-055D  00F6  	MOVWF convertTem_00027_1_iTemp2
-055E  0875  	MOVF convertTem_00027_1_iTemp+D'1', W
-055F  00F7  	MOVWF convertTem_00027_1_iTemp2+D'1'
+    int iTempOut = iTemp16;
+055D  0874  	MOVF convertTem_00027_1_iTemp16, W
+055E  00F6  	MOVWF convertTem_00027_1_iTempOut
+055F  0875  	MOVF convertTem_00027_1_iTemp16+D'1', W
+0560  00F7  	MOVWF convertTem_00027_1_iTempOut+D'1'
 
     // Compare to previous and ignore erroneous readings
     // Ignore startup reading (85 degrees - 1360) or anything greater
-    if (iTemp > 1359)
-0560  3C05  	SUBLW 0x05
-0561  1D03  	BTFSS STATUS,Z
-0562  2D65  	GOTO	label102
-0563  0874  	MOVF convertTem_00027_1_iTemp, W
-0564  3C4F  	SUBLW 0x4F
-0565        label102
-0565  1803  	BTFSC STATUS,C
-0566  2D6A  	GOTO	label103
-0567  1BF5  	BTFSC convertTem_00027_1_iTemp+D'1',7
-0568  2D6A  	GOTO	label103
-056A        label103
-
-        return;
+    //if (iTemp > 1359)
+    //    return;
 
     // this gets celsius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
     // celsius value is always required for triggering
-	gbDS3231IsMinus = (iTemp2 < 0);
-056A  01CD  	CLRF gbl_gbDS3231IsMinus
-056B  1BF7  	BTFSC convertTem_00027_1_iTemp2+D'1',7
-056C  0ACD  	INCF gbl_gbDS3231IsMinus, F
+	gbDS3231IsMinus = (iTemp16.15);
+0561  01CD  	CLRF gbl_gbDS3231IsMinus
+0562  1BF5  	BTFSC convertTem_00027_1_iTemp16+D'1',7
+0563  0ACD  	INCF gbl_gbDS3231IsMinus, F
 
 	if (gbDS3231IsMinus) {
-056D  08CD  	MOVF gbl_gbDS3231IsMinus, F
-056E  1903  	BTFSC STATUS,Z
-056F  2D75  	GOTO	label104
+0564  08CD  	MOVF gbl_gbDS3231IsMinus, F
+0565  1903  	BTFSC STATUS,Z
+0566  2D72  	GOTO	label102
+0572        label102
 
-		iTemp2 = ~iTemp2 + 1;
-0570  09F6  	COMF convertTem_00027_1_iTemp2, F
-0571  09F7  	COMF convertTem_00027_1_iTemp2+D'1', F
-0572  0AF6  	INCF convertTem_00027_1_iTemp2, F
-0573  1903  	BTFSC STATUS,Z
-0574  0AF7  	INCF convertTem_00027_1_iTemp2+D'1', F
-0575        label104
+		iTempOut = ~iTemp16 + 1;
+0567  0974  	COMF convertTem_00027_1_iTemp16, W
+0568  00FC  	MOVWF CompTempVar622
+0569  0975  	COMF convertTem_00027_1_iTemp16+D'1', W
+056A  00FD  	MOVWF CompTempVar623
+056B  0AFC  	INCF CompTempVar622, F
+056C  1903  	BTFSC STATUS,Z
+056D  0AFD  	INCF CompTempVar623, F
+056E  087C  	MOVF CompTempVar622, W
+056F  00F6  	MOVWF convertTem_00027_1_iTempOut
+0570  087D  	MOVF CompTempVar623, W
+0571  00F7  	MOVWF convertTem_00027_1_iTempOut+D'1'
 
 	}
-    int iValueC = (6 * iTemp2) + (iTemp2 / 4);
-0575  3006  	MOVLW 0x06
-0576  00FC  	MOVWF __mul_16s__0000F_arg_a
-0577  01FD  	CLRF __mul_16s__0000F_arg_a+D'1'
-0578  0876  	MOVF convertTem_00027_1_iTemp2, W
-0579  1683  	BSF STATUS, RP0
-057A  00A0  	MOVWF __mul_16s__0000F_arg_b
-057B  1283  	BCF STATUS, RP0
-057C  0877  	MOVF convertTem_00027_1_iTemp2+D'1', W
-057D  1683  	BSF STATUS, RP0
-057E  00A1  	MOVWF __mul_16s__0000F_arg_b+D'1'
-057F  2287  	CALL __mul_16s__0000F
-0580  0825  	MOVF CompTempVarRet387, W
-0581  1283  	BCF STATUS, RP0
-0582  00F8  	MOVWF convertTem_00027_1_iValueC
-0583  1683  	BSF STATUS, RP0
-0584  0826  	MOVF CompTempVarRet387+D'1', W
-0585  1283  	BCF STATUS, RP0
-0586  00FB  	MOVWF CompTempVar617
-0587  0876  	MOVF convertTem_00027_1_iTemp2, W
-0588  00FA  	MOVWF CompTempVar614
-0589  0877  	MOVF convertTem_00027_1_iTemp2+D'1', W
-058A  00F9  	MOVWF convertTem_00027_1_iValueC+D'1'
-058B  0D77  	RLF convertTem_00027_1_iTemp2+D'1', W
+    int iValueC = (6 * iTempOut) + (iTempOut / 4);
+0572  3006  	MOVLW 0x06
+0573  00FC  	MOVWF __mul_16s__0000F_arg_a
+0574  01FD  	CLRF __mul_16s__0000F_arg_a+D'1'
+0575  0876  	MOVF convertTem_00027_1_iTempOut, W
+0576  1683  	BSF STATUS, RP0
+0577  00A0  	MOVWF __mul_16s__0000F_arg_b
+0578  1283  	BCF STATUS, RP0
+0579  0877  	MOVF convertTem_00027_1_iTempOut+D'1', W
+057A  1683  	BSF STATUS, RP0
+057B  00A1  	MOVWF __mul_16s__0000F_arg_b+D'1'
+057C  2287  	CALL __mul_16s__0000F
+057D  0825  	MOVF CompTempVarRet387, W
+057E  1283  	BCF STATUS, RP0
+057F  00F8  	MOVWF convertTem_00027_1_iValueC
+0580  1683  	BSF STATUS, RP0
+0581  0826  	MOVF CompTempVarRet387+D'1', W
+0582  1283  	BCF STATUS, RP0
+0583  00FB  	MOVWF CompTempVar617
+0584  0876  	MOVF convertTem_00027_1_iTempOut, W
+0585  00FA  	MOVWF CompTempVar614
+0586  0877  	MOVF convertTem_00027_1_iTempOut+D'1', W
+0587  00F9  	MOVWF convertTem_00027_1_iValueC+D'1'
+0588  0D77  	RLF convertTem_00027_1_iTempOut+D'1', W
+0589  0CF9  	RRF convertTem_00027_1_iValueC+D'1', F
+058A  0CFA  	RRF CompTempVar614, F
+058B  0D77  	RLF convertTem_00027_1_iTempOut+D'1', W
 058C  0CF9  	RRF convertTem_00027_1_iValueC+D'1', F
 058D  0CFA  	RRF CompTempVar614, F
-058E  0D77  	RLF convertTem_00027_1_iTemp2+D'1', W
-058F  0CF9  	RRF convertTem_00027_1_iValueC+D'1', F
-0590  0CFA  	RRF CompTempVar614, F
-0591  087A  	MOVF CompTempVar614, W
-0592  07F8  	ADDWF convertTem_00027_1_iValueC, F
-0593  087B  	MOVF CompTempVar617, W
-0594  1803  	BTFSC STATUS,C
-0595  0AF9  	INCF convertTem_00027_1_iValueC+D'1', F
-0596  07F9  	ADDWF convertTem_00027_1_iValueC+D'1', F
+058E  087A  	MOVF CompTempVar614, W
+058F  07F8  	ADDWF convertTem_00027_1_iValueC, F
+0590  087B  	MOVF CompTempVar617, W
+0591  1803  	BTFSC STATUS,C
+0592  0AF9  	INCF convertTem_00027_1_iValueC+D'1', F
+0593  07F9  	ADDWF convertTem_00027_1_iValueC+D'1', F
 
     // Split the temperature reading into digits
     giDS3231ValueBCD = intToBcd(iValueC);
-0597  0878  	MOVF convertTem_00027_1_iValueC, W
-0598  00FC  	MOVWF intToBcd_00000_arg_iValue
-0599  0879  	MOVF convertTem_00027_1_iValueC+D'1', W
-059A  00FD  	MOVWF intToBcd_00000_arg_iValue+D'1'
-059B  219F  	CALL intToBcd_00000
-059C  0820  	MOVF CompTempVarRet638, W
-059D  1283  	BCF STATUS, RP0
-059E  00B3  	MOVWF gbl_giDS3231ValueBCD
-059F  1683  	BSF STATUS, RP0
-05A0  0821  	MOVF CompTempVarRet638+D'1', W
-05A1  1283  	BCF STATUS, RP0
-05A2  00B4  	MOVWF gbl_giDS3231ValueBCD+D'1'
+0594  0878  	MOVF convertTem_00027_1_iValueC, W
+0595  00FC  	MOVWF intToBcd_00000_arg_iValue
+0596  0879  	MOVF convertTem_00027_1_iValueC+D'1', W
+0597  00FD  	MOVWF intToBcd_00000_arg_iValue+D'1'
+0598  219F  	CALL intToBcd_00000
+0599  0820  	MOVF CompTempVarRet636, W
+059A  1283  	BCF STATUS, RP0
+059B  00B3  	MOVWF gbl_giDS3231ValueBCD
+059C  1683  	BSF STATUS, RP0
+059D  0821  	MOVF CompTempVarRet636+D'1', W
+059E  1283  	BCF STATUS, RP0
+059F  00B4  	MOVWF gbl_giDS3231ValueBCD+D'1'
 
     // Truncated value for triggering heater/fans
     giDS3231ValueTruncCBCD = giDS3231ValueBCD >> 8;
-05A3  0834  	MOVF gbl_giDS3231ValueBCD+D'1', W
-05A4  00CC  	MOVWF gbl_giDS3231ValueTruncCBCD
+05A0  0834  	MOVF gbl_giDS3231ValueBCD+D'1', W
+05A1  00CC  	MOVWF gbl_giDS3231ValueTruncCBCD
 
 
     if (gcDisplayMode == 1) {
-05A5  0350  	DECF gbl_gcDisplayMode, W
-05A6  1D03  	BTFSS STATUS,Z
+05A2  0350  	DECF gbl_gcDisplayMode, W
+05A3  1D03  	BTFSS STATUS,Z
 
 		// -17.8125 (-285/65251) results in minus fahrenheit (-0.125), -17.75 (-284/65250) results in positive fahrenheit (1)
         // this gets Fahrenheit * 10 - https://www.electro-tech-online.com/threads/temperature-sensor-ds18b20-display-fahrenhiet.117377/
-        iTemp2 = ((iTemp + 4) / 8) + iTemp + 320;
-05A8  3004  	MOVLW 0x04
-05A9  0774  	ADDWF convertTem_00027_1_iTemp, W
-05AA  00FD  	MOVWF CompTempVar629
-05AB  0875  	MOVF convertTem_00027_1_iTemp+D'1', W
-05AC  1683  	BSF STATUS, RP0
-05AD  00A0  	MOVWF CompTempVar632
-05AE  1803  	BTFSC STATUS,C
-05AF  0AA0  	INCF CompTempVar632, F
-05B0  0820  	MOVF CompTempVar632, W
-05B1  1283  	BCF STATUS, RP0
-05B2  00FC  	MOVWF CompTempVar626
-05B3  1683  	BSF STATUS, RP0
-05B4  0D20  	RLF CompTempVar632, W
-05B5  1283  	BCF STATUS, RP0
-05B6  0CFC  	RRF CompTempVar626, F
-05B7  0CFD  	RRF CompTempVar629, F
-05B8  1683  	BSF STATUS, RP0
-05B9  0D20  	RLF CompTempVar632, W
-05BA  1283  	BCF STATUS, RP0
-05BB  0CFC  	RRF CompTempVar626, F
-05BC  0CFD  	RRF CompTempVar629, F
-05BD  1683  	BSF STATUS, RP0
-05BE  0D20  	RLF CompTempVar632, W
-05BF  1283  	BCF STATUS, RP0
-05C0  0CFC  	RRF CompTempVar626, F
-05C1  0CFD  	RRF CompTempVar629, F
-05C2  0874  	MOVF convertTem_00027_1_iTemp, W
-05C3  07FD  	ADDWF CompTempVar629, F
-05C4  0875  	MOVF convertTem_00027_1_iTemp+D'1', W
-05C5  00FE  	MOVWF CompTempVar630
-05C6  087C  	MOVF CompTempVar626, W
-05C7  1803  	BTFSC STATUS,C
-05C8  0AFE  	INCF CompTempVar630, F
-05C9  07FE  	ADDWF CompTempVar630, F
-05CA  3040  	MOVLW 0x40
-05CB  07FD  	ADDWF CompTempVar629, F
-05CC  3001  	MOVLW 0x01
-05CD  1803  	BTFSC STATUS,C
-05CE  0AFE  	INCF CompTempVar630, F
-05CF  07FE  	ADDWF CompTempVar630, F
-05D0  087D  	MOVF CompTempVar629, W
-05D1  00F6  	MOVWF convertTem_00027_1_iTemp2
-05D2  087E  	MOVF CompTempVar630, W
-05D3  00F7  	MOVWF convertTem_00027_1_iTemp2+D'1'
+        iTempOut = ((iTemp16 + 4) / 8) + iTemp16 + 320;
+05A5  3004  	MOVLW 0x04
+05A6  0774  	ADDWF convertTem_00027_1_iTemp16, W
+05A7  00FD  	MOVWF CompTempVar628
+05A8  0875  	MOVF convertTem_00027_1_iTemp16+D'1', W
+05A9  1683  	BSF STATUS, RP0
+05AA  00A0  	MOVWF CompTempVar631
+05AB  1803  	BTFSC STATUS,C
+05AC  0AA0  	INCF CompTempVar631, F
+05AD  0820  	MOVF CompTempVar631, W
+05AE  1283  	BCF STATUS, RP0
+05AF  00FC  	MOVWF CompTempVar625
+05B0  1683  	BSF STATUS, RP0
+05B1  0D20  	RLF CompTempVar631, W
+05B2  1283  	BCF STATUS, RP0
+05B3  0CFC  	RRF CompTempVar625, F
+05B4  0CFD  	RRF CompTempVar628, F
+05B5  1683  	BSF STATUS, RP0
+05B6  0D20  	RLF CompTempVar631, W
+05B7  1283  	BCF STATUS, RP0
+05B8  0CFC  	RRF CompTempVar625, F
+05B9  0CFD  	RRF CompTempVar628, F
+05BA  1683  	BSF STATUS, RP0
+05BB  0D20  	RLF CompTempVar631, W
+05BC  1283  	BCF STATUS, RP0
+05BD  0CFC  	RRF CompTempVar625, F
+05BE  0CFD  	RRF CompTempVar628, F
+05BF  0874  	MOVF convertTem_00027_1_iTemp16, W
+05C0  07FD  	ADDWF CompTempVar628, F
+05C1  0875  	MOVF convertTem_00027_1_iTemp16+D'1', W
+05C2  00FE  	MOVWF CompTempVar629
+05C3  087C  	MOVF CompTempVar625, W
+05C4  1803  	BTFSC STATUS,C
+05C5  0AFE  	INCF CompTempVar629, F
+05C6  07FE  	ADDWF CompTempVar629, F
+05C7  3040  	MOVLW 0x40
+05C8  07FD  	ADDWF CompTempVar628, F
+05C9  3001  	MOVLW 0x01
+05CA  1803  	BTFSC STATUS,C
+05CB  0AFE  	INCF CompTempVar629, F
+05CC  07FE  	ADDWF CompTempVar629, F
+05CD  087D  	MOVF CompTempVar628, W
+05CE  00F6  	MOVWF convertTem_00027_1_iTempOut
+05CF  087E  	MOVF CompTempVar629, W
+05D0  00F7  	MOVWF convertTem_00027_1_iTempOut+D'1'
 
         // convert to absolute value
-        gbDS3231IsMinus = (iTemp2 < 0);
-05D4  01CD  	CLRF gbl_gbDS3231IsMinus
-05D5  1BF7  	BTFSC convertTem_00027_1_iTemp2+D'1',7
-05D6  0ACD  	INCF gbl_gbDS3231IsMinus, F
+        gbDS3231IsMinus = (iTempOut.15);
+05D1  01CD  	CLRF gbl_gbDS3231IsMinus
+05D2  1BF7  	BTFSC convertTem_00027_1_iTempOut+D'1',7
+05D3  0ACD  	INCF gbl_gbDS3231IsMinus, F
 
         if (gbDS3231IsMinus) {
-05D7  08CD  	MOVF gbl_gbDS3231IsMinus, F
-05D8  1903  	BTFSC STATUS,Z
-05D9  2DDF  	GOTO	label105
+05D4  08CD  	MOVF gbl_gbDS3231IsMinus, F
+05D5  1903  	BTFSC STATUS,Z
+05D6  2DDC  	GOTO	label103
 
-            iTemp2 = ~iTemp2 + 1;
-05DA  09F6  	COMF convertTem_00027_1_iTemp2, F
-05DB  09F7  	COMF convertTem_00027_1_iTemp2+D'1', F
-05DC  0AF6  	INCF convertTem_00027_1_iTemp2, F
-05DD  1903  	BTFSC STATUS,Z
-05DE  0AF7  	INCF convertTem_00027_1_iTemp2+D'1', F
-05DF        label105
+            iTempOut = ~iTempOut + 1;
+05D7  09F6  	COMF convertTem_00027_1_iTempOut, F
+05D8  09F7  	COMF convertTem_00027_1_iTempOut+D'1', F
+05D9  0AF6  	INCF convertTem_00027_1_iTempOut, F
+05DA  1903  	BTFSC STATUS,Z
+05DB  0AF7  	INCF convertTem_00027_1_iTempOut+D'1', F
+05DC        label103
 
         }
         // Split the temperature reading into digits
-        giDS3231ValueBCD = intToBcd(iTemp2);
-05DF  0876  	MOVF convertTem_00027_1_iTemp2, W
-05E0  00FC  	MOVWF intToBcd_00000_arg_iValue
-05E1  0877  	MOVF convertTem_00027_1_iTemp2+D'1', W
-05E2  00FD  	MOVWF intToBcd_00000_arg_iValue+D'1'
-05E3  219F  	CALL intToBcd_00000
-05E4  0820  	MOVF CompTempVarRet638, W
-05E5  1283  	BCF STATUS, RP0
-05E6  00B3  	MOVWF gbl_giDS3231ValueBCD
-05E7  1683  	BSF STATUS, RP0
-05E8  0821  	MOVF CompTempVarRet638+D'1', W
-05E9  1283  	BCF STATUS, RP0
-05EA  00B4  	MOVWF gbl_giDS3231ValueBCD+D'1'
+        giDS3231ValueBCD = intToBcd(iTempOut);
+05DC  0876  	MOVF convertTem_00027_1_iTempOut, W
+05DD  00FC  	MOVWF intToBcd_00000_arg_iValue
+05DE  0877  	MOVF convertTem_00027_1_iTempOut+D'1', W
+05DF  00FD  	MOVWF intToBcd_00000_arg_iValue+D'1'
+05E0  219F  	CALL intToBcd_00000
+05E1  0820  	MOVF CompTempVarRet636, W
+05E2  1283  	BCF STATUS, RP0
+05E3  00B3  	MOVWF gbl_giDS3231ValueBCD
+05E4  1683  	BSF STATUS, RP0
+05E5  0821  	MOVF CompTempVarRet636+D'1', W
+05E6  1283  	BCF STATUS, RP0
+05E7  00B4  	MOVWF gbl_giDS3231ValueBCD+D'1'
 
 	}
 }
-0569  0008  	RETURN
-05A7  0008  	RETURN
-05EB  0008  	RETURN
+05A4  0008  	RETURN
+05E8  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -2888,17 +2890,17 @@ void startTemp() {
     // CC indicates to skip rom - addressing all devices (there is only one)
     // 44 is the convert function
     oneWireTxBytes(0xCC, 0x44);
-080C  30CC  	MOVLW 0xCC
-080D  1283  	BCF STATUS, RP0
-080E  1303  	BCF STATUS, RP1
-080F  00F3  	MOVWF oneWireTxB_00016_arg_cData
-0810  3044  	MOVLW 0x44
-0811  00F4  	MOVWF oneWireTxB_00016_arg_cData2
-0812  118A  	BCF PCLATH,3
-0813  24E1  	CALL oneWireTxB_00016
+0809  30CC  	MOVLW 0xCC
+080A  1283  	BCF STATUS, RP0
+080B  1303  	BCF STATUS, RP1
+080C  00F3  	MOVWF oneWireTxB_00016_arg_cData
+080D  3044  	MOVLW 0x44
+080E  00F4  	MOVWF oneWireTxB_00016_arg_cData2
+080F  118A  	BCF PCLATH,3
+0810  24E1  	CALL oneWireTxB_00016
 
 }
-0814  0008  	RETURN
+0811  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -2910,29 +2912,29 @@ void readTemp() {
     // CC indicates to skip rom - addressing all devices (there is only one)
     // BE indicates to read scratchpad
     oneWireTxBytes(0xCC, 0xBE);
-0815  30CC  	MOVLW 0xCC
-0816  1283  	BCF STATUS, RP0
-0817  1303  	BCF STATUS, RP1
-0818  00F3  	MOVWF oneWireTxB_00016_arg_cData
-0819  30BE  	MOVLW 0xBE
-081A  00F4  	MOVWF oneWireTxB_00016_arg_cData2
-081B  118A  	BCF PCLATH,3
-081C  24E1  	CALL oneWireTxB_00016
+0812  30CC  	MOVLW 0xCC
+0813  1283  	BCF STATUS, RP0
+0814  1303  	BCF STATUS, RP1
+0815  00F3  	MOVWF oneWireTxB_00016_arg_cData
+0816  30BE  	MOVLW 0xBE
+0817  00F4  	MOVWF oneWireTxB_00016_arg_cData2
+0818  118A  	BCF PCLATH,3
+0819  24E1  	CALL oneWireTxB_00016
 
     // Now get the temperature from the scratchpad
     // This is in the first two bytes - so get those only and ignore the rest
     cTempL = oneWireRxByte();
-081D  24E8  	CALL oneWireRxB_00017
-081E  0874  	MOVF CompTempVarRet549, W
-081F  00CB  	MOVWF gbl_cTempL
+081A  24E8  	CALL oneWireRxB_00017
+081B  0874  	MOVF CompTempVarRet549, W
+081C  00CB  	MOVWF gbl_cTempL
 
     cTempH = oneWireRxByte();
-0820  24E8  	CALL oneWireRxB_00017
-0821  0874  	MOVF CompTempVarRet549, W
-0822  00CA  	MOVWF gbl_cTempH
+081D  24E8  	CALL oneWireRxB_00017
+081E  0874  	MOVF CompTempVarRet549, W
+081F  00CA  	MOVWF gbl_cTempH
 
 }
-0823  0008  	RETURN
+0820  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -2965,8 +2967,8 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
 0266  2A84  	GOTO	label50
 0267  300F  	MOVLW 0x0F
 0268  0576  	ANDWF bcdAdjust_00000_arg_bcd, W
-0269  00F9  	MOVWF CompTempVar642
-026A  0879  	MOVF CompTempVar642, W
+0269  00F9  	MOVWF CompTempVar640
+026A  0879  	MOVF CompTempVar640, W
 026B  3A09  	XORLW 0x09
 026C  1D03  	BTFSS STATUS,Z
 026D  2A71  	GOTO	label46
@@ -3002,8 +3004,8 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
 0279  2A84  	GOTO	label50
 027A  300F  	MOVLW 0x0F
 027B  0576  	ANDWF bcdAdjust_00000_arg_bcd, W
-027C  00F9  	MOVWF CompTempVar643
-027D  08F9  	MOVF CompTempVar643, F
+027C  00F9  	MOVWF CompTempVar641
+027D  08F9  	MOVF CompTempVar641, F
 027E  1D03  	BTFSS STATUS,Z
 027F  2A83  	GOTO	label49
 0283        label49
@@ -3022,7 +3024,7 @@ char bcdAdjust(char bcd, char bcdMax, char bcdMin) {
     }
     return bcd;
 0284  0876  	MOVF bcdAdjust_00000_arg_bcd, W
-0285  00F9  	MOVWF CompTempVarRet641
+0285  00F9  	MOVWF CompTempVarRet639
 
 }
 0286  0008  	RETURN
@@ -3038,224 +3040,224 @@ void adjustDateTime() {
     switch (gcSetMode) {
 
         case 1:
-0762  1283  	BCF STATUS, RP0
-0763  1303  	BCF STATUS, RP1
-0764  0851  	MOVF gbl_gcSetMode, W
-0765  3A01  	XORLW 0x01
-0766  1903  	BTFSC STATUS,Z
-0767  2F7B  	GOTO	label126
-077B        label126
+075F  1283  	BCF STATUS, RP0
+0760  1303  	BCF STATUS, RP1
+0761  0851  	MOVF gbl_gcSetMode, W
+0762  3A01  	XORLW 0x01
+0763  1903  	BTFSC STATUS,Z
+0764  2F78  	GOTO	label124
+0778        label124
 
             // Setting year - from 00 to 99
             gBcdYear = bcdAdjust(gBcdYear, 0x99, 0x00);
-077B  083B  	MOVF gbl_gBcdYear, W
-077C  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-077D  3099  	MOVLW 0x99
-077E  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-077F  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-0780  225D  	CALL bcdAdjust_00000
-0781  0879  	MOVF CompTempVarRet641, W
-0782  00BB  	MOVWF gbl_gBcdYear
+0778  083B  	MOVF gbl_gBcdYear, W
+0779  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+077A  3099  	MOVLW 0x99
+077B  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+077C  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+077D  225D  	CALL bcdAdjust_00000
+077E  0879  	MOVF CompTempVarRet639, W
+077F  00BB  	MOVWF gbl_gBcdYear
 
             break;
         case 2:
-0768  3A03  	XORLW 0x03
-0769  1903  	BTFSC STATUS,Z
-076A  2F84  	GOTO	label127
-0784        label127
+0765  3A03  	XORLW 0x03
+0766  1903  	BTFSC STATUS,Z
+0767  2F81  	GOTO	label125
+0781        label125
 
             // Setting month - from 1 to 12
             gBcdMonth = bcdAdjust(gBcdMonth, 0x12, 0x01);
-0784  083A  	MOVF gbl_gBcdMonth, W
-0785  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-0786  3012  	MOVLW 0x12
-0787  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-0788  3001  	MOVLW 0x01
-0789  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
-078A  225D  	CALL bcdAdjust_00000
-078B  0879  	MOVF CompTempVarRet641, W
-078C  00BA  	MOVWF gbl_gBcdMonth
+0781  083A  	MOVF gbl_gBcdMonth, W
+0782  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+0783  3012  	MOVLW 0x12
+0784  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+0785  3001  	MOVLW 0x01
+0786  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
+0787  225D  	CALL bcdAdjust_00000
+0788  0879  	MOVF CompTempVarRet639, W
+0789  00BA  	MOVWF gbl_gBcdMonth
 
             break;
         case 3:
-076B  3A01  	XORLW 0x01
-076C  1903  	BTFSC STATUS,Z
-076D  2F8E  	GOTO	label128
-078E        label128
+0768  3A01  	XORLW 0x01
+0769  1903  	BTFSC STATUS,Z
+076A  2F8B  	GOTO	label126
+078B        label126
 
             // Setting day of month - from 1 to max days in month (i.e. 31, 30 or 28/29)
             char iMonth = gBcdMonth;
-078E  083A  	MOVF gbl_gBcdMonth, W
-078F  00F4  	MOVWF adjustDate_00028_1_iMonth
+078B  083A  	MOVF gbl_gBcdMonth, W
+078C  00F4  	MOVWF adjustDate_00028_1_iMonth
 
             if (iMonth & 0xF0)
-0790  30F0  	MOVLW 0xF0
-0791  0574  	ANDWF adjustDate_00028_1_iMonth, W
-0792  1903  	BTFSC STATUS,Z
-0793  2F99  	GOTO	label129
-0799        label129
+078D  30F0  	MOVLW 0xF0
+078E  0574  	ANDWF adjustDate_00028_1_iMonth, W
+078F  1903  	BTFSC STATUS,Z
+0790  2F96  	GOTO	label127
+0796        label127
 
                 iMonth += (gBcdMonth >> 4);
-0794  0E3A  	SWAPF gbl_gBcdMonth, W
-0795  390F  	ANDLW 0x0F
-0796  00F6  	MOVWF CompTempVar644
-0797  0876  	MOVF CompTempVar644, W
-0798  07F4  	ADDWF adjustDate_00028_1_iMonth, F
+0791  0E3A  	SWAPF gbl_gBcdMonth, W
+0792  390F  	ANDLW 0x0F
+0793  00F6  	MOVWF CompTempVar642
+0794  0876  	MOVF CompTempVar642, W
+0795  07F4  	ADDWF adjustDate_00028_1_iMonth, F
 
             iMonth--; // Make 0 to 11 index based
-0799  03F4  	DECF adjustDate_00028_1_iMonth, F
+0796  03F4  	DECF adjustDate_00028_1_iMonth, F
 
             char bcdMaxDay = gDaysInMonth[iMonth];
-079A  083C  	MOVF gbl_gDaysInMonth, W
-079B  00FC  	MOVWF __rom_get_00000_arg_objNumb
-079C  0874  	MOVF adjustDate_00028_1_iMonth, W
-079D  00FD  	MOVWF __rom_get_00000_arg_idx
-079E  201A  	CALL __rom_get_00000
-079F  1283  	BCF STATUS, RP0
-07A0  00F5  	MOVWF adjustDate_00028_1_bcdMaxDay
+0797  083C  	MOVF gbl_gDaysInMonth, W
+0798  00FC  	MOVWF __rom_get_00000_arg_objNumb
+0799  0874  	MOVF adjustDate_00028_1_iMonth, W
+079A  00FD  	MOVWF __rom_get_00000_arg_idx
+079B  201A  	CALL __rom_get_00000
+079C  1283  	BCF STATUS, RP0
+079D  00F5  	MOVWF adjustDate_00028_1_bcdMaxDay
 
             // If February(1), adjust max days for leap years
             if (iMonth == 1) {
-07A1  0374  	DECF adjustDate_00028_1_iMonth, W
-07A2  118A  	BCF PCLATH,3
-07A3  120A  	BCF PCLATH,4
-07A4  1D03  	BTFSS STATUS,Z
-07A5  2FBD  	GOTO	label132
+079E  0374  	DECF adjustDate_00028_1_iMonth, W
+079F  118A  	BCF PCLATH,3
+07A0  120A  	BCF PCLATH,4
+07A1  1D03  	BTFSS STATUS,Z
+07A2  2FBA  	GOTO	label130
 
                 // See if the 24 leap years since 2000 match the current year
                 for (char i = 0; i < 24; i++) {
-07A6  01F6  	CLRF adjustDate_00028_16_i
-07A7        label130
-07A7  3018  	MOVLW 0x18
-07A8  0276  	SUBWF adjustDate_00028_16_i, W
-07A9  1803  	BTFSC STATUS,C
-07AA  2FBD  	GOTO	label132
-07BB  0AF6  	INCF adjustDate_00028_16_i, F
-07BC  2FA7  	GOTO	label130
-07BD        label132
+07A3  01F6  	CLRF adjustDate_00028_16_i
+07A4        label128
+07A4  3018  	MOVLW 0x18
+07A5  0276  	SUBWF adjustDate_00028_16_i, W
+07A6  1803  	BTFSC STATUS,C
+07A7  2FBA  	GOTO	label130
+07B8  0AF6  	INCF adjustDate_00028_16_i, F
+07B9  2FA4  	GOTO	label128
+07BA        label130
 
                     if (gLeapYears[i] == gBcdYear) {
-07AB  083D  	MOVF gbl_gLeapYears, W
-07AC  00FC  	MOVWF __rom_get_00000_arg_objNumb
-07AD  0876  	MOVF adjustDate_00028_16_i, W
-07AE  00FD  	MOVWF __rom_get_00000_arg_idx
-07AF  201A  	CALL __rom_get_00000
-07B0  1283  	BCF STATUS, RP0
-07B1  00F7  	MOVWF CompTempVar645
-07B2  083B  	MOVF gbl_gBcdYear, W
-07B3  0677  	XORWF CompTempVar645, W
-07B4  118A  	BCF PCLATH,3
-07B5  120A  	BCF PCLATH,4
-07B6  1D03  	BTFSS STATUS,Z
-07B7  2FBB  	GOTO	label131
-07BB        label131
+07A8  083D  	MOVF gbl_gLeapYears, W
+07A9  00FC  	MOVWF __rom_get_00000_arg_objNumb
+07AA  0876  	MOVF adjustDate_00028_16_i, W
+07AB  00FD  	MOVWF __rom_get_00000_arg_idx
+07AC  201A  	CALL __rom_get_00000
+07AD  1283  	BCF STATUS, RP0
+07AE  00F7  	MOVWF CompTempVar643
+07AF  083B  	MOVF gbl_gBcdYear, W
+07B0  0677  	XORWF CompTempVar643, W
+07B1  118A  	BCF PCLATH,3
+07B2  120A  	BCF PCLATH,4
+07B3  1D03  	BTFSS STATUS,Z
+07B4  2FB8  	GOTO	label129
+07B8        label129
 
                         bcdMaxDay = 0x29;
-07B8  3029  	MOVLW 0x29
-07B9  00F5  	MOVWF adjustDate_00028_1_bcdMaxDay
+07B5  3029  	MOVLW 0x29
+07B6  00F5  	MOVWF adjustDate_00028_1_bcdMaxDay
 
                         break;
-07BA  2FBD  	GOTO	label132
+07B7  2FBA  	GOTO	label130
 
                     }
                 }
             }
             gBcdDayOfMonth = bcdAdjust(gBcdDayOfMonth, bcdMaxDay, 0x01);
-07BD  0839  	MOVF gbl_gBcdDayOfMonth, W
-07BE  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-07BF  0875  	MOVF adjustDate_00028_1_bcdMaxDay, W
-07C0  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-07C1  3001  	MOVLW 0x01
-07C2  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
-07C3  225D  	CALL bcdAdjust_00000
-07C4  0879  	MOVF CompTempVarRet641, W
-07C5  00B9  	MOVWF gbl_gBcdDayOfMonth
+07BA  0839  	MOVF gbl_gBcdDayOfMonth, W
+07BB  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+07BC  0875  	MOVF adjustDate_00028_1_bcdMaxDay, W
+07BD  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+07BE  3001  	MOVLW 0x01
+07BF  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
+07C0  225D  	CALL bcdAdjust_00000
+07C1  0879  	MOVF CompTempVarRet639, W
+07C2  00B9  	MOVWF gbl_gBcdDayOfMonth
 
             break;
         case 4:
-076E  3A07  	XORLW 0x07
-076F  1903  	BTFSC STATUS,Z
-0770  2FC7  	GOTO	label133
-07C7        label133
+076B  3A07  	XORLW 0x07
+076C  1903  	BTFSC STATUS,Z
+076D  2FC4  	GOTO	label131
+07C4        label131
 
             // Setting day of week - from 1 to 7
             gDayOfWeek = bcdAdjust(gDayOfWeek, 0x07, 0x01);
-07C7  0838  	MOVF gbl_gDayOfWeek, W
-07C8  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-07C9  3007  	MOVLW 0x07
-07CA  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-07CB  3001  	MOVLW 0x01
-07CC  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
-07CD  225D  	CALL bcdAdjust_00000
-07CE  0879  	MOVF CompTempVarRet641, W
-07CF  00B8  	MOVWF gbl_gDayOfWeek
+07C4  0838  	MOVF gbl_gDayOfWeek, W
+07C5  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+07C6  3007  	MOVLW 0x07
+07C7  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+07C8  3001  	MOVLW 0x01
+07C9  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
+07CA  225D  	CALL bcdAdjust_00000
+07CB  0879  	MOVF CompTempVarRet639, W
+07CC  00B8  	MOVWF gbl_gDayOfWeek
 
             break;
         case 5:
-0771  3A01  	XORLW 0x01
-0772  1903  	BTFSC STATUS,Z
-0773  2FD1  	GOTO	label134
-07D1        label134
+076E  3A01  	XORLW 0x01
+076F  1903  	BTFSC STATUS,Z
+0770  2FCE  	GOTO	label132
+07CE        label132
 
             // Setting 12h/24h
             gcHourMode++;
-07D1  0AD2  	INCF gbl_gcHourMode, F
+07CE  0AD2  	INCF gbl_gcHourMode, F
 
             if (gcHourMode > 2)
-07D2  0852  	MOVF gbl_gcHourMode, W
-07D3  3C02  	SUBLW 0x02
-07D4  1C03  	BTFSS STATUS,C
+07CF  0852  	MOVF gbl_gcHourMode, W
+07D0  3C02  	SUBLW 0x02
+07D1  1C03  	BTFSS STATUS,C
 
 				gcHourMode = 0;
-07D5  01D2  	CLRF gbl_gcHourMode
+07D2  01D2  	CLRF gbl_gcHourMode
 
             break;
         case 6:
-0774  3A03  	XORLW 0x03
-0775  1903  	BTFSC STATUS,Z
-0776  2FD7  	GOTO	label135
-07D7        label135
+0771  3A03  	XORLW 0x03
+0772  1903  	BTFSC STATUS,Z
+0773  2FD4  	GOTO	label133
+07D4        label133
 
             // Setting hour - from 0 to 23
             gBcdHour = bcdAdjust(gBcdHour, 0x23, 0x00);
-07D7  0837  	MOVF gbl_gBcdHour, W
-07D8  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-07D9  3023  	MOVLW 0x23
-07DA  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-07DB  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-07DC  225D  	CALL bcdAdjust_00000
-07DD  0879  	MOVF CompTempVarRet641, W
-07DE  00B7  	MOVWF gbl_gBcdHour
+07D4  0837  	MOVF gbl_gBcdHour, W
+07D5  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+07D6  3023  	MOVLW 0x23
+07D7  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+07D8  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+07D9  225D  	CALL bcdAdjust_00000
+07DA  0879  	MOVF CompTempVarRet639, W
+07DB  00B7  	MOVWF gbl_gBcdHour
 
             break;
         case 7:
-0777  3A01  	XORLW 0x01
-0778  1903  	BTFSC STATUS,Z
-0779  2FE0  	GOTO	label136
-07E0        label136
+0774  3A01  	XORLW 0x01
+0775  1903  	BTFSC STATUS,Z
+0776  2FDD  	GOTO	label134
+07DD        label134
 
             // Setting minute - from 0 to 59
             gBcdMinute = bcdAdjust(gBcdMinute, 0x59, 0x00);
-07E0  0836  	MOVF gbl_gBcdMinute, W
-07E1  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-07E2  3059  	MOVLW 0x59
-07E3  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-07E4  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-07E5  225D  	CALL bcdAdjust_00000
-07E6  0879  	MOVF CompTempVarRet641, W
-07E7  00B6  	MOVWF gbl_gBcdMinute
+07DD  0836  	MOVF gbl_gBcdMinute, W
+07DE  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+07DF  3059  	MOVLW 0x59
+07E0  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+07E1  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+07E2  225D  	CALL bcdAdjust_00000
+07E3  0879  	MOVF CompTempVarRet639, W
+07E4  00B6  	MOVWF gbl_gBcdMinute
 
             break;
     }
 }
-077A  0008  	RETURN
-0783  0008  	RETURN
-078D  0008  	RETURN
-07C6  0008  	RETURN
-07D0  0008  	RETURN
-07D6  0008  	RETURN
-07DF  0008  	RETURN
-07E8  0008  	RETURN
+0777  0008  	RETURN
+0780  0008  	RETURN
+078A  0008  	RETURN
+07C3  0008  	RETURN
+07CD  0008  	RETURN
+07D3  0008  	RETURN
+07DC  0008  	RETURN
+07E5  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -3268,340 +3270,340 @@ void adjustTrigger() {
     switch (gcTriggerMode) {
 
         case 1:
-068F  1283  	BCF STATUS, RP0
-0690  1303  	BCF STATUS, RP1
-0691  0853  	MOVF gbl_gcTriggerMode, W
-0692  3A01  	XORLW 0x01
-0693  1903  	BTFSC STATUS,Z
-0694  2EC3  	GOTO	label108
-06C3        label108
+068C  1283  	BCF STATUS, RP0
+068D  1303  	BCF STATUS, RP1
+068E  0853  	MOVF gbl_gcTriggerMode, W
+068F  3A01  	XORLW 0x01
+0690  1903  	BTFSC STATUS,Z
+0691  2EC0  	GOTO	label106
+06C0        label106
 
             // White LED on hour - from 0 to 23
             gBcdWhiteOnHour = bcdAdjust(gBcdWhiteOnHour, 0x23, 0x00);
-06C3  0855  	MOVF gbl_gBcdWhiteOnHour, W
-06C4  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-06C5  3023  	MOVLW 0x23
-06C6  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-06C7  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-06C8  225D  	CALL bcdAdjust_00000
-06C9  0879  	MOVF CompTempVarRet641, W
-06CA  00D5  	MOVWF gbl_gBcdWhiteOnHour
+06C0  0855  	MOVF gbl_gBcdWhiteOnHour, W
+06C1  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+06C2  3023  	MOVLW 0x23
+06C3  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+06C4  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+06C5  225D  	CALL bcdAdjust_00000
+06C6  0879  	MOVF CompTempVarRet639, W
+06C7  00D5  	MOVWF gbl_gBcdWhiteOnHour
 
             break;
         case 2:
-0695  3A03  	XORLW 0x03
-0696  1903  	BTFSC STATUS,Z
-0697  2ECC  	GOTO	label109
-06CC        label109
+0692  3A03  	XORLW 0x03
+0693  1903  	BTFSC STATUS,Z
+0694  2EC9  	GOTO	label107
+06C9        label107
 
             // White LED on minute - from 0 to 59
             gBcdWhiteOnMinute = bcdAdjust(gBcdWhiteOnMinute, 0x59, 0x00);
-06CC  0854  	MOVF gbl_gBcdWhiteOnMinute, W
-06CD  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-06CE  3059  	MOVLW 0x59
-06CF  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-06D0  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-06D1  225D  	CALL bcdAdjust_00000
-06D2  0879  	MOVF CompTempVarRet641, W
-06D3  00D4  	MOVWF gbl_gBcdWhiteOnMinute
+06C9  0854  	MOVF gbl_gBcdWhiteOnMinute, W
+06CA  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+06CB  3059  	MOVLW 0x59
+06CC  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+06CD  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+06CE  225D  	CALL bcdAdjust_00000
+06CF  0879  	MOVF CompTempVarRet639, W
+06D0  00D4  	MOVWF gbl_gBcdWhiteOnMinute
 
             break;
         case 3:
-0698  3A01  	XORLW 0x01
-0699  1903  	BTFSC STATUS,Z
-069A  2ED5  	GOTO	label110
-06D5        label110
+0695  3A01  	XORLW 0x01
+0696  1903  	BTFSC STATUS,Z
+0697  2ED2  	GOTO	label108
+06D2        label108
 
             // White LED off hour - from 0 to 23
             gBcdWhiteOffHour = bcdAdjust(gBcdWhiteOffHour, 0x23, 0x00);
-06D5  0857  	MOVF gbl_gBcdWhiteOffHour, W
-06D6  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-06D7  3023  	MOVLW 0x23
-06D8  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-06D9  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-06DA  225D  	CALL bcdAdjust_00000
-06DB  0879  	MOVF CompTempVarRet641, W
-06DC  00D7  	MOVWF gbl_gBcdWhiteOffHour
+06D2  0857  	MOVF gbl_gBcdWhiteOffHour, W
+06D3  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+06D4  3023  	MOVLW 0x23
+06D5  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+06D6  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+06D7  225D  	CALL bcdAdjust_00000
+06D8  0879  	MOVF CompTempVarRet639, W
+06D9  00D7  	MOVWF gbl_gBcdWhiteOffHour
 
             break;
         case 4:
-069B  3A07  	XORLW 0x07
-069C  1903  	BTFSC STATUS,Z
-069D  2EDE  	GOTO	label111
-06DE        label111
+0698  3A07  	XORLW 0x07
+0699  1903  	BTFSC STATUS,Z
+069A  2EDB  	GOTO	label109
+06DB        label109
 
             // White LED off minute - from 0 to 59
             gBcdWhiteOffMinute = bcdAdjust(gBcdWhiteOffMinute, 0x59, 0x00);
-06DE  0856  	MOVF gbl_gBcdWhiteOffMinute, W
-06DF  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-06E0  3059  	MOVLW 0x59
-06E1  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-06E2  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-06E3  225D  	CALL bcdAdjust_00000
-06E4  0879  	MOVF CompTempVarRet641, W
-06E5  00D6  	MOVWF gbl_gBcdWhiteOffMinute
+06DB  0856  	MOVF gbl_gBcdWhiteOffMinute, W
+06DC  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+06DD  3059  	MOVLW 0x59
+06DE  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+06DF  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+06E0  225D  	CALL bcdAdjust_00000
+06E1  0879  	MOVF CompTempVarRet639, W
+06E2  00D6  	MOVWF gbl_gBcdWhiteOffMinute
 
             break;
         case 5:
-069E  3A01  	XORLW 0x01
-069F  1903  	BTFSC STATUS,Z
-06A0  2EE7  	GOTO	label112
-06E7        label112
+069B  3A01  	XORLW 0x01
+069C  1903  	BTFSC STATUS,Z
+069D  2EE4  	GOTO	label110
+06E4        label110
 
             // 1st Blue LED on hour - from 0 to 23
             gBcdBlueOnHour = bcdAdjust(gBcdBlueOnHour, 0x23, 0x00);
-06E7  0859  	MOVF gbl_gBcdBlueOnHour, W
-06E8  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-06E9  3023  	MOVLW 0x23
-06EA  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-06EB  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-06EC  225D  	CALL bcdAdjust_00000
-06ED  0879  	MOVF CompTempVarRet641, W
-06EE  00D9  	MOVWF gbl_gBcdBlueOnHour
+06E4  0859  	MOVF gbl_gBcdBlueOnHour, W
+06E5  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+06E6  3023  	MOVLW 0x23
+06E7  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+06E8  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+06E9  225D  	CALL bcdAdjust_00000
+06EA  0879  	MOVF CompTempVarRet639, W
+06EB  00D9  	MOVWF gbl_gBcdBlueOnHour
 
             break;
         case 6:
-06A1  3A03  	XORLW 0x03
-06A2  1903  	BTFSC STATUS,Z
-06A3  2EF0  	GOTO	label113
-06F0        label113
+069E  3A03  	XORLW 0x03
+069F  1903  	BTFSC STATUS,Z
+06A0  2EED  	GOTO	label111
+06ED        label111
 
             // 1st Blue LED on minute - from 0 to 59
             gBcdBlueOnMinute = bcdAdjust(gBcdBlueOnMinute, 0x59, 0x00);
-06F0  0858  	MOVF gbl_gBcdBlueOnMinute, W
-06F1  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-06F2  3059  	MOVLW 0x59
-06F3  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-06F4  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-06F5  225D  	CALL bcdAdjust_00000
-06F6  0879  	MOVF CompTempVarRet641, W
-06F7  00D8  	MOVWF gbl_gBcdBlueOnMinute
+06ED  0858  	MOVF gbl_gBcdBlueOnMinute, W
+06EE  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+06EF  3059  	MOVLW 0x59
+06F0  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+06F1  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+06F2  225D  	CALL bcdAdjust_00000
+06F3  0879  	MOVF CompTempVarRet639, W
+06F4  00D8  	MOVWF gbl_gBcdBlueOnMinute
 
             break;
         case 7:
-06A4  3A01  	XORLW 0x01
-06A5  1903  	BTFSC STATUS,Z
-06A6  2EF9  	GOTO	label114
-06F9        label114
+06A1  3A01  	XORLW 0x01
+06A2  1903  	BTFSC STATUS,Z
+06A3  2EF6  	GOTO	label112
+06F6        label112
 
             // 1st Blue LED off hour - from 0 to 23
             gBcdBlueOffHour = bcdAdjust(gBcdBlueOffHour, 0x23, 0x00);
-06F9  085B  	MOVF gbl_gBcdBlueOffHour, W
-06FA  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-06FB  3023  	MOVLW 0x23
-06FC  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-06FD  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-06FE  225D  	CALL bcdAdjust_00000
-06FF  0879  	MOVF CompTempVarRet641, W
-0700  00DB  	MOVWF gbl_gBcdBlueOffHour
+06F6  085B  	MOVF gbl_gBcdBlueOffHour, W
+06F7  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+06F8  3023  	MOVLW 0x23
+06F9  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+06FA  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+06FB  225D  	CALL bcdAdjust_00000
+06FC  0879  	MOVF CompTempVarRet639, W
+06FD  00DB  	MOVWF gbl_gBcdBlueOffHour
 
             break;
         case 8:
-06A7  3A0F  	XORLW 0x0F
-06A8  1903  	BTFSC STATUS,Z
-06A9  2F02  	GOTO	label115
-0702        label115
+06A4  3A0F  	XORLW 0x0F
+06A5  1903  	BTFSC STATUS,Z
+06A6  2EFF  	GOTO	label113
+06FF        label113
 
             // 1st Blue LED off minute - from 0 to 59
             gBcdBlueOffMinute = bcdAdjust(gBcdBlueOffMinute, 0x59, 0x00);
-0702  085A  	MOVF gbl_gBcdBlueOffMinute, W
-0703  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-0704  3059  	MOVLW 0x59
-0705  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-0706  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-0707  225D  	CALL bcdAdjust_00000
-0708  0879  	MOVF CompTempVarRet641, W
-0709  00DA  	MOVWF gbl_gBcdBlueOffMinute
+06FF  085A  	MOVF gbl_gBcdBlueOffMinute, W
+0700  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+0701  3059  	MOVLW 0x59
+0702  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+0703  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+0704  225D  	CALL bcdAdjust_00000
+0705  0879  	MOVF CompTempVarRet639, W
+0706  00DA  	MOVWF gbl_gBcdBlueOffMinute
 
             break;
         case 9:
-06AA  3A01  	XORLW 0x01
-06AB  1903  	BTFSC STATUS,Z
-06AC  2F0B  	GOTO	label116
-070B        label116
+06A7  3A01  	XORLW 0x01
+06A8  1903  	BTFSC STATUS,Z
+06A9  2F08  	GOTO	label114
+0708        label114
 
             // 2nd Blue LED on hour - from 0 to 23
             gBcdBlue2OnHour = bcdAdjust(gBcdBlue2OnHour, 0x23, 0x00);
-070B  085D  	MOVF gbl_gBcdBlue2OnHour, W
-070C  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-070D  3023  	MOVLW 0x23
-070E  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-070F  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-0710  225D  	CALL bcdAdjust_00000
-0711  0879  	MOVF CompTempVarRet641, W
-0712  00DD  	MOVWF gbl_gBcdBlue2OnHour
+0708  085D  	MOVF gbl_gBcdBlue2OnHour, W
+0709  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+070A  3023  	MOVLW 0x23
+070B  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+070C  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+070D  225D  	CALL bcdAdjust_00000
+070E  0879  	MOVF CompTempVarRet639, W
+070F  00DD  	MOVWF gbl_gBcdBlue2OnHour
 
             break;
         case 10:
-06AD  3A03  	XORLW 0x03
-06AE  1903  	BTFSC STATUS,Z
-06AF  2F14  	GOTO	label117
-0714        label117
+06AA  3A03  	XORLW 0x03
+06AB  1903  	BTFSC STATUS,Z
+06AC  2F11  	GOTO	label115
+0711        label115
 
             // 2nd Blue LED on minute - from 0 to 59
             gBcdBlue2OnMinute = bcdAdjust(gBcdBlue2OnMinute, 0x59, 0x00);
-0714  085C  	MOVF gbl_gBcdBlue2OnMinute, W
-0715  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-0716  3059  	MOVLW 0x59
-0717  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-0718  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-0719  225D  	CALL bcdAdjust_00000
-071A  0879  	MOVF CompTempVarRet641, W
-071B  00DC  	MOVWF gbl_gBcdBlue2OnMinute
+0711  085C  	MOVF gbl_gBcdBlue2OnMinute, W
+0712  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+0713  3059  	MOVLW 0x59
+0714  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+0715  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+0716  225D  	CALL bcdAdjust_00000
+0717  0879  	MOVF CompTempVarRet639, W
+0718  00DC  	MOVWF gbl_gBcdBlue2OnMinute
 
             break;
         case 11:
-06B0  3A01  	XORLW 0x01
-06B1  1903  	BTFSC STATUS,Z
-06B2  2F1D  	GOTO	label118
-071D        label118
+06AD  3A01  	XORLW 0x01
+06AE  1903  	BTFSC STATUS,Z
+06AF  2F1A  	GOTO	label116
+071A        label116
 
             // 2nd Blue LED off hour - from 0 to 23
             gBcdBlue2OffHour = bcdAdjust(gBcdBlue2OffHour, 0x23, 0x00);
-071D  085F  	MOVF gbl_gBcdBlue2OffHour, W
-071E  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-071F  3023  	MOVLW 0x23
-0720  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-0721  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-0722  225D  	CALL bcdAdjust_00000
-0723  0879  	MOVF CompTempVarRet641, W
-0724  00DF  	MOVWF gbl_gBcdBlue2OffHour
+071A  085F  	MOVF gbl_gBcdBlue2OffHour, W
+071B  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+071C  3023  	MOVLW 0x23
+071D  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+071E  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+071F  225D  	CALL bcdAdjust_00000
+0720  0879  	MOVF CompTempVarRet639, W
+0721  00DF  	MOVWF gbl_gBcdBlue2OffHour
 
             break;
         case 12:
-06B3  3A07  	XORLW 0x07
-06B4  1903  	BTFSC STATUS,Z
-06B5  2F26  	GOTO	label119
-0726        label119
+06B0  3A07  	XORLW 0x07
+06B1  1903  	BTFSC STATUS,Z
+06B2  2F23  	GOTO	label117
+0723        label117
 
             // 2nd Blue LED off minute - from 0 to 59
             gBcdBlue2OffMinute = bcdAdjust(gBcdBlue2OffMinute, 0x59, 0x00);
-0726  085E  	MOVF gbl_gBcdBlue2OffMinute, W
-0727  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-0728  3059  	MOVLW 0x59
-0729  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-072A  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-072B  225D  	CALL bcdAdjust_00000
-072C  0879  	MOVF CompTempVarRet641, W
-072D  00DE  	MOVWF gbl_gBcdBlue2OffMinute
+0723  085E  	MOVF gbl_gBcdBlue2OffMinute, W
+0724  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+0725  3059  	MOVLW 0x59
+0726  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+0727  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+0728  225D  	CALL bcdAdjust_00000
+0729  0879  	MOVF CompTempVarRet639, W
+072A  00DE  	MOVWF gbl_gBcdBlue2OffMinute
 
             break;
         case 13:
-06B6  3A01  	XORLW 0x01
-06B7  1903  	BTFSC STATUS,Z
-06B8  2F2F  	GOTO	label120
-072F        label120
+06B3  3A01  	XORLW 0x01
+06B4  1903  	BTFSC STATUS,Z
+06B5  2F2C  	GOTO	label118
+072C        label118
 
             // Fan on temp - between 20 and 40 degrees C
             gBcdFanOnTemp = bcdAdjust(gBcdFanOnTemp, 0x40, 0x20);
-072F  0860  	MOVF gbl_gBcdFanOnTemp, W
-0730  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-0731  3040  	MOVLW 0x40
-0732  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-0733  3020  	MOVLW 0x20
-0734  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
-0735  225D  	CALL bcdAdjust_00000
-0736  0879  	MOVF CompTempVarRet641, W
-0737  00E0  	MOVWF gbl_gBcdFanOnTemp
+072C  0860  	MOVF gbl_gBcdFanOnTemp, W
+072D  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+072E  3040  	MOVLW 0x40
+072F  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+0730  3020  	MOVLW 0x20
+0731  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
+0732  225D  	CALL bcdAdjust_00000
+0733  0879  	MOVF CompTempVarRet639, W
+0734  00E0  	MOVWF gbl_gBcdFanOnTemp
 
             break;
         case 14:
-06B9  3A03  	XORLW 0x03
-06BA  1903  	BTFSC STATUS,Z
-06BB  2F39  	GOTO	label121
-0739        label121
+06B6  3A03  	XORLW 0x03
+06B7  1903  	BTFSC STATUS,Z
+06B8  2F36  	GOTO	label119
+0736        label119
 
             // Fan off temp - off must be lower than on, min 20 degrees C
             if (gBcdFanOffTemp > gBcdFanOnTemp)
-0739  0861  	MOVF gbl_gBcdFanOffTemp, W
-073A  0260  	SUBWF gbl_gBcdFanOnTemp, W
-073B  1803  	BTFSC STATUS,C
-073C  2F3F  	GOTO	label122
-073F        label122
+0736  0861  	MOVF gbl_gBcdFanOffTemp, W
+0737  0260  	SUBWF gbl_gBcdFanOnTemp, W
+0738  1803  	BTFSC STATUS,C
+0739  2F3C  	GOTO	label120
+073C        label120
 
 				gBcdFanOffTemp = gBcdFanOnTemp;
-073D  0860  	MOVF gbl_gBcdFanOnTemp, W
-073E  00E1  	MOVWF gbl_gBcdFanOffTemp
+073A  0860  	MOVF gbl_gBcdFanOnTemp, W
+073B  00E1  	MOVWF gbl_gBcdFanOffTemp
 
             gBcdFanOffTemp = bcdAdjust(gBcdFanOffTemp, gBcdFanOnTemp, 0x20);
-073F  0861  	MOVF gbl_gBcdFanOffTemp, W
-0740  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-0741  0860  	MOVF gbl_gBcdFanOnTemp, W
-0742  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-0743  3020  	MOVLW 0x20
-0744  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
-0745  225D  	CALL bcdAdjust_00000
-0746  0879  	MOVF CompTempVarRet641, W
-0747  00E1  	MOVWF gbl_gBcdFanOffTemp
+073C  0861  	MOVF gbl_gBcdFanOffTemp, W
+073D  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+073E  0860  	MOVF gbl_gBcdFanOnTemp, W
+073F  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+0740  3020  	MOVLW 0x20
+0741  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
+0742  225D  	CALL bcdAdjust_00000
+0743  0879  	MOVF CompTempVarRet639, W
+0744  00E1  	MOVWF gbl_gBcdFanOffTemp
 
             break;
         case 15:
-06BC  3A01  	XORLW 0x01
-06BD  1903  	BTFSC STATUS,Z
-06BE  2F49  	GOTO	label123
-0749        label123
+06B9  3A01  	XORLW 0x01
+06BA  1903  	BTFSC STATUS,Z
+06BB  2F46  	GOTO	label121
+0746        label121
 
             // Heater on temp - between 0 and 40 degrees C
             gBcdHeaterOnTemp = bcdAdjust(gBcdHeaterOnTemp, 0x40, 0);
-0749  0862  	MOVF gbl_gBcdHeaterOnTemp, W
-074A  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-074B  3040  	MOVLW 0x40
-074C  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-074D  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
-074E  225D  	CALL bcdAdjust_00000
-074F  0879  	MOVF CompTempVarRet641, W
-0750  00E2  	MOVWF gbl_gBcdHeaterOnTemp
+0746  0862  	MOVF gbl_gBcdHeaterOnTemp, W
+0747  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+0748  3040  	MOVLW 0x40
+0749  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+074A  01F8  	CLRF bcdAdjust_00000_arg_bcdMin
+074B  225D  	CALL bcdAdjust_00000
+074C  0879  	MOVF CompTempVarRet639, W
+074D  00E2  	MOVWF gbl_gBcdHeaterOnTemp
 
             break;
         case 16:
-06BF  3A1F  	XORLW 0x1F
-06C0  1903  	BTFSC STATUS,Z
-06C1  2F52  	GOTO	label124
-0752        label124
+06BC  3A1F  	XORLW 0x1F
+06BD  1903  	BTFSC STATUS,Z
+06BE  2F4F  	GOTO	label122
+074F        label122
 
             // Heater off temp - off must be equal or higher than on - max 40 degrees C
             if (gBcdHeaterOffTemp < gBcdHeaterOnTemp)
-0752  0862  	MOVF gbl_gBcdHeaterOnTemp, W
-0753  0263  	SUBWF gbl_gBcdHeaterOffTemp, W
-0754  1803  	BTFSC STATUS,C
-0755  2F58  	GOTO	label125
-0758        label125
+074F  0862  	MOVF gbl_gBcdHeaterOnTemp, W
+0750  0263  	SUBWF gbl_gBcdHeaterOffTemp, W
+0751  1803  	BTFSC STATUS,C
+0752  2F55  	GOTO	label123
+0755        label123
 
 				gBcdHeaterOffTemp = gBcdHeaterOnTemp;
-0756  0862  	MOVF gbl_gBcdHeaterOnTemp, W
-0757  00E3  	MOVWF gbl_gBcdHeaterOffTemp
+0753  0862  	MOVF gbl_gBcdHeaterOnTemp, W
+0754  00E3  	MOVWF gbl_gBcdHeaterOffTemp
 
             gBcdHeaterOffTemp = bcdAdjust(gBcdHeaterOffTemp, 0x40, gBcdHeaterOnTemp);
-0758  0863  	MOVF gbl_gBcdHeaterOffTemp, W
-0759  00F6  	MOVWF bcdAdjust_00000_arg_bcd
-075A  3040  	MOVLW 0x40
-075B  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
-075C  0862  	MOVF gbl_gBcdHeaterOnTemp, W
-075D  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
-075E  225D  	CALL bcdAdjust_00000
-075F  0879  	MOVF CompTempVarRet641, W
-0760  00E3  	MOVWF gbl_gBcdHeaterOffTemp
+0755  0863  	MOVF gbl_gBcdHeaterOffTemp, W
+0756  00F6  	MOVWF bcdAdjust_00000_arg_bcd
+0757  3040  	MOVLW 0x40
+0758  00F7  	MOVWF bcdAdjust_00000_arg_bcdMax
+0759  0862  	MOVF gbl_gBcdHeaterOnTemp, W
+075A  00F8  	MOVWF bcdAdjust_00000_arg_bcdMin
+075B  225D  	CALL bcdAdjust_00000
+075C  0879  	MOVF CompTempVarRet639, W
+075D  00E3  	MOVWF gbl_gBcdHeaterOffTemp
 
             break;
     }
 }
-06C2  0008  	RETURN
-06CB  0008  	RETURN
-06D4  0008  	RETURN
-06DD  0008  	RETURN
-06E6  0008  	RETURN
-06EF  0008  	RETURN
-06F8  0008  	RETURN
-0701  0008  	RETURN
-070A  0008  	RETURN
-0713  0008  	RETURN
-071C  0008  	RETURN
-0725  0008  	RETURN
-072E  0008  	RETURN
-0738  0008  	RETURN
-0748  0008  	RETURN
-0751  0008  	RETURN
-0761  0008  	RETURN
+06BF  0008  	RETURN
+06C8  0008  	RETURN
+06D1  0008  	RETURN
+06DA  0008  	RETURN
+06E3  0008  	RETURN
+06EC  0008  	RETURN
+06F5  0008  	RETURN
+06FE  0008  	RETURN
+0707  0008  	RETURN
+0710  0008  	RETURN
+0719  0008  	RETURN
+0722  0008  	RETURN
+072B  0008  	RETURN
+0735  0008  	RETURN
+0745  0008  	RETURN
+074E  0008  	RETURN
+075E  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -3614,228 +3616,228 @@ void processKeys() {
     switch (tm1638Keys) {
 
         case 0x1F:
-0824  1283  	BCF STATUS, RP0
-0825  1303  	BCF STATUS, RP1
-0826  086C  	MOVF gbl_tm1638Keys, W
-0827  3A1F  	XORLW 0x1F
-0828  1903  	BTFSC STATUS,Z
-0829  2840  	GOTO	label140
-0840        label140
+0821  1283  	BCF STATUS, RP0
+0822  1303  	BCF STATUS, RP1
+0823  086C  	MOVF gbl_tm1638Keys, W
+0824  3A1F  	XORLW 0x1F
+0825  1903  	BTFSC STATUS,Z
+0826  283D  	GOTO	label138
+083D        label138
 
             // Toggle white light on/off
             WHITE_LED = !WHITE_LED;
-0840  01F4  	CLRF CompTempVar646
-0841  1C87  	BTFSS gbl_portc,1
-0842  0AF4  	INCF CompTempVar646, F
-0843  1874  	BTFSC CompTempVar646,0
-0844  1487  	BSF gbl_portc,1
-0845  1C74  	BTFSS CompTempVar646,0
-0846  1087  	BCF gbl_portc,1
+083D  01F4  	CLRF CompTempVar644
+083E  1C87  	BTFSS gbl_portc,1
+083F  0AF4  	INCF CompTempVar644, F
+0840  1874  	BTFSC CompTempVar644,0
+0841  1487  	BSF gbl_portc,1
+0842  1C74  	BTFSS CompTempVar644,0
+0843  1087  	BCF gbl_portc,1
 
             break;
         case 0x17:
-082A  3A08  	XORLW 0x08
-082B  1903  	BTFSC STATUS,Z
-082C  2848  	GOTO	label141
-0848        label141
+0827  3A08  	XORLW 0x08
+0828  1903  	BTFSC STATUS,Z
+0829  2845  	GOTO	label139
+0845        label139
 
             // Toggle blue light on/off
             BLUE_LED = !BLUE_LED;
-0848  01F4  	CLRF CompTempVar647
-0849  1D07  	BTFSS gbl_portc,2
-084A  0AF4  	INCF CompTempVar647, F
-084B  1874  	BTFSC CompTempVar647,0
-084C  1507  	BSF gbl_portc,2
-084D  1C74  	BTFSS CompTempVar647,0
-084E  1107  	BCF gbl_portc,2
+0845  01F4  	CLRF CompTempVar645
+0846  1D07  	BTFSS gbl_portc,2
+0847  0AF4  	INCF CompTempVar645, F
+0848  1874  	BTFSC CompTempVar645,0
+0849  1507  	BSF gbl_portc,2
+084A  1C74  	BTFSS CompTempVar645,0
+084B  1107  	BCF gbl_portc,2
 
             break;
         case 0x0F:
-082D  3A18  	XORLW 0x18
-082E  1903  	BTFSC STATUS,Z
-082F  2850  	GOTO	label142
-0850        label142
+082A  3A18  	XORLW 0x18
+082B  1903  	BTFSC STATUS,Z
+082C  284D  	GOTO	label140
+084D        label140
 
             // Toggle fan on/off
             gbFanOn = !gbFanOn;
-0850  01F4  	CLRF CompTempVar648
-0851  1C4F  	BTFSS gbl_gbFanOn,0
-0852  0AF4  	INCF CompTempVar648, F
-0853  104F  	BCF gbl_gbFanOn,0
-0854  0874  	MOVF CompTempVar648, W
-0855  1D03  	BTFSS STATUS,Z
-0856  144F  	BSF gbl_gbFanOn,0
+084D  01F4  	CLRF CompTempVar646
+084E  1C4F  	BTFSS gbl_gbFanOn,0
+084F  0AF4  	INCF CompTempVar646, F
+0850  104F  	BCF gbl_gbFanOn,0
+0851  0874  	MOVF CompTempVar646, W
+0852  1D03  	BTFSS STATUS,Z
+0853  144F  	BSF gbl_gbFanOn,0
 
             break;
         case 0x07:
-0830  3A08  	XORLW 0x08
-0831  1903  	BTFSC STATUS,Z
-0832  2858  	GOTO	label143
-0858        label143
+082D  3A08  	XORLW 0x08
+082E  1903  	BTFSC STATUS,Z
+082F  2855  	GOTO	label141
+0855        label141
 
             // Exit other modes
             if (gcTriggerMode)
-0858  08D3  	MOVF gbl_gcTriggerMode, F
-085A  1D03  	BTFSS STATUS,Z
+0855  08D3  	MOVF gbl_gcTriggerMode, F
+0857  1D03  	BTFSS STATUS,Z
 
                 at24c32WriteAll(); // Exiting trigger mode, save the new triggers to EEPROM chip
-0859  118A  	BCF PCLATH,3
-085B  25EC  	CALL at24c32Wri_00018
+0856  118A  	BCF PCLATH,3
+0858  25E9  	CALL at24c32Wri_00018
 
             gcSetMode = 0;
-085C  01D1  	CLRF gbl_gcSetMode
+0859  01D1  	CLRF gbl_gcSetMode
 
             gcTriggerMode = 0;
-085D  01D3  	CLRF gbl_gcTriggerMode
+085A  01D3  	CLRF gbl_gcTriggerMode
 
             // Display temp C/temp F/date
             gcDisplayMode++;
-085E  0AD0  	INCF gbl_gcDisplayMode, F
+085B  0AD0  	INCF gbl_gcDisplayMode, F
 
             if (gcDisplayMode > 3)
-085F  0850  	MOVF gbl_gcDisplayMode, W
-0860  3C03  	SUBLW 0x03
-0861  1C03  	BTFSS STATUS,C
+085C  0850  	MOVF gbl_gcDisplayMode, W
+085D  3C03  	SUBLW 0x03
+085E  1C03  	BTFSS STATUS,C
 
                 gcDisplayMode = 0;
-0862  01D0  	CLRF gbl_gcDisplayMode
+085F  01D0  	CLRF gbl_gcDisplayMode
 
             convertTemp(); // force conversion (no read)
-0863  2555  	CALL convertTem_00027
+0860  2556  	CALL convertTem_00027
 
             break;
         case 0x1B:
-0833  3A1C  	XORLW 0x1C
-0834  1903  	BTFSC STATUS,Z
-0835  2865  	GOTO	label144
-0865        label144
+0830  3A1C  	XORLW 0x1C
+0831  1903  	BTFSC STATUS,Z
+0832  2862  	GOTO	label142
+0862        label142
 
             // Exit other modes
             gcTriggerMode = 0;
-0865  01D3  	CLRF gbl_gcTriggerMode
+0862  01D3  	CLRF gbl_gcTriggerMode
 
             // Adjust set mode
             gcSetMode++;
-0866  0AD1  	INCF gbl_gcSetMode, F
+0863  0AD1  	INCF gbl_gcSetMode, F
 
             if (gcSetMode > 7) {
-0867  0851  	MOVF gbl_gcSetMode, W
-0868  3C07  	SUBLW 0x07
-0869  1803  	BTFSC STATUS,C
+0864  0851  	MOVF gbl_gcSetMode, W
+0865  3C07  	SUBLW 0x07
+0866  1803  	BTFSC STATUS,C
 
                 ds3231WriteDateTime();
-086B  118A  	BCF PCLATH,3
-086C  2519  	CALL ds3231Writ_0001B
+0868  118A  	BCF PCLATH,3
+0869  251A  	CALL ds3231Writ_0001B
 
                 gcSetMode = 0;
-086D  01D1  	CLRF gbl_gcSetMode
+086A  01D1  	CLRF gbl_gcSetMode
 
             }
             break;
         case 0x13:
-0836  3A08  	XORLW 0x08
-0837  1903  	BTFSC STATUS,Z
-0838  286F  	GOTO	label145
-086F        label145
+0833  3A08  	XORLW 0x08
+0834  1903  	BTFSC STATUS,Z
+0835  286C  	GOTO	label143
+086C        label143
 
             // Adjust down
             iBcdAdjustment = 0;
-086F  01F0  	CLRF gbl_iBcdAdjustment
+086C  01F0  	CLRF gbl_iBcdAdjustment
 
             if (gcSetMode) {
-0870  08D1  	MOVF gbl_gcSetMode, F
-0871  1903  	BTFSC STATUS,Z
-0872  2876  	GOTO	label146
-0876        label146
+086D  08D1  	MOVF gbl_gcSetMode, F
+086E  1903  	BTFSC STATUS,Z
+086F  2873  	GOTO	label144
+0873        label144
 
                 adjustDateTime();
-0873  118A  	BCF PCLATH,3
-0874  2762  	CALL adjustDate_00028
+0870  118A  	BCF PCLATH,3
+0871  275F  	CALL adjustDate_00028
 
             } else if (gcTriggerMode) {
-0876  08D3  	MOVF gbl_gcTriggerMode, F
-0878  1D03  	BTFSS STATUS,Z
+0873  08D3  	MOVF gbl_gcTriggerMode, F
+0875  1D03  	BTFSS STATUS,Z
 
                 adjustTrigger();
-0877  118A  	BCF PCLATH,3
-0879  268F  	CALL adjustTrig_00029
+0874  118A  	BCF PCLATH,3
+0876  268C  	CALL adjustTrig_00029
 
             }
             break;
         case 0x0B:
-0839  3A18  	XORLW 0x18
-083A  1903  	BTFSC STATUS,Z
-083B  287B  	GOTO	label147
-087B        label147
+0836  3A18  	XORLW 0x18
+0837  1903  	BTFSC STATUS,Z
+0838  2878  	GOTO	label145
+0878        label145
 
             iBcdAdjustment = 1;
-087B  3001  	MOVLW 0x01
-087C  00F0  	MOVWF gbl_iBcdAdjustment
+0878  3001  	MOVLW 0x01
+0879  00F0  	MOVWF gbl_iBcdAdjustment
 
             // Adjust up
             if (gcSetMode) {
-087D  08D1  	MOVF gbl_gcSetMode, F
-087E  1903  	BTFSC STATUS,Z
-087F  2883  	GOTO	label148
-0883        label148
+087A  08D1  	MOVF gbl_gcSetMode, F
+087B  1903  	BTFSC STATUS,Z
+087C  2880  	GOTO	label146
+0880        label146
 
                 adjustDateTime();
-0880  118A  	BCF PCLATH,3
-0881  2762  	CALL adjustDate_00028
+087D  118A  	BCF PCLATH,3
+087E  275F  	CALL adjustDate_00028
 
             } else if (gcTriggerMode) {
-0883  08D3  	MOVF gbl_gcTriggerMode, F
-0885  1D03  	BTFSS STATUS,Z
+0880  08D3  	MOVF gbl_gcTriggerMode, F
+0882  1D03  	BTFSS STATUS,Z
 
                 adjustTrigger();
-0884  118A  	BCF PCLATH,3
-0886  268F  	CALL adjustTrig_00029
+0881  118A  	BCF PCLATH,3
+0883  268C  	CALL adjustTrig_00029
 
             }
             break;
         case 0x03:
-083C  3A08  	XORLW 0x08
-083D  1903  	BTFSC STATUS,Z
-083E  2888  	GOTO	label149
-0888        label149
+0839  3A08  	XORLW 0x08
+083A  1903  	BTFSC STATUS,Z
+083B  2885  	GOTO	label147
+0885        label147
 
             // Exit set mode
             gcSetMode = 0;
-0888  01D1  	CLRF gbl_gcSetMode
+0885  01D1  	CLRF gbl_gcSetMode
 
             // Adjust timer mode
             gcTriggerMode++;
-0889  0AD3  	INCF gbl_gcTriggerMode, F
+0886  0AD3  	INCF gbl_gcTriggerMode, F
 
             if (gcTriggerMode > 16) {
-088A  0853  	MOVF gbl_gcTriggerMode, W
-088B  3C10  	SUBLW 0x10
-088C  1803  	BTFSC STATUS,C
+0887  0853  	MOVF gbl_gcTriggerMode, W
+0888  3C10  	SUBLW 0x10
+0889  1803  	BTFSC STATUS,C
 
                 at24c32WriteAll(); // Exiting trigger mode, save the new triggers to EEPROM chip
-088E  118A  	BCF PCLATH,3
-088F  25EC  	CALL at24c32Wri_00018
+088B  118A  	BCF PCLATH,3
+088C  25E9  	CALL at24c32Wri_00018
 
                 gcTriggerMode = 0;
-0890  01D3  	CLRF gbl_gcTriggerMode
+088D  01D3  	CLRF gbl_gcTriggerMode
 
             }
             break;
     }
 }
-083F  0008  	RETURN
-0847  0008  	RETURN
-084F  0008  	RETURN
-0857  0008  	RETURN
-0864  0008  	RETURN
-086A  0008  	RETURN
-086E  0008  	RETURN
-0875  0008  	RETURN
-087A  0008  	RETURN
-0882  0008  	RETURN
-0887  0008  	RETURN
-088D  0008  	RETURN
-0891  0008  	RETURN
+083C  0008  	RETURN
+0844  0008  	RETURN
+084C  0008  	RETURN
+0854  0008  	RETURN
+0861  0008  	RETURN
+0867  0008  	RETURN
+086B  0008  	RETURN
+0872  0008  	RETURN
+0877  0008  	RETURN
+087F  0008  	RETURN
+0884  0008  	RETURN
+088A  0008  	RETURN
+088E  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -3846,57 +3848,57 @@ void interrupt() {
 
     // Interrupt on timer0 - flash digit delay
     if (intcon.T0IF) {
-0A65  1D0B  	BTFSS gbl_intcon,2
-0A66  2A6D  	GOTO	label178
-0A6D        label178
+0A62  1D0B  	BTFSS gbl_intcon,2
+0A63  2A6A  	GOTO	label176
+0A6A        label176
 
         tmr0 = TMR0PRELOAD;
-0A67  303D  	MOVLW 0x3D
-0A68  1283  	BCF STATUS, RP0
-0A69  1303  	BCF STATUS, RP1
-0A6A  0081  	MOVWF gbl_tmr0
+0A64  303D  	MOVLW 0x3D
+0A65  1283  	BCF STATUS, RP0
+0A66  1303  	BCF STATUS, RP1
+0A67  0081  	MOVWF gbl_tmr0
 
         cTask.TASK_TIMER0 = 1;
-0A6B  14CE  	BSF gbl_cTask,1
+0A68  14CE  	BSF gbl_cTask,1
 
         // Clear interrupt flag
         intcon.T0IF = 0;
-0A6C  110B  	BCF gbl_intcon,2
+0A69  110B  	BCF gbl_intcon,2
 
     }
     // Handle timer1 interrupt - delay counter from DS3231
     if (pir1.TMR1IF) {
-0A6D  1283  	BCF STATUS, RP0
-0A6E  1303  	BCF STATUS, RP1
-0A6F  1C0C  	BTFSS gbl_pir1,0
-0A70  2A76  	GOTO	label179
-0A76        label179
+0A6A  1283  	BCF STATUS, RP0
+0A6B  1303  	BCF STATUS, RP1
+0A6C  1C0C  	BTFSS gbl_pir1,0
+0A6D  2A73  	GOTO	label177
+0A73        label177
 
         tmr1h = TMR1HV;      // preset for timer1 MSB register
-0A71  30FF  	MOVLW 0xFF
-0A72  008F  	MOVWF gbl_tmr1h
+0A6E  30FF  	MOVLW 0xFF
+0A6F  008F  	MOVWF gbl_tmr1h
 
         tmr1l = TMR1LV;      // preset for timer1 LSB register
-0A73  008E  	MOVWF gbl_tmr1l
+0A70  008E  	MOVWF gbl_tmr1l
 
 
         pir1.TMR1IF = 0;     // Clear interrupt flag
-0A74  100C  	BCF gbl_pir1,0
+0A71  100C  	BCF gbl_pir1,0
 
         cTask.TASK_TIMER1 = 1;
-0A75  154E  	BSF gbl_cTask,2
+0A72  154E  	BSF gbl_cTask,2
 
     }
 }
-0A76  0E32  	SWAPF Int1BContext+D'2', W
-0A77  0084  	MOVWF FSR
-0A78  0E31  	SWAPF Int1BContext+D'1', W
-0A79  008A  	MOVWF PCLATH
-0A7A  0E30  	SWAPF Int1BContext, W
-0A7B  0083  	MOVWF STATUS
-0A7C  0EFF  	SWAPF Int1Context, F
-0A7D  0E7F  	SWAPF Int1Context, W
-0A7E  0009  	RETFIE
+0A73  0E32  	SWAPF Int1BContext+D'2', W
+0A74  0084  	MOVWF FSR
+0A75  0E31  	SWAPF Int1BContext+D'1', W
+0A76  008A  	MOVWF PCLATH
+0A77  0E30  	SWAPF Int1BContext, W
+0A78  0083  	MOVWF STATUS
+0A79  0EFF  	SWAPF Int1Context, F
+0A7A  0E7F  	SWAPF Int1Context, W
+0A7B  0009  	RETFIE
 
 
 /*********************************************************************************************
@@ -3921,13 +3923,13 @@ void initialise() {
     RA0     OUT HEATER
     */
     trisa = 0x00; // all outputs
-08AB  1683  	BSF STATUS, RP0
-08AC  1303  	BCF STATUS, RP1
-08AD  0185  	CLRF gbl_trisa
+08A8  1683  	BSF STATUS, RP0
+08A9  1303  	BCF STATUS, RP1
+08AA  0185  	CLRF gbl_trisa
 
     porta = 0x00; // All off
-08AE  1283  	BCF STATUS, RP0
-08AF  0185  	CLRF gbl_porta
+08AB  1283  	BCF STATUS, RP0
+08AC  0185  	CLRF gbl_porta
 
 
     // Configure port B
@@ -3942,13 +3944,13 @@ void initialise() {
     RB0
     */
     trisb = 0x00; // all outputs by default
-08B0  1683  	BSF STATUS, RP0
-08B1  0186  	CLRF gbl_trisb
+08AD  1683  	BSF STATUS, RP0
+08AE  0186  	CLRF gbl_trisb
 
     portb = 0x0E; // default TM1638 pins high
-08B2  300E  	MOVLW 0x0E
-08B3  1283  	BCF STATUS, RP0
-08B4  0086  	MOVWF gbl_portb
+08AF  300E  	MOVLW 0x0E
+08B0  1283  	BCF STATUS, RP0
+08B1  0086  	MOVWF gbl_portb
 
 
     // Configure port C
@@ -3963,30 +3965,30 @@ void initialise() {
     RC0     IN SQW DS3231M
     */
     trisc = 0x21; // RC0 and RC5 inputs
-08B5  3021  	MOVLW 0x21
-08B6  1683  	BSF STATUS, RP0
-08B7  0087  	MOVWF gbl_trisc
+08B2  3021  	MOVLW 0x21
+08B3  1683  	BSF STATUS, RP0
+08B4  0087  	MOVWF gbl_trisc
 
     portc = 0x38; // default DS18B20 and DS3231 pins high
-08B8  3038  	MOVLW 0x38
-08B9  1283  	BCF STATUS, RP0
-08BA  0087  	MOVWF gbl_portc
+08B5  3038  	MOVLW 0x38
+08B6  1283  	BCF STATUS, RP0
+08B7  0087  	MOVWF gbl_portc
 
 
     option_reg = 0;
-08BB  1683  	BSF STATUS, RP0
-08BC  0181  	CLRF gbl_option_reg
+08B8  1683  	BSF STATUS, RP0
+08B9  0181  	CLRF gbl_option_reg
 
     option_reg.NOT_RBPU = 1; // disable port b pull ups
-08BD  1781  	BSF gbl_option_reg,7
+08BA  1781  	BSF gbl_option_reg,7
 
 
     // ADC setup
     // PIC16F73 doesn't have comparators, setting cmcon may be needed for some PICs
     //cmcon = 7; // disable all comparators so port a is usable as digital io
     adcon1 = 7; // Set RA0,RA1,RA2,RA5,RA3 all to digital I/O
-08BE  3007  	MOVLW 0x07
-08BF  009F  	MOVWF gbl_adcon1
+08BB  3007  	MOVLW 0x07
+08BC  009F  	MOVWF gbl_adcon1
 
 
 
@@ -3997,24 +3999,24 @@ void initialise() {
     //option_reg.T0SE = 0; // bit 4 TMR0 Source Edge Select bit 0 = low/high 1 = high/low
     //option_reg.PSA = 0; // bit 3  Prescaler Assignment bit...0 = Prescaler is assigned to the Timer0
     option_reg.PS2 = 1; // bits 2-0  PS2:PS0: Prescaler Rate Select bits
-08C0  1501  	BSF gbl_option_reg,2
+08BD  1501  	BSF gbl_option_reg,2
 
     option_reg.PS1 = 1;
-08C1  1481  	BSF gbl_option_reg,1
+08BE  1481  	BSF gbl_option_reg,1
 
     option_reg.PS0 = 1;
-08C2  1401  	BSF gbl_option_reg,0
+08BF  1401  	BSF gbl_option_reg,0
 
     tmr0 = TMR0PRELOAD; // preset for timer register (61)
-08C3  303D  	MOVLW 0x3D
-08C4  1283  	BCF STATUS, RP0
-08C5  0081  	MOVWF gbl_tmr0
+08C0  303D  	MOVLW 0x3D
+08C1  1283  	BCF STATUS, RP0
+08C2  0081  	MOVWF gbl_tmr0
 
     intcon.T0IF = 0; // Clear timer 1 interrupt flag bit
-08C6  110B  	BCF gbl_intcon,2
+08C3  110B  	BCF gbl_intcon,2
 
     intcon.T0IE = 1; // Timer 1 interrupt enabled
-08C7  168B  	BSF gbl_intcon,5
+08C4  168B  	BSF gbl_intcon,5
 
 
     // Setup timer 1, used to update clock display and periodically ask for a temperature reading
@@ -4026,89 +4028,89 @@ void initialise() {
     // Bit 1 TMR1CS = 1: Timer1 Clock Source Select bit, 1 = External clock from T1OSO/T1CKI pin (on the rising edge)
     // Bit 0 TMR1ON = 0: Timer1 On Bit, 0 = off
     t1con = 0b00000111;
-08C8  3007  	MOVLW 0x07
-08C9  0090  	MOVWF gbl_t1con
+08C5  3007  	MOVLW 0x07
+08C6  0090  	MOVWF gbl_t1con
 
     tmr1h = TMR1HV;      // preset for timer1 MSB register
-08CA  30FF  	MOVLW 0xFF
-08CB  008F  	MOVWF gbl_tmr1h
+08C7  30FF  	MOVLW 0xFF
+08C8  008F  	MOVWF gbl_tmr1h
 
     tmr1l = TMR1LV;      // preset for timer1 LSB register
-08CC  008E  	MOVWF gbl_tmr1l
+08C9  008E  	MOVWF gbl_tmr1l
 
     pie1.TMR1IE = 1;     // Timer 1 interrupt
-08CD  1683  	BSF STATUS, RP0
-08CE  140C  	BSF gbl_pie1,0
+08CA  1683  	BSF STATUS, RP0
+08CB  140C  	BSF gbl_pie1,0
 
 
     // No task at initialisation
     cTask = 0;
-08CF  1283  	BCF STATUS, RP0
-08D0  01CE  	CLRF gbl_cTask
+08CC  1283  	BCF STATUS, RP0
+08CD  01CE  	CLRF gbl_cTask
 
 
 	// I2C Bus initialisation - baud rate divisor not applicable for software implementation
 	i2c_init(1);
-08D1  3001  	MOVLW 0x01
-08D2  00F4  	MOVWF i2c_INIT_00000_arg_i2c_divisor
-08D3  118A  	BCF PCLATH,3
-08D4  2506  	CALL i2c_INIT_00000
+08CE  3001  	MOVLW 0x01
+08CF  00F4  	MOVWF i2c_INIT_00000_arg_i2c_divisor
+08D0  118A  	BCF PCLATH,3
+08D1  2507  	CALL i2c_INIT_00000
 
 
 	// Startup delay
 	delay_ms(500);
-08D5  30F4  	MOVLW 0xF4
-08D6  00F4  	MOVWF delay_ms_00000_arg_del
-08D7  2084  	CALL delay_ms_00000
+08D2  30F4  	MOVLW 0xF4
+08D3  00F4  	MOVWF delay_ms_00000_arg_del
+08D4  2084  	CALL delay_ms_00000
 
 
     // Read in variables from EEPROM
     at24c32ReadAll();
-08D8  262F  	CALL at24c32Rea_00019
+08D5  262C  	CALL at24c32Rea_00019
 
 
     // Check if the DS3231 needs initilising
     char cStatus = ds3231ReadRegister(0x0F); // Read the status register
-08D9  300F  	MOVLW 0x0F
-08DA  00F4  	MOVWF ds3231Read_0001D_arg_cRegAddress
-08DB  2535  	CALL ds3231Read_0001D
-08DC  0876  	MOVF CompTempVarRet552, W
-08DD  00F3  	MOVWF initialise_00000_1_cStatus
+08D6  300F  	MOVLW 0x0F
+08D7  00F4  	MOVWF ds3231Read_0001D_arg_cRegAddress
+08D8  2536  	CALL ds3231Read_0001D
+08D9  0876  	MOVF CompTempVarRet552, W
+08DA  00F3  	MOVWF initialise_00000_1_cStatus
 
     // If the oscillator (OSF bit in status register) has stopped, then init and write a default date/time
     // This is only expected first time, or backup battery not present/empty in DS3231M module
     if (cStatus.7) {
-08DE  158A  	BSF PCLATH,3
-08DF  1FF3  	BTFSS initialise_00000_1_cStatus,7
-08E0  28E4  	GOTO	label150
-08E4        label150
+08DB  158A  	BSF PCLATH,3
+08DC  1FF3  	BTFSS initialise_00000_1_cStatus,7
+08DD  28E1  	GOTO	label148
+08E1        label148
 
         ds3231Init();
-08E1  118A  	BCF PCLATH,3
-08E2  254A  	CALL ds3231Init_00000
+08DE  118A  	BCF PCLATH,3
+08DF  254B  	CALL ds3231Init_00000
 
         ds3231WriteDateTime();
-08E3  2519  	CALL ds3231Writ_0001B
+08E0  251A  	CALL ds3231Writ_0001B
 
     }
 
 	tm1638DisplayOn();
-08E4  118A  	BCF PCLATH,3
-08E5  24D9  	CALL tm1638Disp_0001F
+08E1  118A  	BCF PCLATH,3
+08E2  24D9  	CALL tm1638Disp_0001F
 
     tm1638UpdateDisplay();
-08E6  22B4  	CALL tm1638Upda_00022
+08E3  22B4  	CALL tm1638Upda_00022
 
 
     // Enable interrupts
     intcon.GIE = 1;
-08E7  178B  	BSF gbl_intcon,7
+08E4  178B  	BSF gbl_intcon,7
 
     intcon.PEIE = 1;
-08E8  170B  	BSF gbl_intcon,6
+08E5  170B  	BSF gbl_intcon,6
 
 }
-08E9  0008  	RETURN
+08E6  0008  	RETURN
 
 
 /*********************************************************************************************
@@ -4118,473 +4120,473 @@ void initialise() {
 void main() {
 
     initialise();
-0915  20AB  	CALL initialise_00000
+0912  20A8  	CALL initialise_00000
 
 
     // Endless loop
     while(1) {
-0916        label151
+0913        label149
 
         // Task scheduler
         // If there are tasks to be performed, find out the
         // most recent task from the array and execute it
         while (cTask > 0) {
-0916  084E  	MOVF gbl_cTask, W
-0917  3C00  	SUBLW 0x00
-0918  158A  	BSF PCLATH,3
-0919  1803  	BTFSC STATUS,C
-091A  2916  	GOTO	label151
+0913  084E  	MOVF gbl_cTask, W
+0914  3C00  	SUBLW 0x00
+0915  158A  	BSF PCLATH,3
+0916  1803  	BTFSC STATUS,C
+0917  2913  	GOTO	label149
 
             if (cTask.TASK_TIMER1) {
-091B  1D4E  	BTFSS gbl_cTask,2
-091C  29CE  	GOTO	label171
-09CE        label171
+0918  1D4E  	BTFSS gbl_cTask,2
+0919  29CB  	GOTO	label169
+09CB        label169
 
                 if (!gcSetMode) {
-091D  08D1  	MOVF gbl_gcSetMode, F
-091E  1D03  	BTFSS STATUS,Z
-091F  295C  	GOTO	label157
+091A  08D1  	MOVF gbl_gcSetMode, F
+091B  1D03  	BTFSS STATUS,Z
+091C  2959  	GOTO	label155
 
                     // Don't read date/time when in set mode
                     ds3231ReadDateTime();
-0920  20EA  	CALL ds3231Read_0001C
+091D  20E7  	CALL ds3231Read_0001C
 
                     if ((gBcdSecond == 0x29) || (gBcdSecond == 0x59)) {
-0921  0835  	MOVF gbl_gBcdSecond, W
-0922  3A29  	XORLW 0x29
-0923  158A  	BSF PCLATH,3
-0924  1903  	BTFSC STATUS,Z
-0925  292A  	GOTO	label152
-0926  0835  	MOVF gbl_gBcdSecond, W
-0927  3A59  	XORLW 0x59
-0928  1D03  	BTFSS STATUS,Z
-0929  292F  	GOTO	label153
-092A        label152
-092F        label153
+091E  0835  	MOVF gbl_gBcdSecond, W
+091F  3A29  	XORLW 0x29
+0920  158A  	BSF PCLATH,3
+0921  1903  	BTFSC STATUS,Z
+0922  2927  	GOTO	label150
+0923  0835  	MOVF gbl_gBcdSecond, W
+0924  3A59  	XORLW 0x59
+0925  1D03  	BTFSS STATUS,Z
+0926  292C  	GOTO	label151
+0927        label150
+092C        label151
 
                         // Ask to convert for temperature reading at 29 seconds or 59 seconds past the minute
                         oneWireBusReset();
-092A  2092  	CALL oneWireBus_00014
+0927  208F  	CALL oneWireBus_00014
 
                         startTemp();
-092B  158A  	BSF PCLATH,3
-092C  200C  	CALL startTemp_00000
+0928  158A  	BSF PCLATH,3
+0929  2009  	CALL startTemp_00000
 
                     } else if ((gBcdSecond == 0) || (gBcdSecond == 0x30)) {
-092D  158A  	BSF PCLATH,3
-092E  293A  	GOTO	label155
-092F  08B5  	MOVF gbl_gBcdSecond, F
-0930  1903  	BTFSC STATUS,Z
-0931  2936  	GOTO	label154
-0932  0835  	MOVF gbl_gBcdSecond, W
-0933  3A30  	XORLW 0x30
-0934  1D03  	BTFSS STATUS,Z
-0935  293A  	GOTO	label155
-0936        label154
-093A        label155
-09FE  158A  	BSF PCLATH,3
-09FF  2916  	GOTO	label151
+092A  158A  	BSF PCLATH,3
+092B  2937  	GOTO	label153
+092C  08B5  	MOVF gbl_gBcdSecond, F
+092D  1903  	BTFSC STATUS,Z
+092E  2933  	GOTO	label152
+092F  0835  	MOVF gbl_gBcdSecond, W
+0930  3A30  	XORLW 0x30
+0931  1D03  	BTFSS STATUS,Z
+0932  2937  	GOTO	label153
+0933        label152
+0937        label153
+09FB  158A  	BSF PCLATH,3
+09FC  2913  	GOTO	label149
 
                         // 1 second later, read the converted temperature
                         oneWireBusReset();
-0936  2092  	CALL oneWireBus_00014
+0933  208F  	CALL oneWireBus_00014
 
                         readTemp();
-0937  158A  	BSF PCLATH,3
-0938  2015  	CALL readTemp_00000
+0934  158A  	BSF PCLATH,3
+0935  2012  	CALL readTemp_00000
 
                         // store it in the array, next display refresh will pick it up
                         convertTemp();
-0939  2555  	CALL convertTem_00027
+0936  2556  	CALL convertTem_00027
 
                     }
                     // daylight savings time handling (UK/europe) - last sunday of March or October (this can fall between the 25th and the 31st)
                     if ((gBcdSecond == 0) && (gDayOfWeek == 7) && (gBcdDayOfMonth > 0x24)) {
-093A  08B5  	MOVF gbl_gBcdSecond, F
-093B  158A  	BSF PCLATH,3
-093C  1D03  	BTFSS STATUS,Z
-093D  295C  	GOTO	label157
-093E  0838  	MOVF gbl_gDayOfWeek, W
-093F  3A07  	XORLW 0x07
-0940  1D03  	BTFSS STATUS,Z
-0941  295C  	GOTO	label157
-0942  0839  	MOVF gbl_gBcdDayOfMonth, W
-0943  3C24  	SUBLW 0x24
-0944  1803  	BTFSC STATUS,C
-0945  295C  	GOTO	label157
+0937  08B5  	MOVF gbl_gBcdSecond, F
+0938  158A  	BSF PCLATH,3
+0939  1D03  	BTFSS STATUS,Z
+093A  2959  	GOTO	label155
+093B  0838  	MOVF gbl_gDayOfWeek, W
+093C  3A07  	XORLW 0x07
+093D  1D03  	BTFSS STATUS,Z
+093E  2959  	GOTO	label155
+093F  0839  	MOVF gbl_gBcdDayOfMonth, W
+0940  3C24  	SUBLW 0x24
+0941  1803  	BTFSC STATUS,C
+0942  2959  	GOTO	label155
 
 						// In March, at 1AM, apply daylight savings time if appropriate
 						if ((gBcdHour == 1) && (gBcdMonth == 3)) {
-0946  0337  	DECF gbl_gBcdHour, W
-0947  1D03  	BTFSS STATUS,Z
-0948  2950  	GOTO	label156
-0949  083A  	MOVF gbl_gBcdMonth, W
-094A  3A03  	XORLW 0x03
-094B  1D03  	BTFSS STATUS,Z
-094C  2950  	GOTO	label156
-0950        label156
+0943  0337  	DECF gbl_gBcdHour, W
+0944  1D03  	BTFSS STATUS,Z
+0945  294D  	GOTO	label154
+0946  083A  	MOVF gbl_gBcdMonth, W
+0947  3A03  	XORLW 0x03
+0948  1D03  	BTFSS STATUS,Z
+0949  294D  	GOTO	label154
+094D        label154
 
 							gBcdHour++; // one hour forwards
-094D  0AB7  	INCF gbl_gBcdHour, F
+094A  0AB7  	INCF gbl_gBcdHour, F
 
 							ds3231WriteDateTime();
-094E  118A  	BCF PCLATH,3
-094F  2519  	CALL ds3231Writ_0001B
+094B  118A  	BCF PCLATH,3
+094C  251A  	CALL ds3231Writ_0001B
 
 						}
 						// In October, at 2AM, remove daylight savings time if appropriate (UK/europe) daylight savings time if appropriate (UK/europe) - last sunday of October
 						if ((gBcdHour == 2) && (gBcdMonth == 0x10)) {
-0950  0837  	MOVF gbl_gBcdHour, W
-0951  3A02  	XORLW 0x02
-0952  158A  	BSF PCLATH,3
-0953  1D03  	BTFSS STATUS,Z
-0954  295C  	GOTO	label157
-0955  083A  	MOVF gbl_gBcdMonth, W
-0956  3A10  	XORLW 0x10
-0957  1D03  	BTFSS STATUS,Z
-0958  295C  	GOTO	label157
-095C        label157
+094D  0837  	MOVF gbl_gBcdHour, W
+094E  3A02  	XORLW 0x02
+094F  158A  	BSF PCLATH,3
+0950  1D03  	BTFSS STATUS,Z
+0951  2959  	GOTO	label155
+0952  083A  	MOVF gbl_gBcdMonth, W
+0953  3A10  	XORLW 0x10
+0954  1D03  	BTFSS STATUS,Z
+0955  2959  	GOTO	label155
+0959        label155
 
 							gBcdHour--; // one hour back
-0959  03B7  	DECF gbl_gBcdHour, F
+0956  03B7  	DECF gbl_gBcdHour, F
 
 							ds3231WriteDateTime();
-095A  118A  	BCF PCLATH,3
-095B  2519  	CALL ds3231Writ_0001B
+0957  118A  	BCF PCLATH,3
+0958  251A  	CALL ds3231Writ_0001B
 
 						}
 					}
                 }
                 if (!gcTriggerMode) {
-095C  08D3  	MOVF gbl_gcTriggerMode, F
-095D  158A  	BSF PCLATH,3
-095E  1D03  	BTFSS STATUS,Z
-095F  29C5  	GOTO	label169
+0959  08D3  	MOVF gbl_gcTriggerMode, F
+095A  158A  	BSF PCLATH,3
+095B  1D03  	BTFSS STATUS,Z
+095C  29C2  	GOTO	label167
 
 					// Don't activate triggers when in trigger set mode
 					// Trigger white led
 					// Don't activate/deactivate if on and off set hour/min are the same
 					if ((gBcdWhiteOnHour != gBcdWhiteOffHour) || (gBcdWhiteOnMinute != gBcdWhiteOffMinute)) {
-0960  0857  	MOVF gbl_gBcdWhiteOffHour, W
-0961  0655  	XORWF gbl_gBcdWhiteOnHour, W
-0962  1D03  	BTFSS STATUS,Z
-0963  2968  	GOTO	label158
-0964  0856  	MOVF gbl_gBcdWhiteOffMinute, W
-0965  0654  	XORWF gbl_gBcdWhiteOnMinute, W
-0966  1903  	BTFSC STATUS,Z
-0967  2978  	GOTO	label160
-0968        label158
+095D  0857  	MOVF gbl_gBcdWhiteOffHour, W
+095E  0655  	XORWF gbl_gBcdWhiteOnHour, W
+095F  1D03  	BTFSS STATUS,Z
+0960  2965  	GOTO	label156
+0961  0856  	MOVF gbl_gBcdWhiteOffMinute, W
+0962  0654  	XORWF gbl_gBcdWhiteOnMinute, W
+0963  1903  	BTFSC STATUS,Z
+0964  2975  	GOTO	label158
+0965        label156
 
 						if ((gBcdHour == gBcdWhiteOnHour) && (gBcdMinute == gBcdWhiteOnMinute)) {
-0968  0855  	MOVF gbl_gBcdWhiteOnHour, W
-0969  0637  	XORWF gbl_gBcdHour, W
-096A  1D03  	BTFSS STATUS,Z
-096B  2970  	GOTO	label159
-096C  0854  	MOVF gbl_gBcdWhiteOnMinute, W
-096D  0636  	XORWF gbl_gBcdMinute, W
-096E  1903  	BTFSC STATUS,Z
+0965  0855  	MOVF gbl_gBcdWhiteOnHour, W
+0966  0637  	XORWF gbl_gBcdHour, W
+0967  1D03  	BTFSS STATUS,Z
+0968  296D  	GOTO	label157
+0969  0854  	MOVF gbl_gBcdWhiteOnMinute, W
+096A  0636  	XORWF gbl_gBcdMinute, W
+096B  1903  	BTFSC STATUS,Z
 
 							WHITE_LED = 1;
-096F  1487  	BSF gbl_portc,1
-0970        label159
+096C  1487  	BSF gbl_portc,1
+096D        label157
 
 						}
 						if ((gBcdHour == gBcdWhiteOffHour) && (gBcdMinute == gBcdWhiteOffMinute)) {
-0970  0857  	MOVF gbl_gBcdWhiteOffHour, W
-0971  0637  	XORWF gbl_gBcdHour, W
-0972  1D03  	BTFSS STATUS,Z
-0973  2978  	GOTO	label160
-0974  0856  	MOVF gbl_gBcdWhiteOffMinute, W
-0975  0636  	XORWF gbl_gBcdMinute, W
-0976  1903  	BTFSC STATUS,Z
+096D  0857  	MOVF gbl_gBcdWhiteOffHour, W
+096E  0637  	XORWF gbl_gBcdHour, W
+096F  1D03  	BTFSS STATUS,Z
+0970  2975  	GOTO	label158
+0971  0856  	MOVF gbl_gBcdWhiteOffMinute, W
+0972  0636  	XORWF gbl_gBcdMinute, W
+0973  1903  	BTFSC STATUS,Z
 
 							WHITE_LED = 0;
-0977  1087  	BCF gbl_portc,1
-0978        label160
+0974  1087  	BCF gbl_portc,1
+0975        label158
 
 						}
 					}
 					// Trigger blue led
 					// Don't activate/deactivate if on and off set hour/min are the same
 					if ((gBcdBlueOnHour != gBcdBlueOffHour) || (gBcdBlueOnMinute != gBcdBlueOffMinute)) {
-0978  085B  	MOVF gbl_gBcdBlueOffHour, W
-0979  0659  	XORWF gbl_gBcdBlueOnHour, W
-097A  1D03  	BTFSS STATUS,Z
-097B  2980  	GOTO	label161
-097C  085A  	MOVF gbl_gBcdBlueOffMinute, W
-097D  0658  	XORWF gbl_gBcdBlueOnMinute, W
-097E  1903  	BTFSC STATUS,Z
-097F  2990  	GOTO	label163
-0980        label161
+0975  085B  	MOVF gbl_gBcdBlueOffHour, W
+0976  0659  	XORWF gbl_gBcdBlueOnHour, W
+0977  1D03  	BTFSS STATUS,Z
+0978  297D  	GOTO	label159
+0979  085A  	MOVF gbl_gBcdBlueOffMinute, W
+097A  0658  	XORWF gbl_gBcdBlueOnMinute, W
+097B  1903  	BTFSC STATUS,Z
+097C  298D  	GOTO	label161
+097D        label159
 
 						if ((gBcdHour == gBcdBlueOnHour) && (gBcdMinute == gBcdBlueOnMinute)) {
-0980  0859  	MOVF gbl_gBcdBlueOnHour, W
-0981  0637  	XORWF gbl_gBcdHour, W
-0982  1D03  	BTFSS STATUS,Z
-0983  2988  	GOTO	label162
-0984  0858  	MOVF gbl_gBcdBlueOnMinute, W
-0985  0636  	XORWF gbl_gBcdMinute, W
-0986  1903  	BTFSC STATUS,Z
+097D  0859  	MOVF gbl_gBcdBlueOnHour, W
+097E  0637  	XORWF gbl_gBcdHour, W
+097F  1D03  	BTFSS STATUS,Z
+0980  2985  	GOTO	label160
+0981  0858  	MOVF gbl_gBcdBlueOnMinute, W
+0982  0636  	XORWF gbl_gBcdMinute, W
+0983  1903  	BTFSC STATUS,Z
 
 							BLUE_LED = 1;
-0987  1507  	BSF gbl_portc,2
-0988        label162
+0984  1507  	BSF gbl_portc,2
+0985        label160
 
 						}
 						if ((gBcdHour == gBcdBlueOffHour) && (gBcdMinute == gBcdBlueOffMinute)) {
-0988  085B  	MOVF gbl_gBcdBlueOffHour, W
-0989  0637  	XORWF gbl_gBcdHour, W
-098A  1D03  	BTFSS STATUS,Z
-098B  2990  	GOTO	label163
-098C  085A  	MOVF gbl_gBcdBlueOffMinute, W
-098D  0636  	XORWF gbl_gBcdMinute, W
-098E  1903  	BTFSC STATUS,Z
+0985  085B  	MOVF gbl_gBcdBlueOffHour, W
+0986  0637  	XORWF gbl_gBcdHour, W
+0987  1D03  	BTFSS STATUS,Z
+0988  298D  	GOTO	label161
+0989  085A  	MOVF gbl_gBcdBlueOffMinute, W
+098A  0636  	XORWF gbl_gBcdMinute, W
+098B  1903  	BTFSC STATUS,Z
 
 							BLUE_LED = 0;
-098F  1107  	BCF gbl_portc,2
-0990        label163
+098C  1107  	BCF gbl_portc,2
+098D        label161
 
 						}
 					}
 					// 2nd Trigger blue led
 					// Don't activate/deactivate if on and off set hour/min are the same
 					if ((gBcdBlue2OnHour != gBcdBlue2OffHour) || (gBcdBlue2OnMinute != gBcdBlue2OffMinute)) {
-0990  085F  	MOVF gbl_gBcdBlue2OffHour, W
-0991  065D  	XORWF gbl_gBcdBlue2OnHour, W
-0992  1D03  	BTFSS STATUS,Z
-0993  2998  	GOTO	label164
-0994  085E  	MOVF gbl_gBcdBlue2OffMinute, W
-0995  065C  	XORWF gbl_gBcdBlue2OnMinute, W
-0996  1903  	BTFSC STATUS,Z
-0997  29A8  	GOTO	label166
-0998        label164
+098D  085F  	MOVF gbl_gBcdBlue2OffHour, W
+098E  065D  	XORWF gbl_gBcdBlue2OnHour, W
+098F  1D03  	BTFSS STATUS,Z
+0990  2995  	GOTO	label162
+0991  085E  	MOVF gbl_gBcdBlue2OffMinute, W
+0992  065C  	XORWF gbl_gBcdBlue2OnMinute, W
+0993  1903  	BTFSC STATUS,Z
+0994  29A5  	GOTO	label164
+0995        label162
 
 						if ((gBcdHour == gBcdBlue2OnHour) && (gBcdMinute == gBcdBlue2OnMinute)) {
-0998  085D  	MOVF gbl_gBcdBlue2OnHour, W
-0999  0637  	XORWF gbl_gBcdHour, W
-099A  1D03  	BTFSS STATUS,Z
-099B  29A0  	GOTO	label165
-099C  085C  	MOVF gbl_gBcdBlue2OnMinute, W
-099D  0636  	XORWF gbl_gBcdMinute, W
-099E  1903  	BTFSC STATUS,Z
+0995  085D  	MOVF gbl_gBcdBlue2OnHour, W
+0996  0637  	XORWF gbl_gBcdHour, W
+0997  1D03  	BTFSS STATUS,Z
+0998  299D  	GOTO	label163
+0999  085C  	MOVF gbl_gBcdBlue2OnMinute, W
+099A  0636  	XORWF gbl_gBcdMinute, W
+099B  1903  	BTFSC STATUS,Z
 
 							BLUE_LED = 1;
-099F  1507  	BSF gbl_portc,2
-09A0        label165
+099C  1507  	BSF gbl_portc,2
+099D        label163
 
 						}
 						if ((gBcdHour == gBcdBlue2OffHour) && (gBcdMinute == gBcdBlue2OffMinute)) {
-09A0  085F  	MOVF gbl_gBcdBlue2OffHour, W
-09A1  0637  	XORWF gbl_gBcdHour, W
-09A2  1D03  	BTFSS STATUS,Z
-09A3  29A8  	GOTO	label166
-09A4  085E  	MOVF gbl_gBcdBlue2OffMinute, W
-09A5  0636  	XORWF gbl_gBcdMinute, W
-09A6  1903  	BTFSC STATUS,Z
+099D  085F  	MOVF gbl_gBcdBlue2OffHour, W
+099E  0637  	XORWF gbl_gBcdHour, W
+099F  1D03  	BTFSS STATUS,Z
+09A0  29A5  	GOTO	label164
+09A1  085E  	MOVF gbl_gBcdBlue2OffMinute, W
+09A2  0636  	XORWF gbl_gBcdMinute, W
+09A3  1903  	BTFSC STATUS,Z
 
 							BLUE_LED = 0;
-09A7  1107  	BCF gbl_portc,2
-09A8        label166
+09A4  1107  	BCF gbl_portc,2
+09A5        label164
 
 						}
 					}
 					// Trigger fan
 					// Don't activate/deactivate if on and off temperature are the same
 					if (gBcdFanOnTemp != gBcdFanOffTemp) {
-09A8  0861  	MOVF gbl_gBcdFanOffTemp, W
-09A9  0660  	XORWF gbl_gBcdFanOnTemp, W
-09AA  1903  	BTFSC STATUS,Z
-09AB  29B4  	GOTO	label167
+09A5  0861  	MOVF gbl_gBcdFanOffTemp, W
+09A6  0660  	XORWF gbl_gBcdFanOnTemp, W
+09A7  1903  	BTFSC STATUS,Z
+09A8  29B1  	GOTO	label165
 
 						if (giDS3231ValueTruncCBCD >= gBcdFanOnTemp) {
-09AC  0860  	MOVF gbl_gBcdFanOnTemp, W
-09AD  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
-09AE  1803  	BTFSC STATUS,C
+09A9  0860  	MOVF gbl_gBcdFanOnTemp, W
+09AA  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
+09AB  1803  	BTFSC STATUS,C
 
 							FAN = 1;
-09AF  1485  	BSF gbl_porta,1
+09AC  1485  	BSF gbl_porta,1
 
 						}
 						if (giDS3231ValueTruncCBCD <= gBcdFanOffTemp) {
-09B0  084C  	MOVF gbl_giDS3231ValueTruncCBCD, W
-09B1  0261  	SUBWF gbl_gBcdFanOffTemp, W
-09B2  1803  	BTFSC STATUS,C
+09AD  084C  	MOVF gbl_giDS3231ValueTruncCBCD, W
+09AE  0261  	SUBWF gbl_gBcdFanOffTemp, W
+09AF  1803  	BTFSC STATUS,C
 
 							FAN = 0;
-09B3  1085  	BCF gbl_porta,1
-09B4        label167
+09B0  1085  	BCF gbl_porta,1
+09B1        label165
 
 						}
 					}
 					// Forced on
 					if (gbFanOn)
-09B4  184F  	BTFSC gbl_gbFanOn,0
+09B1  184F  	BTFSC gbl_gbFanOn,0
 
 						FAN = 1;
-09B5  1485  	BSF gbl_porta,1
+09B2  1485  	BSF gbl_porta,1
 
 					// Trigger heater
 					// Don't activate/deactivate if on and off temperature are the same
 					if (gBcdHeaterOnTemp != gBcdHeaterOffTemp) {
-09B6  0863  	MOVF gbl_gBcdHeaterOffTemp, W
-09B7  0662  	XORWF gbl_gBcdHeaterOnTemp, W
-09B8  1903  	BTFSC STATUS,Z
-09B9  29C2  	GOTO	label168
+09B3  0863  	MOVF gbl_gBcdHeaterOffTemp, W
+09B4  0662  	XORWF gbl_gBcdHeaterOnTemp, W
+09B5  1903  	BTFSC STATUS,Z
+09B6  29BF  	GOTO	label166
 
 						if (giDS3231ValueTruncCBCD <= gBcdHeaterOnTemp) {
-09BA  084C  	MOVF gbl_giDS3231ValueTruncCBCD, W
-09BB  0262  	SUBWF gbl_gBcdHeaterOnTemp, W
-09BC  1803  	BTFSC STATUS,C
+09B7  084C  	MOVF gbl_giDS3231ValueTruncCBCD, W
+09B8  0262  	SUBWF gbl_gBcdHeaterOnTemp, W
+09B9  1803  	BTFSC STATUS,C
 
 							HEATER = 1;
-09BD  1405  	BSF gbl_porta,0
+09BA  1405  	BSF gbl_porta,0
 
 						}
 						if (giDS3231ValueTruncCBCD >= gBcdHeaterOffTemp) {
-09BE  0863  	MOVF gbl_gBcdHeaterOffTemp, W
-09BF  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
-09C0  1803  	BTFSC STATUS,C
+09BB  0863  	MOVF gbl_gBcdHeaterOffTemp, W
+09BC  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
+09BD  1803  	BTFSC STATUS,C
 
 							HEATER = 0;
-09C1  1005  	BCF gbl_porta,0
-09C2        label168
+09BE  1005  	BCF gbl_porta,0
+09BF        label166
 
 						}
 					}
 					// If temperature is minus, always trigger heater
 					if (gbDS3231IsMinus)
-09C2  08CD  	MOVF gbl_gbDS3231IsMinus, F
-09C3  1D03  	BTFSS STATUS,Z
+09BF  08CD  	MOVF gbl_gbDS3231IsMinus, F
+09C0  1D03  	BTFSS STATUS,Z
 
 						HEATER = 1;
-09C4  1405  	BSF gbl_porta,0
-09C5        label169
+09C1  1405  	BSF gbl_porta,0
+09C2        label167
 
 				}
 				// Display time and temperature or date on TM1638 after clock tick
 				if (!gcTriggerMode && !gcSetMode) {
-09C5  08D3  	MOVF gbl_gcTriggerMode, F
+09C2  08D3  	MOVF gbl_gcTriggerMode, F
+09C3  1D03  	BTFSS STATUS,Z
+09C4  29CA  	GOTO	label168
+09C5  08D1  	MOVF gbl_gcSetMode, F
 09C6  1D03  	BTFSS STATUS,Z
-09C7  29CD  	GOTO	label170
-09C8  08D1  	MOVF gbl_gcSetMode, F
-09C9  1D03  	BTFSS STATUS,Z
-09CA  29CD  	GOTO	label170
-09CD        label170
+09C7  29CA  	GOTO	label168
+09CA        label168
 
 					tm1638UpdateDisplay();
-09CB  118A  	BCF PCLATH,3
-09CC  22B4  	CALL tm1638Upda_00022
+09C8  118A  	BCF PCLATH,3
+09C9  22B4  	CALL tm1638Upda_00022
 
                 }
 
                 cTask.TASK_TIMER1 = 0;
-09CD  114E  	BCF gbl_cTask,2
+09CA  114E  	BCF gbl_cTask,2
 
             }
             if (cTask.TASK_TIMER0) {
-09CE  158A  	BSF PCLATH,3
-09CF  1CCE  	BTFSS gbl_cTask,1
-09D0  2916  	GOTO	label151
+09CB  158A  	BSF PCLATH,3
+09CC  1CCE  	BTFSS gbl_cTask,1
+09CD  2913  	GOTO	label149
 
 				// Task should happen about every 50ms
                 // Digit flashing - see if 10 counts has happened for an ~half second count
                 iTimer0FlashCounts++;
-09D1  0ABE  	INCF gbl_iTimer0FlashCounts, F
+09CE  0ABE  	INCF gbl_iTimer0FlashCounts, F
 
 				if (iTimer0FlashCounts > 9) {
-09D2  083E  	MOVF gbl_iTimer0FlashCounts, W
-09D3  3C09  	SUBLW 0x09
-09D4  1803  	BTFSC STATUS,C
-09D5  29E0  	GOTO	label173
+09CF  083E  	MOVF gbl_iTimer0FlashCounts, W
+09D0  3C09  	SUBLW 0x09
+09D1  1803  	BTFSC STATUS,C
+09D2  29DD  	GOTO	label171
 
 					iFlashDigitOff++;
-09D6  0AC8  	INCF gbl_iFlashDigitOff, F
+09D3  0AC8  	INCF gbl_iFlashDigitOff, F
 
 					iTimer0FlashCounts = 0;
-09D7  01BE  	CLRF gbl_iTimer0FlashCounts
+09D4  01BE  	CLRF gbl_iTimer0FlashCounts
 
 					// If in set or trigger mode, update the display every ~half second to flash a digit
 					if (gcSetMode || gcTriggerMode)
-09D8  08D1  	MOVF gbl_gcSetMode, F
-09D9  1D03  	BTFSS STATUS,Z
-09DA  29DE  	GOTO	label172
-09DB  08D3  	MOVF gbl_gcTriggerMode, F
-09DC  1903  	BTFSC STATUS,Z
-09DD  29E0  	GOTO	label173
-09DE        label172
+09D5  08D1  	MOVF gbl_gcSetMode, F
+09D6  1D03  	BTFSS STATUS,Z
+09D7  29DB  	GOTO	label170
+09D8  08D3  	MOVF gbl_gcTriggerMode, F
+09D9  1903  	BTFSC STATUS,Z
+09DA  29DD  	GOTO	label171
+09DB        label170
 
 						tm1638UpdateDisplay();
-09DE  118A  	BCF PCLATH,3
-09DF  22B4  	CALL tm1638Upda_00022
+09DB  118A  	BCF PCLATH,3
+09DC  22B4  	CALL tm1638Upda_00022
 
 				}
 				// Poll keys
 				tm1638ReadKeys();
-09E0  118A  	BCF PCLATH,3
-09E1  27E9  	CALL tm1638Read_00025
+09DD  118A  	BCF PCLATH,3
+09DE  27E6  	CALL tm1638Read_00025
 
 				// Button state changed
                 char processKeys = 0;
-09E2  01F3  	CLRF main_104_processKeys
+09DF  01F3  	CLRF main_104_processKeys
 
                 if (tm1638Keys != tm1638KeysOld) {
-09E3  086D  	MOVF gbl_tm1638KeysOld, W
-09E4  066C  	XORWF gbl_tm1638Keys, W
-09E5  1903  	BTFSC STATUS,Z
-09E6  29EA  	GOTO	label174
-09EA        label174
+09E0  086D  	MOVF gbl_tm1638KeysOld, W
+09E1  066C  	XORWF gbl_tm1638Keys, W
+09E2  1903  	BTFSC STATUS,Z
+09E3  29E7  	GOTO	label172
+09E7        label172
 
                     processKeys = 1;
-09E7  3001  	MOVLW 0x01
-09E8  00F3  	MOVWF main_104_processKeys
+09E4  3001  	MOVLW 0x01
+09E5  00F3  	MOVWF main_104_processKeys
 
                 } else if (tm1638Keys != 0) {
-09E9  29F4  	GOTO	label175
-09EA  08EC  	MOVF gbl_tm1638Keys, F
-09EB  1903  	BTFSC STATUS,Z
-09EC  29F4  	GOTO	label175
+09E6  29F1  	GOTO	label173
+09E7  08EC  	MOVF gbl_tm1638Keys, F
+09E8  1903  	BTFSC STATUS,Z
+09E9  29F1  	GOTO	label173
 
                     // Button held
                     iTimer0KeyCounts++;
-09ED  0ABF  	INCF gbl_iTimer0KeyCounts, F
+09EA  0ABF  	INCF gbl_iTimer0KeyCounts, F
 
                     // If button held more than 250ms
                     if (iTimer0KeyCounts > 4) {
-09EE  083F  	MOVF gbl_iTimer0KeyCounts, W
-09EF  3C04  	SUBLW 0x04
-09F0  1803  	BTFSC STATUS,C
-09F1  29F4  	GOTO	label175
-09F4        label175
+09EB  083F  	MOVF gbl_iTimer0KeyCounts, W
+09EC  3C04  	SUBLW 0x04
+09ED  1803  	BTFSC STATUS,C
+09EE  29F1  	GOTO	label173
+09F1        label173
 
                         processKeys = 1;
-09F2  3001  	MOVLW 0x01
-09F3  00F3  	MOVWF main_104_processKeys
+09EF  3001  	MOVLW 0x01
+09F0  00F3  	MOVWF main_104_processKeys
 
                     }
                 }
                 if (processKeys) {
-09F4  08F3  	MOVF main_104_processKeys, F
-09F5  1903  	BTFSC STATUS,Z
-09F6  29FD  	GOTO	label176
-09FD        label176
+09F1  08F3  	MOVF main_104_processKeys, F
+09F2  1903  	BTFSC STATUS,Z
+09F3  29FA  	GOTO	label174
+09FA        label174
 
 					processKeys();
-09F7  2024  	CALL processKey_0002A
+09F4  2021  	CALL processKey_0002A
 
 					tm1638UpdateDisplay();
-09F8  118A  	BCF PCLATH,3
-09F9  22B4  	CALL tm1638Upda_00022
+09F5  118A  	BCF PCLATH,3
+09F6  22B4  	CALL tm1638Upda_00022
 
 					tm1638KeysOld = tm1638Keys;
-09FA  086C  	MOVF gbl_tm1638Keys, W
-09FB  00ED  	MOVWF gbl_tm1638KeysOld
+09F7  086C  	MOVF gbl_tm1638Keys, W
+09F8  00ED  	MOVWF gbl_tm1638KeysOld
 
                     iTimer0KeyCounts = 0;
-09FC  01BF  	CLRF gbl_iTimer0KeyCounts
+09F9  01BF  	CLRF gbl_iTimer0KeyCounts
 
                 }
                 cTask.TASK_TIMER0 = 0;
-09FD  10CE  	BCF gbl_cTask,1
+09FA  10CE  	BCF gbl_cTask,1
 
             }
         }
@@ -5676,59 +5678,59 @@ void i2c_INIT(unsigned char i2c_divisor)
 	volatile bit l_sspen@T_i2c_SSPCON1.i2c_SSPEN, l_smp@T_i2c_SSPSTAT.T_i2c_SMP_BIT;
 
 	l_sda_tris = 1;
-0506  1683  	BSF STATUS, RP0
-0507  1607  	BSF i2c_INIT_00000_1_l_sda_tris,4
+0507  1683  	BSF STATUS, RP0
+0508  1607  	BSF i2c_INIT_00000_1_l_sda_tris,4
 
 	l_scl_tris = 1;
-0508  1587  	BSF i2c_INIT_00000_1_l_scl_tris,3
+0509  1587  	BSF i2c_INIT_00000_1_l_scl_tris,3
 
 	
 	i2c_SSPCON1 = 0x00; // initialise the I2C control register (mirrors HW SSPCON1)	
-0509  1283  	BCF STATUS, RP0
-050A  01C0  	CLRF i2c_INIT_00000_1_i2c_SSPCON1
+050A  1283  	BCF STATUS, RP0
+050B  01C0  	CLRF i2c_INIT_00000_1_i2c_SSPCON1
 
 	i2c_SSPADD = i2c_divisor; // get the I2C baud rate divisor
-050B  0874  	MOVF i2c_INIT_00000_arg_i2c_divisor, W
-050C  00C3  	MOVWF i2c_INIT_00000_1_i2c_SSPADD
+050C  0874  	MOVF i2c_INIT_00000_arg_i2c_divisor, W
+050D  00C3  	MOVWF i2c_INIT_00000_1_i2c_SSPADD
 
 	i2c_SSPCON1 = 0x08; // initialise the I2C control register (mirrors HW SSPCON1)	
-050D  3008  	MOVLW 0x08
-050E  00C0  	MOVWF i2c_INIT_00000_1_i2c_SSPCON1
+050E  3008  	MOVLW 0x08
+050F  00C0  	MOVWF i2c_INIT_00000_1_i2c_SSPCON1
 
 	i2c_SSPCON2 = 0x00; // initialise the I2C control register (mirrors HW SSPCON2)	
-050F  01C1  	CLRF i2c_INIT_00000_1_i2c_SSPCON2
+0510  01C1  	CLRF i2c_INIT_00000_1_i2c_SSPCON2
 
 	
 	i2c_SSPSTAT = 0x00; // initialise the I2C status register (mirrors HW SSPSTAT)
-0510  01C2  	CLRF i2c_INIT_00000_1_i2c_SSPSTAT
+0511  01C2  	CLRF i2c_INIT_00000_1_i2c_SSPSTAT
 
 	
 	if (T_MODE & i2c_SMP)
 		l_smp = 1;
-0511  17C2  	BSF i2c_INIT_00000_1_l_smp,7
+0512  17C2  	BSF i2c_INIT_00000_1_l_smp,7
 
 
 	l_sspif = 0; // initialise the I2C SSP interrupt status
-0512  11C5  	BCF i2c_INIT_00000_1_l_sspif,3
+0513  11C5  	BCF i2c_INIT_00000_1_l_sspif,3
 
 	l_bclif = 0; // initialise the I2C BCL interrupt status
-0513  11C6  	BCF i2c_INIT_00000_1_l_bclif,3
+0514  11C6  	BCF i2c_INIT_00000_1_l_bclif,3
 
 	l_sda = 0;
-0514  1207  	BCF i2c_INIT_00000_1_l_sda,4
+0515  1207  	BCF i2c_INIT_00000_1_l_sda,4
 
 	l_scl = 0;
-0515  1187  	BCF i2c_INIT_00000_1_l_scl,3
+0516  1187  	BCF i2c_INIT_00000_1_l_scl,3
 
 	l_sspen = 1; // enable I2C
-0516  16C0  	BSF i2c_INIT_00000_1_l_sspen,5
+0517  16C0  	BSF i2c_INIT_00000_1_l_sspen,5
 
 	
 	i2c_STOP<_I2C_TEMPL_ARGS>();
-0517  20FA  	CALL i2c_STOP_00000
+0518  20FA  	CALL i2c_STOP_00000
 
 }
-0518  0008  	RETURN
+0519  0008  	RETURN
 
 
 
@@ -5740,7 +5742,7 @@ void i2c_INIT(unsigned char i2c_divisor)
 // Code with no source :-)
 ////////////////////////////////////////
 0000  158A  	BSF PCLATH,3
-0001  2A00  	GOTO	_startup
+0001  29FD  	GOTO	_startup
 
 0004  00FF  	MOVWF Int1Context
 0005  0E03  	SWAPF STATUS, W
@@ -5753,7 +5755,7 @@ void i2c_INIT(unsigned char i2c_divisor)
 000C  00B2  	MOVWF Int1BContext+D'2'
 000D  158A  	BSF PCLATH,3
 000E  120A  	BCF PCLATH,4
-000F  2A65  	GOTO	interrupt
+000F  2A62  	GOTO	interrupt
 0010        delay_us_00000
 0010        ; { delay_us ; function begin
 0010  3003  	MOVLW 0x03
@@ -6005,10 +6007,12 @@ void i2c_INIT(unsigned char i2c_divisor)
 
 
 
-0A00        _startup
 
-0A62  158A  	BSF PCLATH,3
-0A63  120A  	BCF PCLATH,4
-0A64  2915  	GOTO	main
+
+09FD        _startup
+
+0A5F  158A  	BSF PCLATH,3
+0A60  120A  	BCF PCLATH,4
+0A61  2912  	GOTO	main
 
 2007  3FB1  	DW 0x3FB1

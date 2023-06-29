@@ -92,15 +92,20 @@ char oneWireRxByte() {
         oneWireTris = 1;
 
         // Sample within 15us
-        // delay overhead 10us, unit delay 1us, resolution 4 units
-        delay_us(4); // Delay 15us
+        // At 4MHz, delay overhead 10us, unit delay 1us, resolution 4 units
+        // 4us using delay_us is too slow as sometimes reads all 1s, use nops instead
+        //delay_us(4); // Delay 16us
+        nop();
+        nop();
+        nop();
+        nop();
 
         // Check the value of the onewire bus - set the MSB of cDataIn if so
-        if (oneWireBus)
+        if (oneWireBus) // check takes 2us
             cDataIn.7 = 1;
 
         // To finish time slot
-        delay_10us(6); // 60us
+        delay_10us(6); // 60us (really 65us at 4MHz)
     }
 
     return cDataIn;
@@ -729,20 +734,20 @@ int intToBcd(int iValue) {
 *********************************************************************************************/
 void convertTemp() {
     // convert both bytes to a 16bit int - e.g. 0000 0001 0100 0110 (1 and 70, gives 326)
-    signed int iTemp = (cTempH << 8) | cTempL;
-    signed int iTemp2 = iTemp;
+    signed int iTemp16 = (cTempH << 8) | cTempL;
+    int iTempOut = iTemp16;
     // Compare to previous and ignore erroneous readings
     // Ignore startup reading (85 degrees - 1360) or anything greater
-    if (iTemp > 1359)
-        return;
+    //if (iTemp > 1359)
+    //    return;
 
     // this gets celsius * 100 - https://www.phanderson.com/PIC/PICC/sourceboost/ds18b20_1.html
     // celsius value is always required for triggering
-	gbDS3231IsMinus = (iTemp2 < 0);
+	gbDS3231IsMinus = (iTemp16.15);
 	if (gbDS3231IsMinus) {
-		iTemp2 = ~iTemp2 + 1;
+		iTempOut = ~iTemp16 + 1;
 	}
-    int iValueC = (6 * iTemp2) + (iTemp2 / 4);
+    int iValueC = (6 * iTempOut) + (iTempOut / 4);
     // Split the temperature reading into digits
     giDS3231ValueBCD = intToBcd(iValueC);
     // Truncated value for triggering heater/fans
@@ -751,14 +756,14 @@ void convertTemp() {
     if (gcDisplayMode == 1) {
 		// -17.8125 (-285/65251) results in minus fahrenheit (-0.125), -17.75 (-284/65250) results in positive fahrenheit (1)
         // this gets Fahrenheit * 10 - https://www.electro-tech-online.com/threads/temperature-sensor-ds18b20-display-fahrenhiet.117377/
-        iTemp2 = ((iTemp + 4) / 8) + iTemp + 320;
+        iTempOut = ((iTemp16 + 4) / 8) + iTemp16 + 320;
         // convert to absolute value
-        gbDS3231IsMinus = (iTemp2 < 0);
+        gbDS3231IsMinus = (iTempOut.15);
         if (gbDS3231IsMinus) {
-            iTemp2 = ~iTemp2 + 1;
+            iTempOut = ~iTempOut + 1;
         }
         // Split the temperature reading into digits
-        giDS3231ValueBCD = intToBcd(iTemp2);
+        giDS3231ValueBCD = intToBcd(iTempOut);
 	}
 }
 
