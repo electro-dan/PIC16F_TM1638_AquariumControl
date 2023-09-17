@@ -281,7 +281,7 @@ i2c_INIT_00000_1_l_sspif         EQU	0x00000045 ; bit:3
 i2c_INIT_00000_1_l_bclif         EQU	0x00000046 ; bit:3
 i2c_INIT_00000_1_l_sspen         EQU	0x00000040 ; bit:5
 i2c_INIT_00000_1_l_smp           EQU	0x00000042 ; bit:7
-main_104_processKeys             EQU	0x00000073 ; bytes:1
+main_109_processKeys             EQU	0x00000073 ; bytes:1
 delay_us_00000_arg_del           EQU	0x00000079 ; bytes:1
 delay_10us_00000_arg_del         EQU	0x00000078 ; bytes:1
 delay_ms_00000_arg_del           EQU	0x00000074 ; bytes:1
@@ -1767,8 +1767,6 @@ label100
 	BSF gbl_trisc,5
 	NOP
 	NOP
-	NOP
-	NOP
 	BCF STATUS, RP0
 	BTFSC gbl_portc,5
 	BSF oneWireRxB_00017_1_cDataIn,7
@@ -1783,7 +1781,7 @@ label101
 	RETURN
 ; } oneWireRxByte function end
 
-	ORG 0x00000507
+	ORG 0x00000505
 i2c_INIT_00000
 ; { i2c_INIT ; function begin
 	BSF STATUS, RP0
@@ -1807,7 +1805,7 @@ i2c_INIT_00000
 	RETURN
 ; } i2c_INIT function end
 
-	ORG 0x0000051A
+	ORG 0x00000518
 ds3231Writ_0001B
 ; { ds3231WriteDateTime ; function begin
 	CALL i2c_START_00000
@@ -1840,7 +1838,7 @@ ds3231Writ_0001B
 	RETURN
 ; } ds3231WriteDateTime function end
 
-	ORG 0x00000536
+	ORG 0x00000534
 ds3231Read_0001D
 ; { ds3231ReadRegister ; function begin
 	CALL i2c_START_00000
@@ -1866,7 +1864,7 @@ ds3231Read_0001D
 	RETURN
 ; } ds3231ReadRegister function end
 
-	ORG 0x0000054B
+	ORG 0x00000549
 ds3231Init_00000
 ; { ds3231Init ; function begin
 	MOVLW 0x0E
@@ -1882,7 +1880,7 @@ ds3231Init_00000
 	RETURN
 ; } ds3231Init function end
 
-	ORG 0x00000556
+	ORG 0x00000554
 convertTem_00027
 ; { convertTemp ; function begin
 	BCF STATUS, RP0
@@ -2036,7 +2034,7 @@ label103
 	RETURN
 ; } convertTemp function end
 
-	ORG 0x000005E9
+	ORG 0x000005E7
 at24c32Wri_00018
 ; { at24c32WriteAll ; function begin
 	CALL i2c_START_00000
@@ -2108,7 +2106,7 @@ at24c32Wri_00018
 	RETURN
 ; } at24c32WriteAll function end
 
-	ORG 0x0000062C
+	ORG 0x0000062A
 at24c32Rea_00019
 ; { at24c32ReadAll ; function begin
 	CALL i2c_START_00000
@@ -2211,7 +2209,7 @@ label105
 	RETURN
 ; } at24c32ReadAll function end
 
-	ORG 0x0000068C
+	ORG 0x0000068A
 adjustTrig_00029
 ; { adjustTrigger ; function begin
 	BCF STATUS, RP0
@@ -2445,7 +2443,7 @@ label123
 	RETURN
 ; } adjustTrigger function end
 
-	ORG 0x0000075F
+	ORG 0x0000075D
 adjustDate_00028
 ; { adjustDateTime ; function begin
 	BCF STATUS, RP0
@@ -2596,7 +2594,7 @@ label134
 	RETURN
 ; } adjustDateTime function end
 
-	ORG 0x000007E6
+	ORG 0x000007E4
 tm1638Read_00025
 ; { tm1638ReadKeys ; function begin
 	BCF STATUS, RP0
@@ -2620,7 +2618,6 @@ label135
 	DECF tm1638Read_00025_1_tm1638K_00026, F
 	BCF gbl_portb,2
 	NOP
-	BCF PCLATH,3
 	BTFSS gbl_portb,1
 	GOTO	label136
 	BCF STATUS,C
@@ -2639,7 +2636,7 @@ label137
 	RETURN
 ; } tm1638ReadKeys function end
 
-	ORG 0x00000809
+	ORG 0x00000805
 startTemp_00000
 ; { startTemp ; function begin
 	MOVLW 0xCC
@@ -2653,7 +2650,7 @@ startTemp_00000
 	RETURN
 ; } startTemp function end
 
-	ORG 0x00000812
+	ORG 0x0000080E
 readTemp_00000
 ; { readTemp ; function begin
 	MOVLW 0xCC
@@ -2673,7 +2670,7 @@ readTemp_00000
 	RETURN
 ; } readTemp function end
 
-	ORG 0x00000821
+	ORG 0x0000081D
 processKey_0002A
 ; { processKeys ; function begin
 	BCF STATUS, RP0
@@ -2798,7 +2795,7 @@ label147
 	RETURN
 ; } processKeys function end
 
-	ORG 0x0000088F
+	ORG 0x0000088B
 oneWireBus_00014
 ; { oneWireBusReset ; function begin
 	BSF STATUS, RP0
@@ -2828,7 +2825,7 @@ oneWireBus_00014
 	RETURN
 ; } oneWireBusReset function end
 
-	ORG 0x000008A8
+	ORG 0x000008A4
 initialise_00000
 ; { initialise ; function begin
 	BSF STATUS, RP0
@@ -2897,7 +2894,7 @@ label148
 	RETURN
 ; } initialise function end
 
-	ORG 0x000008E7
+	ORG 0x000008E3
 ds3231Read_0001C
 ; { ds3231ReadDateTime ; function begin
 	BCF PCLATH,3
@@ -2945,7 +2942,7 @@ ds3231Read_0001C
 	RETURN
 ; } ds3231ReadDateTime function end
 
-	ORG 0x00000912
+	ORG 0x0000090E
 main
 ; { main ; function begin
 	CALL initialise_00000
@@ -3111,34 +3108,46 @@ label163
 	BTFSC STATUS,Z
 	BCF gbl_portc,2
 label164
-	MOVF gbl_gBcdFanOffTemp, W
-	XORWF gbl_gBcdFanOnTemp, W
-	BTFSC STATUS,Z
-	GOTO	label165
 	MOVF gbl_gBcdFanOnTemp, W
 	SUBWF gbl_giDS3231ValueTruncCBCD, W
 	BTFSC STATUS,C
 	BSF gbl_porta,1
-	MOVF gbl_giDS3231ValueTruncCBCD, W
-	SUBWF gbl_gBcdFanOffTemp, W
+	MOVF gbl_gBcdFanOffTemp, W
+	SUBWF gbl_giDS3231ValueTruncCBCD, W
 	BTFSC STATUS,C
+	GOTO	label166
 	BCF gbl_porta,1
+	MOVF gbl_gBcdHour, F
+	BTFSC STATUS,Z
+	GOTO	label165
+	MOVF gbl_gBcdHour, W
+	XORLW 0x06
+	BTFSC STATUS,Z
+	GOTO	label165
+	MOVF gbl_gBcdHour, W
+	XORLW 0x0C
+	BTFSC STATUS,Z
+	GOTO	label165
+	MOVF gbl_gBcdHour, W
+	XORLW 0x12
+	BTFSS STATUS,Z
+	GOTO	label166
 label165
+	MOVF gbl_gBcdMinute, F
+	BTFSS STATUS,Z
+	GOTO	label166
+	BSF gbl_porta,1
+label166
 	BTFSC gbl_gbFanOn,0
 	BSF gbl_porta,1
-	MOVF gbl_gBcdHeaterOffTemp, W
-	XORWF gbl_gBcdHeaterOnTemp, W
-	BTFSC STATUS,Z
-	GOTO	label166
-	MOVF gbl_giDS3231ValueTruncCBCD, W
-	SUBWF gbl_gBcdHeaterOnTemp, W
-	BTFSC STATUS,C
+	MOVF gbl_gBcdHeaterOnTemp, W
+	SUBWF gbl_giDS3231ValueTruncCBCD, W
+	BTFSS STATUS,C
 	BSF gbl_porta,0
 	MOVF gbl_gBcdHeaterOffTemp, W
 	SUBWF gbl_giDS3231ValueTruncCBCD, W
 	BTFSC STATUS,C
 	BCF gbl_porta,0
-label166
 	MOVF gbl_gbDS3231IsMinus, F
 	BTFSS STATUS,Z
 	BSF gbl_porta,0
@@ -3176,13 +3185,13 @@ label170
 label171
 	BCF PCLATH,3
 	CALL tm1638Read_00025
-	CLRF main_104_processKeys
+	CLRF main_109_processKeys
 	MOVF gbl_tm1638KeysOld, W
 	XORWF gbl_tm1638Keys, W
 	BTFSC STATUS,Z
 	GOTO	label172
 	MOVLW 0x01
-	MOVWF main_104_processKeys
+	MOVWF main_109_processKeys
 	GOTO	label173
 label172
 	MOVF gbl_tm1638Keys, F
@@ -3194,9 +3203,9 @@ label172
 	BTFSC STATUS,C
 	GOTO	label173
 	MOVLW 0x01
-	MOVWF main_104_processKeys
+	MOVWF main_109_processKeys
 label173
-	MOVF main_104_processKeys, F
+	MOVF main_109_processKeys, F
 	BTFSC STATUS,Z
 	GOTO	label174
 	CALL processKey_0002A
@@ -3211,7 +3220,7 @@ label174
 	GOTO	label149
 ; } main function end
 
-	ORG 0x000009FD
+	ORG 0x00000A06
 _startup
 	BCF STATUS, RP0
 	BCF STATUS, RP1
@@ -3314,7 +3323,7 @@ _startup
 	BSF PCLATH,3
 	BCF PCLATH,4
 	GOTO	main
-	ORG 0x00000A62
+	ORG 0x00000A6B
 interrupt
 ; { interrupt ; function begin
 	BTFSS gbl_intcon,2

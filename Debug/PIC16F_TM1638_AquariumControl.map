@@ -35,27 +35,27 @@ Address  Length   Unique Name      Name
 000002B4:00000225 tm1638Upda_00022 tm1638UpdateDisplay(void)  
 000004D9:00000008 tm1638Disp_0001F tm1638DisplayOn(void)  
 000004E1:00000007 oneWireTxB_00016 oneWireTxBytes(unsigned char,unsigned char)  
-000004E8:0000001F oneWireRxB_00017 oneWireRxByte(void)  
-00000507:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
-0000051A:0000001C ds3231Writ_0001B ds3231WriteDateTime(void)  
-00000536:00000015 ds3231Read_0001D ds3231ReadRegister(unsigned char)  
-0000054B:0000000B ds3231Init_00000 ds3231Init(void)  
-00000556:00000093 convertTem_00027 convertTemp(void)  
-000005E9:00000043 at24c32Wri_00018 at24c32WriteAll(void)  
-0000062C:00000060 at24c32Rea_00019 at24c32ReadAll(void)  
-0000068C:000000D3 adjustTrig_00029 adjustTrigger(void)  
-0000075F:00000087 adjustDate_00028 adjustDateTime(void)  
-000007E6:00000023 tm1638Read_00025 tm1638ReadKeys(void)  
-00000809:00000009 startTemp_00000  startTemp(void)  
-00000812:0000000F readTemp_00000   readTemp(void)  
-00000821:0000006E processKey_0002A processKeys(void)  
-0000088F:00000019 oneWireBus_00014 oneWireBusReset(void)  
-000008A8:0000003F initialise_00000 initialise(void)  
-000008E7:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
-00000912:000000EB main             main(void)  
-000009FD:00000065 _startup_00000   _startup(void)  
-00000A62:0000001A interrupt        interrupt(void)  
-00000A7C:00000584 *Unused Block 
+000004E8:0000001D oneWireRxB_00017 oneWireRxByte(void)  
+00000505:00000013 i2c_INIT_00000   i2c_INIT(unsigned char)  
+00000518:0000001C ds3231Writ_0001B ds3231WriteDateTime(void)  
+00000534:00000015 ds3231Read_0001D ds3231ReadRegister(unsigned char)  
+00000549:0000000B ds3231Init_00000 ds3231Init(void)  
+00000554:00000093 convertTem_00027 convertTemp(void)  
+000005E7:00000043 at24c32Wri_00018 at24c32WriteAll(void)  
+0000062A:00000060 at24c32Rea_00019 at24c32ReadAll(void)  
+0000068A:000000D3 adjustTrig_00029 adjustTrigger(void)  
+0000075D:00000087 adjustDate_00028 adjustDateTime(void)  
+000007E4:00000021 tm1638Read_00025 tm1638ReadKeys(void)  
+00000805:00000009 startTemp_00000  startTemp(void)  
+0000080E:0000000F readTemp_00000   readTemp(void)  
+0000081D:0000006E processKey_0002A processKeys(void)  
+0000088B:00000019 oneWireBus_00014 oneWireBusReset(void)  
+000008A4:0000003F initialise_00000 initialise(void)  
+000008E3:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
+0000090E:000000F8 main             main(void)  
+00000A06:00000065 _startup_00000   _startup(void)  
+00000A6B:0000001A interrupt        interrupt(void)  
+00000A85:0000057B *Unused Block 
 
 Register usage
 ==============
@@ -157,7 +157,7 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 00000070:00000008             gbl_iBcdAdjustment               iBcdAdjustment
 00000071:00000008             gbl_oneWireIsPresent             oneWireIsPresent
 00000072:00000008             gbl_oneWireResetStage            oneWireResetStage
-00000073:00000008             main_104_processKeys             processKeys
+00000073:00000008             main_109_processKeys             processKeys
 00000074:00000008             delay_ms_00000_arg_del           del
 00000075:00000008             adjustDate_00028_1_bcdMaxDay     bcdMaxDay
 00000076:00000008             i2c_READ_00000_arg_ack_status    ack_status
@@ -198,4 +198,4 @@ Memory Usage Report
 ===================
 RAM available:192 bytes, used:104 bytes (54.2%), free:88 bytes (45.8%), 
 Heap size:88 bytes, Heap max single alloc:87 bytes
-ROM available:4096 words, used:2684 words (65.6%), free:1412 words (34.4%)
+ROM available:4096 words, used:2693 words (65.8%), free:1403 words (34.2%)
