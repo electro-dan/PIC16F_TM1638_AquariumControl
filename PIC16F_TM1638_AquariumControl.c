@@ -1188,7 +1188,7 @@ void main() {
                         convertTemp();
                     }
                     // daylight savings time handling (UK/europe) - last sunday of March or October (this can fall between the 25th and the 31st)
-                    if ((gBcdSecond == 0) && (gDayOfWeek == 7) && (gBcdDayOfMonth > 0x24)) {
+                    if ((gBcdSecond == 0) && (gBcdMinute == 0) && (gDayOfWeek == 7) && (gBcdDayOfMonth > 0x24)) {
                         // In March, at 1AM, apply daylight savings time if appropriate
                         if ((gBcdHour == 1) && (gBcdMonth == 3)) {
                             gBcdHour++; // one hour forwards
