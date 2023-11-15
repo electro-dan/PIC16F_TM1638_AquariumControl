@@ -52,10 +52,10 @@ Address  Length   Unique Name      Name
 0000088B:00000019 oneWireBus_00014 oneWireBusReset(void)  
 000008A4:0000003F initialise_00000 initialise(void)  
 000008E3:0000002B ds3231Read_0001C ds3231ReadDateTime(void)  
-0000090E:000000F8 main             main(void)  
-00000A06:00000065 _startup_00000   _startup(void)  
-00000A6B:0000001A interrupt        interrupt(void)  
-00000A85:0000057B *Unused Block 
+0000090E:000000FB main             main(void)  
+00000A09:00000065 _startup_00000   _startup(void)  
+00000A6E:0000001A interrupt        interrupt(void)  
+00000A88:00000578 *Unused Block 
 
 Register usage
 ==============
@@ -157,7 +157,7 @@ Address  Bit Lengh Bit Mask   Unique Name                      Name
 00000070:00000008             gbl_iBcdAdjustment               iBcdAdjustment
 00000071:00000008             gbl_oneWireIsPresent             oneWireIsPresent
 00000072:00000008             gbl_oneWireResetStage            oneWireResetStage
-00000073:00000008             main_109_processKeys             processKeys
+00000073:00000008             main_110_processKeys             processKeys
 00000074:00000008             delay_ms_00000_arg_del           del
 00000075:00000008             adjustDate_00028_1_bcdMaxDay     bcdMaxDay
 00000076:00000008             i2c_READ_00000_arg_ack_status    ack_status
@@ -198,4 +198,4 @@ Memory Usage Report
 ===================
 RAM available:192 bytes, used:104 bytes (54.2%), free:88 bytes (45.8%), 
 Heap size:88 bytes, Heap max single alloc:87 bytes
-ROM available:4096 words, used:2693 words (65.8%), free:1403 words (34.2%)
+ROM available:4096 words, used:2696 words (65.9%), free:1400 words (34.1%)

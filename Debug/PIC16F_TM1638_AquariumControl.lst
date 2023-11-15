@@ -7,7 +7,7 @@
 
 	ORG 0x00000000
 0000  158A  	BSF PCLATH,3
-0001  2A06  	GOTO	_startup
+0001  2A09  	GOTO	_startup
 	ORG 0x00000004
 0004  00FF  	MOVWF Int1Context
 0005  0E03  	SWAPF STATUS, W
@@ -20,7 +20,7 @@
 000C  00B2  	MOVWF Int1BContext+D'2'
 000D  158A  	BSF PCLATH,3
 000E  120A  	BCF PCLATH,4
-000F  2A6B  	GOTO	interrupt
+000F  2A6E  	GOTO	interrupt
 	ORG 0x00000010
 0010        delay_us_00000
 0010        ; { delay_us ; function begin
@@ -2667,10 +2667,10 @@
 0912  1803  	BTFSC STATUS,C
 0913  290F  	GOTO	label149
 0914  1D4E  	BTFSS gbl_cTask,2
-0915  29D3  	GOTO	label169
+0915  29D6  	GOTO	label169
 0916  08D1  	MOVF gbl_gcSetMode, F
 0917  1D03  	BTFSS STATUS,Z
-0918  2955  	GOTO	label155
+0918  2958  	GOTO	label155
 0919  20E3  	CALL ds3231Read_0001C
 091A  0835  	MOVF gbl_gBcdSecond, W
 091B  3A29  	XORLW 0x29
@@ -2704,372 +2704,375 @@
 0933  08B5  	MOVF gbl_gBcdSecond, F
 0934  158A  	BSF PCLATH,3
 0935  1D03  	BTFSS STATUS,Z
-0936  2955  	GOTO	label155
-0937  0838  	MOVF gbl_gDayOfWeek, W
-0938  3A07  	XORLW 0x07
-0939  1D03  	BTFSS STATUS,Z
-093A  2955  	GOTO	label155
-093B  0839  	MOVF gbl_gBcdDayOfMonth, W
-093C  3C24  	SUBLW 0x24
-093D  1803  	BTFSC STATUS,C
-093E  2955  	GOTO	label155
-093F  0337  	DECF gbl_gBcdHour, W
-0940  1D03  	BTFSS STATUS,Z
-0941  2949  	GOTO	label154
-0942  083A  	MOVF gbl_gBcdMonth, W
-0943  3A03  	XORLW 0x03
-0944  1D03  	BTFSS STATUS,Z
-0945  2949  	GOTO	label154
-0946  0AB7  	INCF gbl_gBcdHour, F
-0947  118A  	BCF PCLATH,3
-0948  2518  	CALL ds3231Writ_0001B
-0949        label154
-0949  0837  	MOVF gbl_gBcdHour, W
-094A  3A02  	XORLW 0x02
-094B  158A  	BSF PCLATH,3
-094C  1D03  	BTFSS STATUS,Z
-094D  2955  	GOTO	label155
-094E  083A  	MOVF gbl_gBcdMonth, W
-094F  3A10  	XORLW 0x10
-0950  1D03  	BTFSS STATUS,Z
-0951  2955  	GOTO	label155
-0952  03B7  	DECF gbl_gBcdHour, F
-0953  118A  	BCF PCLATH,3
-0954  2518  	CALL ds3231Writ_0001B
-0955        label155
-0955  08D3  	MOVF gbl_gcTriggerMode, F
-0956  158A  	BSF PCLATH,3
-0957  1D03  	BTFSS STATUS,Z
-0958  29CA  	GOTO	label167
-0959  0857  	MOVF gbl_gBcdWhiteOffHour, W
-095A  0655  	XORWF gbl_gBcdWhiteOnHour, W
-095B  1D03  	BTFSS STATUS,Z
-095C  2961  	GOTO	label156
-095D  0856  	MOVF gbl_gBcdWhiteOffMinute, W
-095E  0654  	XORWF gbl_gBcdWhiteOnMinute, W
-095F  1903  	BTFSC STATUS,Z
-0960  2971  	GOTO	label158
-0961        label156
-0961  0855  	MOVF gbl_gBcdWhiteOnHour, W
-0962  0637  	XORWF gbl_gBcdHour, W
-0963  1D03  	BTFSS STATUS,Z
-0964  2969  	GOTO	label157
-0965  0854  	MOVF gbl_gBcdWhiteOnMinute, W
-0966  0636  	XORWF gbl_gBcdMinute, W
-0967  1903  	BTFSC STATUS,Z
-0968  1487  	BSF gbl_portc,1
-0969        label157
-0969  0857  	MOVF gbl_gBcdWhiteOffHour, W
-096A  0637  	XORWF gbl_gBcdHour, W
-096B  1D03  	BTFSS STATUS,Z
-096C  2971  	GOTO	label158
-096D  0856  	MOVF gbl_gBcdWhiteOffMinute, W
-096E  0636  	XORWF gbl_gBcdMinute, W
-096F  1903  	BTFSC STATUS,Z
-0970  1087  	BCF gbl_portc,1
-0971        label158
-0971  085B  	MOVF gbl_gBcdBlueOffHour, W
-0972  0659  	XORWF gbl_gBcdBlueOnHour, W
-0973  1D03  	BTFSS STATUS,Z
-0974  2979  	GOTO	label159
-0975  085A  	MOVF gbl_gBcdBlueOffMinute, W
-0976  0658  	XORWF gbl_gBcdBlueOnMinute, W
-0977  1903  	BTFSC STATUS,Z
-0978  2989  	GOTO	label161
-0979        label159
-0979  0859  	MOVF gbl_gBcdBlueOnHour, W
-097A  0637  	XORWF gbl_gBcdHour, W
-097B  1D03  	BTFSS STATUS,Z
-097C  2981  	GOTO	label160
-097D  0858  	MOVF gbl_gBcdBlueOnMinute, W
-097E  0636  	XORWF gbl_gBcdMinute, W
-097F  1903  	BTFSC STATUS,Z
-0980  1507  	BSF gbl_portc,2
-0981        label160
-0981  085B  	MOVF gbl_gBcdBlueOffHour, W
-0982  0637  	XORWF gbl_gBcdHour, W
-0983  1D03  	BTFSS STATUS,Z
-0984  2989  	GOTO	label161
-0985  085A  	MOVF gbl_gBcdBlueOffMinute, W
-0986  0636  	XORWF gbl_gBcdMinute, W
-0987  1903  	BTFSC STATUS,Z
-0988  1107  	BCF gbl_portc,2
-0989        label161
-0989  085F  	MOVF gbl_gBcdBlue2OffHour, W
-098A  065D  	XORWF gbl_gBcdBlue2OnHour, W
-098B  1D03  	BTFSS STATUS,Z
-098C  2991  	GOTO	label162
-098D  085E  	MOVF gbl_gBcdBlue2OffMinute, W
-098E  065C  	XORWF gbl_gBcdBlue2OnMinute, W
-098F  1903  	BTFSC STATUS,Z
-0990  29A1  	GOTO	label164
-0991        label162
-0991  085D  	MOVF gbl_gBcdBlue2OnHour, W
-0992  0637  	XORWF gbl_gBcdHour, W
-0993  1D03  	BTFSS STATUS,Z
-0994  2999  	GOTO	label163
-0995  085C  	MOVF gbl_gBcdBlue2OnMinute, W
-0996  0636  	XORWF gbl_gBcdMinute, W
-0997  1903  	BTFSC STATUS,Z
-0998  1507  	BSF gbl_portc,2
-0999        label163
-0999  085F  	MOVF gbl_gBcdBlue2OffHour, W
-099A  0637  	XORWF gbl_gBcdHour, W
-099B  1D03  	BTFSS STATUS,Z
-099C  29A1  	GOTO	label164
-099D  085E  	MOVF gbl_gBcdBlue2OffMinute, W
-099E  0636  	XORWF gbl_gBcdMinute, W
-099F  1903  	BTFSC STATUS,Z
-09A0  1107  	BCF gbl_portc,2
-09A1        label164
-09A1  0860  	MOVF gbl_gBcdFanOnTemp, W
-09A2  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
-09A3  1803  	BTFSC STATUS,C
-09A4  1485  	BSF gbl_porta,1
-09A5  0861  	MOVF gbl_gBcdFanOffTemp, W
-09A6  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
-09A7  1803  	BTFSC STATUS,C
-09A8  29BD  	GOTO	label166
-09A9  1085  	BCF gbl_porta,1
-09AA  08B7  	MOVF gbl_gBcdHour, F
-09AB  1903  	BTFSC STATUS,Z
-09AC  29B9  	GOTO	label165
-09AD  0837  	MOVF gbl_gBcdHour, W
-09AE  3A06  	XORLW 0x06
-09AF  1903  	BTFSC STATUS,Z
-09B0  29B9  	GOTO	label165
-09B1  0837  	MOVF gbl_gBcdHour, W
-09B2  3A0C  	XORLW 0x0C
-09B3  1903  	BTFSC STATUS,Z
-09B4  29B9  	GOTO	label165
-09B5  0837  	MOVF gbl_gBcdHour, W
-09B6  3A12  	XORLW 0x12
-09B7  1D03  	BTFSS STATUS,Z
-09B8  29BD  	GOTO	label166
-09B9        label165
-09B9  08B6  	MOVF gbl_gBcdMinute, F
+0936  2958  	GOTO	label155
+0937  08B6  	MOVF gbl_gBcdMinute, F
+0938  1D03  	BTFSS STATUS,Z
+0939  2958  	GOTO	label155
+093A  0838  	MOVF gbl_gDayOfWeek, W
+093B  3A07  	XORLW 0x07
+093C  1D03  	BTFSS STATUS,Z
+093D  2958  	GOTO	label155
+093E  0839  	MOVF gbl_gBcdDayOfMonth, W
+093F  3C24  	SUBLW 0x24
+0940  1803  	BTFSC STATUS,C
+0941  2958  	GOTO	label155
+0942  0337  	DECF gbl_gBcdHour, W
+0943  1D03  	BTFSS STATUS,Z
+0944  294C  	GOTO	label154
+0945  083A  	MOVF gbl_gBcdMonth, W
+0946  3A03  	XORLW 0x03
+0947  1D03  	BTFSS STATUS,Z
+0948  294C  	GOTO	label154
+0949  0AB7  	INCF gbl_gBcdHour, F
+094A  118A  	BCF PCLATH,3
+094B  2518  	CALL ds3231Writ_0001B
+094C        label154
+094C  0837  	MOVF gbl_gBcdHour, W
+094D  3A02  	XORLW 0x02
+094E  158A  	BSF PCLATH,3
+094F  1D03  	BTFSS STATUS,Z
+0950  2958  	GOTO	label155
+0951  083A  	MOVF gbl_gBcdMonth, W
+0952  3A10  	XORLW 0x10
+0953  1D03  	BTFSS STATUS,Z
+0954  2958  	GOTO	label155
+0955  03B7  	DECF gbl_gBcdHour, F
+0956  118A  	BCF PCLATH,3
+0957  2518  	CALL ds3231Writ_0001B
+0958        label155
+0958  08D3  	MOVF gbl_gcTriggerMode, F
+0959  158A  	BSF PCLATH,3
+095A  1D03  	BTFSS STATUS,Z
+095B  29CD  	GOTO	label167
+095C  0857  	MOVF gbl_gBcdWhiteOffHour, W
+095D  0655  	XORWF gbl_gBcdWhiteOnHour, W
+095E  1D03  	BTFSS STATUS,Z
+095F  2964  	GOTO	label156
+0960  0856  	MOVF gbl_gBcdWhiteOffMinute, W
+0961  0654  	XORWF gbl_gBcdWhiteOnMinute, W
+0962  1903  	BTFSC STATUS,Z
+0963  2974  	GOTO	label158
+0964        label156
+0964  0855  	MOVF gbl_gBcdWhiteOnHour, W
+0965  0637  	XORWF gbl_gBcdHour, W
+0966  1D03  	BTFSS STATUS,Z
+0967  296C  	GOTO	label157
+0968  0854  	MOVF gbl_gBcdWhiteOnMinute, W
+0969  0636  	XORWF gbl_gBcdMinute, W
+096A  1903  	BTFSC STATUS,Z
+096B  1487  	BSF gbl_portc,1
+096C        label157
+096C  0857  	MOVF gbl_gBcdWhiteOffHour, W
+096D  0637  	XORWF gbl_gBcdHour, W
+096E  1D03  	BTFSS STATUS,Z
+096F  2974  	GOTO	label158
+0970  0856  	MOVF gbl_gBcdWhiteOffMinute, W
+0971  0636  	XORWF gbl_gBcdMinute, W
+0972  1903  	BTFSC STATUS,Z
+0973  1087  	BCF gbl_portc,1
+0974        label158
+0974  085B  	MOVF gbl_gBcdBlueOffHour, W
+0975  0659  	XORWF gbl_gBcdBlueOnHour, W
+0976  1D03  	BTFSS STATUS,Z
+0977  297C  	GOTO	label159
+0978  085A  	MOVF gbl_gBcdBlueOffMinute, W
+0979  0658  	XORWF gbl_gBcdBlueOnMinute, W
+097A  1903  	BTFSC STATUS,Z
+097B  298C  	GOTO	label161
+097C        label159
+097C  0859  	MOVF gbl_gBcdBlueOnHour, W
+097D  0637  	XORWF gbl_gBcdHour, W
+097E  1D03  	BTFSS STATUS,Z
+097F  2984  	GOTO	label160
+0980  0858  	MOVF gbl_gBcdBlueOnMinute, W
+0981  0636  	XORWF gbl_gBcdMinute, W
+0982  1903  	BTFSC STATUS,Z
+0983  1507  	BSF gbl_portc,2
+0984        label160
+0984  085B  	MOVF gbl_gBcdBlueOffHour, W
+0985  0637  	XORWF gbl_gBcdHour, W
+0986  1D03  	BTFSS STATUS,Z
+0987  298C  	GOTO	label161
+0988  085A  	MOVF gbl_gBcdBlueOffMinute, W
+0989  0636  	XORWF gbl_gBcdMinute, W
+098A  1903  	BTFSC STATUS,Z
+098B  1107  	BCF gbl_portc,2
+098C        label161
+098C  085F  	MOVF gbl_gBcdBlue2OffHour, W
+098D  065D  	XORWF gbl_gBcdBlue2OnHour, W
+098E  1D03  	BTFSS STATUS,Z
+098F  2994  	GOTO	label162
+0990  085E  	MOVF gbl_gBcdBlue2OffMinute, W
+0991  065C  	XORWF gbl_gBcdBlue2OnMinute, W
+0992  1903  	BTFSC STATUS,Z
+0993  29A4  	GOTO	label164
+0994        label162
+0994  085D  	MOVF gbl_gBcdBlue2OnHour, W
+0995  0637  	XORWF gbl_gBcdHour, W
+0996  1D03  	BTFSS STATUS,Z
+0997  299C  	GOTO	label163
+0998  085C  	MOVF gbl_gBcdBlue2OnMinute, W
+0999  0636  	XORWF gbl_gBcdMinute, W
+099A  1903  	BTFSC STATUS,Z
+099B  1507  	BSF gbl_portc,2
+099C        label163
+099C  085F  	MOVF gbl_gBcdBlue2OffHour, W
+099D  0637  	XORWF gbl_gBcdHour, W
+099E  1D03  	BTFSS STATUS,Z
+099F  29A4  	GOTO	label164
+09A0  085E  	MOVF gbl_gBcdBlue2OffMinute, W
+09A1  0636  	XORWF gbl_gBcdMinute, W
+09A2  1903  	BTFSC STATUS,Z
+09A3  1107  	BCF gbl_portc,2
+09A4        label164
+09A4  0860  	MOVF gbl_gBcdFanOnTemp, W
+09A5  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
+09A6  1803  	BTFSC STATUS,C
+09A7  1485  	BSF gbl_porta,1
+09A8  0861  	MOVF gbl_gBcdFanOffTemp, W
+09A9  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
+09AA  1803  	BTFSC STATUS,C
+09AB  29C0  	GOTO	label166
+09AC  1085  	BCF gbl_porta,1
+09AD  08B7  	MOVF gbl_gBcdHour, F
+09AE  1903  	BTFSC STATUS,Z
+09AF  29BC  	GOTO	label165
+09B0  0837  	MOVF gbl_gBcdHour, W
+09B1  3A06  	XORLW 0x06
+09B2  1903  	BTFSC STATUS,Z
+09B3  29BC  	GOTO	label165
+09B4  0837  	MOVF gbl_gBcdHour, W
+09B5  3A0C  	XORLW 0x0C
+09B6  1903  	BTFSC STATUS,Z
+09B7  29BC  	GOTO	label165
+09B8  0837  	MOVF gbl_gBcdHour, W
+09B9  3A12  	XORLW 0x12
 09BA  1D03  	BTFSS STATUS,Z
-09BB  29BD  	GOTO	label166
-09BC  1485  	BSF gbl_porta,1
-09BD        label166
-09BD  184F  	BTFSC gbl_gbFanOn,0
-09BE  1485  	BSF gbl_porta,1
-09BF  0862  	MOVF gbl_gBcdHeaterOnTemp, W
-09C0  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
-09C1  1C03  	BTFSS STATUS,C
-09C2  1405  	BSF gbl_porta,0
-09C3  0863  	MOVF gbl_gBcdHeaterOffTemp, W
-09C4  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
-09C5  1803  	BTFSC STATUS,C
-09C6  1005  	BCF gbl_porta,0
-09C7  08CD  	MOVF gbl_gbDS3231IsMinus, F
-09C8  1D03  	BTFSS STATUS,Z
-09C9  1405  	BSF gbl_porta,0
-09CA        label167
-09CA  08D3  	MOVF gbl_gcTriggerMode, F
+09BB  29C0  	GOTO	label166
+09BC        label165
+09BC  08B6  	MOVF gbl_gBcdMinute, F
+09BD  1D03  	BTFSS STATUS,Z
+09BE  29C0  	GOTO	label166
+09BF  1485  	BSF gbl_porta,1
+09C0        label166
+09C0  184F  	BTFSC gbl_gbFanOn,0
+09C1  1485  	BSF gbl_porta,1
+09C2  0862  	MOVF gbl_gBcdHeaterOnTemp, W
+09C3  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
+09C4  1C03  	BTFSS STATUS,C
+09C5  1405  	BSF gbl_porta,0
+09C6  0863  	MOVF gbl_gBcdHeaterOffTemp, W
+09C7  024C  	SUBWF gbl_giDS3231ValueTruncCBCD, W
+09C8  1803  	BTFSC STATUS,C
+09C9  1005  	BCF gbl_porta,0
+09CA  08CD  	MOVF gbl_gbDS3231IsMinus, F
 09CB  1D03  	BTFSS STATUS,Z
-09CC  29D2  	GOTO	label168
-09CD  08D1  	MOVF gbl_gcSetMode, F
+09CC  1405  	BSF gbl_porta,0
+09CD        label167
+09CD  08D3  	MOVF gbl_gcTriggerMode, F
 09CE  1D03  	BTFSS STATUS,Z
-09CF  29D2  	GOTO	label168
-09D0  118A  	BCF PCLATH,3
-09D1  22B4  	CALL tm1638Upda_00022
-09D2        label168
-09D2  114E  	BCF gbl_cTask,2
-09D3        label169
-09D3  158A  	BSF PCLATH,3
-09D4  1CCE  	BTFSS gbl_cTask,1
-09D5  290F  	GOTO	label149
-09D6  0ABE  	INCF gbl_iTimer0FlashCounts, F
-09D7  083E  	MOVF gbl_iTimer0FlashCounts, W
-09D8  3C09  	SUBLW 0x09
-09D9  1803  	BTFSC STATUS,C
-09DA  29E5  	GOTO	label171
-09DB  0AC8  	INCF gbl_iFlashDigitOff, F
-09DC  01BE  	CLRF gbl_iTimer0FlashCounts
-09DD  08D1  	MOVF gbl_gcSetMode, F
-09DE  1D03  	BTFSS STATUS,Z
-09DF  29E3  	GOTO	label170
-09E0  08D3  	MOVF gbl_gcTriggerMode, F
-09E1  1903  	BTFSC STATUS,Z
-09E2  29E5  	GOTO	label171
-09E3        label170
-09E3  118A  	BCF PCLATH,3
-09E4  22B4  	CALL tm1638Upda_00022
-09E5        label171
-09E5  118A  	BCF PCLATH,3
-09E6  27E4  	CALL tm1638Read_00025
-09E7  01F3  	CLRF main_109_processKeys
-09E8  086D  	MOVF gbl_tm1638KeysOld, W
-09E9  066C  	XORWF gbl_tm1638Keys, W
-09EA  158A  	BSF PCLATH,3
-09EB  1903  	BTFSC STATUS,Z
-09EC  29F0  	GOTO	label172
-09ED  3001  	MOVLW 0x01
-09EE  00F3  	MOVWF main_109_processKeys
-09EF  29FA  	GOTO	label173
-09F0        label172
-09F0  08EC  	MOVF gbl_tm1638Keys, F
-09F1  1903  	BTFSC STATUS,Z
-09F2  29FA  	GOTO	label173
-09F3  0ABF  	INCF gbl_iTimer0KeyCounts, F
-09F4  083F  	MOVF gbl_iTimer0KeyCounts, W
-09F5  3C04  	SUBLW 0x04
-09F6  1803  	BTFSC STATUS,C
-09F7  29FA  	GOTO	label173
-09F8  3001  	MOVLW 0x01
-09F9  00F3  	MOVWF main_109_processKeys
-09FA        label173
-09FA  08F3  	MOVF main_109_processKeys, F
-09FB  1903  	BTFSC STATUS,Z
-09FC  2A03  	GOTO	label174
-09FD  201D  	CALL processKey_0002A
-09FE  118A  	BCF PCLATH,3
-09FF  22B4  	CALL tm1638Upda_00022
-0A00  086C  	MOVF gbl_tm1638Keys, W
-0A01  00ED  	MOVWF gbl_tm1638KeysOld
-0A02  01BF  	CLRF gbl_iTimer0KeyCounts
-0A03        label174
-0A03  10CE  	BCF gbl_cTask,1
-0A04  158A  	BSF PCLATH,3
-0A05  290F  	GOTO	label149
-0A06        ; } main function end
+09CF  29D5  	GOTO	label168
+09D0  08D1  	MOVF gbl_gcSetMode, F
+09D1  1D03  	BTFSS STATUS,Z
+09D2  29D5  	GOTO	label168
+09D3  118A  	BCF PCLATH,3
+09D4  22B4  	CALL tm1638Upda_00022
+09D5        label168
+09D5  114E  	BCF gbl_cTask,2
+09D6        label169
+09D6  158A  	BSF PCLATH,3
+09D7  1CCE  	BTFSS gbl_cTask,1
+09D8  290F  	GOTO	label149
+09D9  0ABE  	INCF gbl_iTimer0FlashCounts, F
+09DA  083E  	MOVF gbl_iTimer0FlashCounts, W
+09DB  3C09  	SUBLW 0x09
+09DC  1803  	BTFSC STATUS,C
+09DD  29E8  	GOTO	label171
+09DE  0AC8  	INCF gbl_iFlashDigitOff, F
+09DF  01BE  	CLRF gbl_iTimer0FlashCounts
+09E0  08D1  	MOVF gbl_gcSetMode, F
+09E1  1D03  	BTFSS STATUS,Z
+09E2  29E6  	GOTO	label170
+09E3  08D3  	MOVF gbl_gcTriggerMode, F
+09E4  1903  	BTFSC STATUS,Z
+09E5  29E8  	GOTO	label171
+09E6        label170
+09E6  118A  	BCF PCLATH,3
+09E7  22B4  	CALL tm1638Upda_00022
+09E8        label171
+09E8  118A  	BCF PCLATH,3
+09E9  27E4  	CALL tm1638Read_00025
+09EA  01F3  	CLRF main_110_processKeys
+09EB  086D  	MOVF gbl_tm1638KeysOld, W
+09EC  066C  	XORWF gbl_tm1638Keys, W
+09ED  158A  	BSF PCLATH,3
+09EE  1903  	BTFSC STATUS,Z
+09EF  29F3  	GOTO	label172
+09F0  3001  	MOVLW 0x01
+09F1  00F3  	MOVWF main_110_processKeys
+09F2  29FD  	GOTO	label173
+09F3        label172
+09F3  08EC  	MOVF gbl_tm1638Keys, F
+09F4  1903  	BTFSC STATUS,Z
+09F5  29FD  	GOTO	label173
+09F6  0ABF  	INCF gbl_iTimer0KeyCounts, F
+09F7  083F  	MOVF gbl_iTimer0KeyCounts, W
+09F8  3C04  	SUBLW 0x04
+09F9  1803  	BTFSC STATUS,C
+09FA  29FD  	GOTO	label173
+09FB  3001  	MOVLW 0x01
+09FC  00F3  	MOVWF main_110_processKeys
+09FD        label173
+09FD  08F3  	MOVF main_110_processKeys, F
+09FE  1903  	BTFSC STATUS,Z
+09FF  2A06  	GOTO	label174
+0A00  201D  	CALL processKey_0002A
+0A01  118A  	BCF PCLATH,3
+0A02  22B4  	CALL tm1638Upda_00022
+0A03  086C  	MOVF gbl_tm1638Keys, W
+0A04  00ED  	MOVWF gbl_tm1638KeysOld
+0A05  01BF  	CLRF gbl_iTimer0KeyCounts
+0A06        label174
+0A06  10CE  	BCF gbl_cTask,1
+0A07  158A  	BSF PCLATH,3
+0A08  290F  	GOTO	label149
+0A09        ; } main function end
 
-	ORG 0x00000A06
-0A06        _startup
-0A06  1283  	BCF STATUS, RP0
-0A07  1303  	BCF STATUS, RP1
-0A08  01B5  	CLRF gbl_gBcdSecond
-0A09  01B6  	CLRF gbl_gBcdMinute
-0A0A  01B7  	CLRF gbl_gBcdHour
-0A0B  3001  	MOVLW 0x01
-0A0C  00B8  	MOVWF gbl_gDayOfWeek
-0A0D  3001  	MOVLW 0x01
-0A0E  00B9  	MOVWF gbl_gBcdDayOfMonth
-0A0F  3001  	MOVLW 0x01
-0A10  00BA  	MOVWF gbl_gBcdMonth
-0A11  3023  	MOVLW 0x23
-0A12  00BB  	MOVWF gbl_gBcdYear
-0A13  3000  	MOVLW 0x00
-0A14  00BC  	MOVWF gbl_gDaysInMonth
-0A15  3001  	MOVLW 0x01
-0A16  00BD  	MOVWF gbl_gLeapYears
-0A17  01BE  	CLRF gbl_iTimer0FlashCounts
-0A18  01BF  	CLRF gbl_iTimer0KeyCounts
-0A19  01C8  	CLRF gbl_iFlashDigitOff
-0A1A  3008  	MOVLW 0x08
-0A1B  00C9  	MOVWF gbl_iDigitToFlash
-0A1C  3001  	MOVLW 0x01
-0A1D  00CA  	MOVWF gbl_cTempH
-0A1E  3046  	MOVLW 0x46
-0A1F  00CB  	MOVWF gbl_cTempL
-0A20  01B3  	CLRF gbl_giDS3231ValueBCD
-0A21  01B4  	CLRF gbl_giDS3231ValueBCD+D'1'
-0A22  01CC  	CLRF gbl_giDS3231ValueTruncCBCD
-0A23  01CD  	CLRF gbl_gbDS3231IsMinus
-0A24  01CE  	CLRF gbl_cTask
-0A25  104F  	BCF gbl_gbFanOn,0
-0A26  10CF  	BCF gbl_gbHeaterOn,1
-0A27  01D0  	CLRF gbl_gcDisplayMode
-0A28  01D1  	CLRF gbl_gcSetMode
-0A29  01D2  	CLRF gbl_gcHourMode
-0A2A  01D3  	CLRF gbl_gcTriggerMode
-0A2B  01D4  	CLRF gbl_gBcdWhiteOnMinute
-0A2C  01D5  	CLRF gbl_gBcdWhiteOnHour
-0A2D  01D6  	CLRF gbl_gBcdWhiteOffMinute
-0A2E  01D7  	CLRF gbl_gBcdWhiteOffHour
-0A2F  01D8  	CLRF gbl_gBcdBlueOnMinute
-0A30  01D9  	CLRF gbl_gBcdBlueOnHour
-0A31  01DA  	CLRF gbl_gBcdBlueOffMinute
-0A32  01DB  	CLRF gbl_gBcdBlueOffHour
-0A33  01DC  	CLRF gbl_gBcdBlue2OnMinute
-0A34  01DD  	CLRF gbl_gBcdBlue2OnHour
-0A35  01DE  	CLRF gbl_gBcdBlue2OffMinute
-0A36  01DF  	CLRF gbl_gBcdBlue2OffHour
-0A37  3028  	MOVLW 0x28
-0A38  00E0  	MOVWF gbl_gBcdFanOnTemp
-0A39  3027  	MOVLW 0x27
-0A3A  00E1  	MOVWF gbl_gBcdFanOffTemp
-0A3B  3024  	MOVLW 0x24
-0A3C  00E2  	MOVWF gbl_gBcdHeaterOnTemp
-0A3D  3025  	MOVLW 0x25
-0A3E  00E3  	MOVWF gbl_gBcdHeaterOffTemp
-0A3F  3008  	MOVLW 0x08
-0A40  00E4  	MOVWF gbl_tm1638MaxDigits
-0A41  3002  	MOVLW 0x02
-0A42  00E5  	MOVWF gbl_tm1638DisplayNumtoSeg
-0A43  3080  	MOVLW 0x80
-0A44  00E6  	MOVWF gbl_tm1638Dot
-0A45  3007  	MOVLW 0x07
-0A46  00E7  	MOVWF gbl_tm1638Brightness
-0A47  3040  	MOVLW 0x40
-0A48  00E8  	MOVWF gbl_tm1638ByteSetData
-0A49  3042  	MOVLW 0x42
-0A4A  00E9  	MOVWF gbl_tm1638ByteReadData
-0A4B  30C0  	MOVLW 0xC0
-0A4C  00EA  	MOVWF gbl_tm1638ByteSetAddr
-0A4D  3088  	MOVLW 0x88
-0A4E  00EB  	MOVWF gbl_tm1638ByteSetOn
-0A4F  01A0  	CLRF gbl_tm1638Data
-0A50  01A1  	CLRF gbl_tm1638Data+D'1'
-0A51  01A2  	CLRF gbl_tm1638Data+D'2'
-0A52  01A3  	CLRF gbl_tm1638Data+D'3'
-0A53  01A4  	CLRF gbl_tm1638Data+D'4'
-0A54  01A5  	CLRF gbl_tm1638Data+D'5'
-0A55  01A6  	CLRF gbl_tm1638Data+D'6'
-0A56  01A7  	CLRF gbl_tm1638Data+D'7'
-0A57  01A8  	CLRF gbl_tm1638LEDs
-0A58  01A9  	CLRF gbl_tm1638LEDs+D'1'
-0A59  01AA  	CLRF gbl_tm1638LEDs+D'2'
-0A5A  01AB  	CLRF gbl_tm1638LEDs+D'3'
-0A5B  01AC  	CLRF gbl_tm1638LEDs+D'4'
-0A5C  01AD  	CLRF gbl_tm1638LEDs+D'5'
-0A5D  01AE  	CLRF gbl_tm1638LEDs+D'6'
-0A5E  01AF  	CLRF gbl_tm1638LEDs+D'7'
-0A5F  01EC  	CLRF gbl_tm1638Keys
-0A60  01ED  	CLRF gbl_tm1638KeysOld
-0A61  01EE  	CLRF gbl_iPrintStartDigit
-0A62  3008  	MOVLW 0x08
-0A63  00EF  	MOVWF gbl_iPrintDotDigit
-0A64  3001  	MOVLW 0x01
-0A65  00F0  	MOVWF gbl_iBcdAdjustment
-0A66  01F1  	CLRF gbl_oneWireIsPresent
-0A67  01F2  	CLRF gbl_oneWireResetStage
-0A68  158A  	BSF PCLATH,3
-0A69  120A  	BCF PCLATH,4
-0A6A  290E  	GOTO	main
-	ORG 0x00000A6B
-0A6B        interrupt
-0A6B        ; { interrupt ; function begin
-0A6B  1D0B  	BTFSS gbl_intcon,2
-0A6C  2A73  	GOTO	label176
-0A6D  303D  	MOVLW 0x3D
-0A6E  1283  	BCF STATUS, RP0
-0A6F  1303  	BCF STATUS, RP1
-0A70  0081  	MOVWF gbl_tmr0
-0A71  14CE  	BSF gbl_cTask,1
-0A72  110B  	BCF gbl_intcon,2
-0A73        label176
-0A73  1283  	BCF STATUS, RP0
-0A74  1303  	BCF STATUS, RP1
-0A75  1C0C  	BTFSS gbl_pir1,0
-0A76  2A7C  	GOTO	label177
-0A77  30FF  	MOVLW 0xFF
-0A78  008F  	MOVWF gbl_tmr1h
-0A79  008E  	MOVWF gbl_tmr1l
-0A7A  100C  	BCF gbl_pir1,0
-0A7B  154E  	BSF gbl_cTask,2
-0A7C        label177
-0A7C  0E32  	SWAPF Int1BContext+D'2', W
-0A7D  0084  	MOVWF FSR
-0A7E  0E31  	SWAPF Int1BContext+D'1', W
-0A7F  008A  	MOVWF PCLATH
-0A80  0E30  	SWAPF Int1BContext, W
-0A81  0083  	MOVWF STATUS
-0A82  0EFF  	SWAPF Int1Context, F
-0A83  0E7F  	SWAPF Int1Context, W
-0A84  0009  	RETFIE
-0A85        ; } interrupt function end
+	ORG 0x00000A09
+0A09        _startup
+0A09  1283  	BCF STATUS, RP0
+0A0A  1303  	BCF STATUS, RP1
+0A0B  01B5  	CLRF gbl_gBcdSecond
+0A0C  01B6  	CLRF gbl_gBcdMinute
+0A0D  01B7  	CLRF gbl_gBcdHour
+0A0E  3001  	MOVLW 0x01
+0A0F  00B8  	MOVWF gbl_gDayOfWeek
+0A10  3001  	MOVLW 0x01
+0A11  00B9  	MOVWF gbl_gBcdDayOfMonth
+0A12  3001  	MOVLW 0x01
+0A13  00BA  	MOVWF gbl_gBcdMonth
+0A14  3023  	MOVLW 0x23
+0A15  00BB  	MOVWF gbl_gBcdYear
+0A16  3000  	MOVLW 0x00
+0A17  00BC  	MOVWF gbl_gDaysInMonth
+0A18  3001  	MOVLW 0x01
+0A19  00BD  	MOVWF gbl_gLeapYears
+0A1A  01BE  	CLRF gbl_iTimer0FlashCounts
+0A1B  01BF  	CLRF gbl_iTimer0KeyCounts
+0A1C  01C8  	CLRF gbl_iFlashDigitOff
+0A1D  3008  	MOVLW 0x08
+0A1E  00C9  	MOVWF gbl_iDigitToFlash
+0A1F  3001  	MOVLW 0x01
+0A20  00CA  	MOVWF gbl_cTempH
+0A21  3046  	MOVLW 0x46
+0A22  00CB  	MOVWF gbl_cTempL
+0A23  01B3  	CLRF gbl_giDS3231ValueBCD
+0A24  01B4  	CLRF gbl_giDS3231ValueBCD+D'1'
+0A25  01CC  	CLRF gbl_giDS3231ValueTruncCBCD
+0A26  01CD  	CLRF gbl_gbDS3231IsMinus
+0A27  01CE  	CLRF gbl_cTask
+0A28  104F  	BCF gbl_gbFanOn,0
+0A29  10CF  	BCF gbl_gbHeaterOn,1
+0A2A  01D0  	CLRF gbl_gcDisplayMode
+0A2B  01D1  	CLRF gbl_gcSetMode
+0A2C  01D2  	CLRF gbl_gcHourMode
+0A2D  01D3  	CLRF gbl_gcTriggerMode
+0A2E  01D4  	CLRF gbl_gBcdWhiteOnMinute
+0A2F  01D5  	CLRF gbl_gBcdWhiteOnHour
+0A30  01D6  	CLRF gbl_gBcdWhiteOffMinute
+0A31  01D7  	CLRF gbl_gBcdWhiteOffHour
+0A32  01D8  	CLRF gbl_gBcdBlueOnMinute
+0A33  01D9  	CLRF gbl_gBcdBlueOnHour
+0A34  01DA  	CLRF gbl_gBcdBlueOffMinute
+0A35  01DB  	CLRF gbl_gBcdBlueOffHour
+0A36  01DC  	CLRF gbl_gBcdBlue2OnMinute
+0A37  01DD  	CLRF gbl_gBcdBlue2OnHour
+0A38  01DE  	CLRF gbl_gBcdBlue2OffMinute
+0A39  01DF  	CLRF gbl_gBcdBlue2OffHour
+0A3A  3028  	MOVLW 0x28
+0A3B  00E0  	MOVWF gbl_gBcdFanOnTemp
+0A3C  3027  	MOVLW 0x27
+0A3D  00E1  	MOVWF gbl_gBcdFanOffTemp
+0A3E  3024  	MOVLW 0x24
+0A3F  00E2  	MOVWF gbl_gBcdHeaterOnTemp
+0A40  3025  	MOVLW 0x25
+0A41  00E3  	MOVWF gbl_gBcdHeaterOffTemp
+0A42  3008  	MOVLW 0x08
+0A43  00E4  	MOVWF gbl_tm1638MaxDigits
+0A44  3002  	MOVLW 0x02
+0A45  00E5  	MOVWF gbl_tm1638DisplayNumtoSeg
+0A46  3080  	MOVLW 0x80
+0A47  00E6  	MOVWF gbl_tm1638Dot
+0A48  3007  	MOVLW 0x07
+0A49  00E7  	MOVWF gbl_tm1638Brightness
+0A4A  3040  	MOVLW 0x40
+0A4B  00E8  	MOVWF gbl_tm1638ByteSetData
+0A4C  3042  	MOVLW 0x42
+0A4D  00E9  	MOVWF gbl_tm1638ByteReadData
+0A4E  30C0  	MOVLW 0xC0
+0A4F  00EA  	MOVWF gbl_tm1638ByteSetAddr
+0A50  3088  	MOVLW 0x88
+0A51  00EB  	MOVWF gbl_tm1638ByteSetOn
+0A52  01A0  	CLRF gbl_tm1638Data
+0A53  01A1  	CLRF gbl_tm1638Data+D'1'
+0A54  01A2  	CLRF gbl_tm1638Data+D'2'
+0A55  01A3  	CLRF gbl_tm1638Data+D'3'
+0A56  01A4  	CLRF gbl_tm1638Data+D'4'
+0A57  01A5  	CLRF gbl_tm1638Data+D'5'
+0A58  01A6  	CLRF gbl_tm1638Data+D'6'
+0A59  01A7  	CLRF gbl_tm1638Data+D'7'
+0A5A  01A8  	CLRF gbl_tm1638LEDs
+0A5B  01A9  	CLRF gbl_tm1638LEDs+D'1'
+0A5C  01AA  	CLRF gbl_tm1638LEDs+D'2'
+0A5D  01AB  	CLRF gbl_tm1638LEDs+D'3'
+0A5E  01AC  	CLRF gbl_tm1638LEDs+D'4'
+0A5F  01AD  	CLRF gbl_tm1638LEDs+D'5'
+0A60  01AE  	CLRF gbl_tm1638LEDs+D'6'
+0A61  01AF  	CLRF gbl_tm1638LEDs+D'7'
+0A62  01EC  	CLRF gbl_tm1638Keys
+0A63  01ED  	CLRF gbl_tm1638KeysOld
+0A64  01EE  	CLRF gbl_iPrintStartDigit
+0A65  3008  	MOVLW 0x08
+0A66  00EF  	MOVWF gbl_iPrintDotDigit
+0A67  3001  	MOVLW 0x01
+0A68  00F0  	MOVWF gbl_iBcdAdjustment
+0A69  01F1  	CLRF gbl_oneWireIsPresent
+0A6A  01F2  	CLRF gbl_oneWireResetStage
+0A6B  158A  	BSF PCLATH,3
+0A6C  120A  	BCF PCLATH,4
+0A6D  290E  	GOTO	main
+	ORG 0x00000A6E
+0A6E        interrupt
+0A6E        ; { interrupt ; function begin
+0A6E  1D0B  	BTFSS gbl_intcon,2
+0A6F  2A76  	GOTO	label176
+0A70  303D  	MOVLW 0x3D
+0A71  1283  	BCF STATUS, RP0
+0A72  1303  	BCF STATUS, RP1
+0A73  0081  	MOVWF gbl_tmr0
+0A74  14CE  	BSF gbl_cTask,1
+0A75  110B  	BCF gbl_intcon,2
+0A76        label176
+0A76  1283  	BCF STATUS, RP0
+0A77  1303  	BCF STATUS, RP1
+0A78  1C0C  	BTFSS gbl_pir1,0
+0A79  2A7F  	GOTO	label177
+0A7A  30FF  	MOVLW 0xFF
+0A7B  008F  	MOVWF gbl_tmr1h
+0A7C  008E  	MOVWF gbl_tmr1l
+0A7D  100C  	BCF gbl_pir1,0
+0A7E  154E  	BSF gbl_cTask,2
+0A7F        label177
+0A7F  0E32  	SWAPF Int1BContext+D'2', W
+0A80  0084  	MOVWF FSR
+0A81  0E31  	SWAPF Int1BContext+D'1', W
+0A82  008A  	MOVWF PCLATH
+0A83  0E30  	SWAPF Int1BContext, W
+0A84  0083  	MOVWF STATUS
+0A85  0EFF  	SWAPF Int1Context, F
+0A86  0E7F  	SWAPF Int1Context, W
+0A87  0009  	RETFIE
+0A88        ; } interrupt function end
 
 	ORG 0x00002007
 2007  3FB1  	DW 0x3FB1

@@ -281,7 +281,7 @@ i2c_INIT_00000_1_l_sspif         EQU	0x00000045 ; bit:3
 i2c_INIT_00000_1_l_bclif         EQU	0x00000046 ; bit:3
 i2c_INIT_00000_1_l_sspen         EQU	0x00000040 ; bit:5
 i2c_INIT_00000_1_l_smp           EQU	0x00000042 ; bit:7
-main_109_processKeys             EQU	0x00000073 ; bytes:1
+main_110_processKeys             EQU	0x00000073 ; bytes:1
 delay_us_00000_arg_del           EQU	0x00000079 ; bytes:1
 delay_10us_00000_arg_del         EQU	0x00000078 ; bytes:1
 delay_ms_00000_arg_del           EQU	0x00000074 ; bytes:1
@@ -2612,7 +2612,6 @@ tm1638Read_00025
 label135
 	MOVLW 0x20
 	SUBWF tm1638Read_00025_2_i, W
-	BSF PCLATH,3
 	BTFSC STATUS,C
 	GOTO	label137
 	DECF tm1638Read_00025_1_tm1638K_00026, F
@@ -2991,6 +2990,9 @@ label153
 	BSF PCLATH,3
 	BTFSS STATUS,Z
 	GOTO	label155
+	MOVF gbl_gBcdMinute, F
+	BTFSS STATUS,Z
+	GOTO	label155
 	MOVF gbl_gDayOfWeek, W
 	XORLW 0x07
 	BTFSS STATUS,Z
@@ -3185,13 +3187,14 @@ label170
 label171
 	BCF PCLATH,3
 	CALL tm1638Read_00025
-	CLRF main_109_processKeys
+	CLRF main_110_processKeys
 	MOVF gbl_tm1638KeysOld, W
 	XORWF gbl_tm1638Keys, W
+	BSF PCLATH,3
 	BTFSC STATUS,Z
 	GOTO	label172
 	MOVLW 0x01
-	MOVWF main_109_processKeys
+	MOVWF main_110_processKeys
 	GOTO	label173
 label172
 	MOVF gbl_tm1638Keys, F
@@ -3203,9 +3206,9 @@ label172
 	BTFSC STATUS,C
 	GOTO	label173
 	MOVLW 0x01
-	MOVWF main_109_processKeys
+	MOVWF main_110_processKeys
 label173
-	MOVF main_109_processKeys, F
+	MOVF main_110_processKeys, F
 	BTFSC STATUS,Z
 	GOTO	label174
 	CALL processKey_0002A
@@ -3220,7 +3223,7 @@ label174
 	GOTO	label149
 ; } main function end
 
-	ORG 0x00000A06
+	ORG 0x00000A09
 _startup
 	BCF STATUS, RP0
 	BCF STATUS, RP1
@@ -3323,7 +3326,7 @@ _startup
 	BSF PCLATH,3
 	BCF PCLATH,4
 	GOTO	main
-	ORG 0x00000A6B
+	ORG 0x00000A6E
 interrupt
 ; { interrupt ; function begin
 	BTFSS gbl_intcon,2
