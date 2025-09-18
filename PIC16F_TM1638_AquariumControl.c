@@ -1188,16 +1188,18 @@ void main() {
                         convertTemp();
                     }
                     // daylight savings time handling (UK/europe) - last sunday of March or October (this can fall between the 25th and the 31st)
-                    if ((gBcdSecond == 0) && (gBcdMinute == 0) && (gDayOfWeek == 7) && (gBcdDayOfMonth > 0x24)) {
+                    if ((gBcdSecond == 0) && (gBcdMinute == 0) && (gDayOfWeek == 7) && (gBcdDayOfMonth > 0x24) && (gBcdMonth != gBcdDSTLastOccurred)) {
                         // In March, at 1AM, apply daylight savings time if appropriate
                         if ((gBcdHour == 1) && (gBcdMonth == 3)) {
                             gBcdHour++; // one hour forwards
                             ds3231WriteDateTime();
+                            gBcdDSTLastOccurred = 3;
                         }
                         // In October, at 2AM, remove daylight savings time if appropriate (UK/europe) daylight savings time if appropriate (UK/europe) - last sunday of October
                         if ((gBcdHour == 2) && (gBcdMonth == 0x10)) {
                             gBcdHour--; // one hour back
                             ds3231WriteDateTime();
+                            gBcdDSTLastOccurred = 0x10;
                         }
                     }
                 }

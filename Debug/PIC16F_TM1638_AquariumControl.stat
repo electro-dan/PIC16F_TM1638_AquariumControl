@@ -1,6 +1,6 @@
 // SourceBoost Linker Function Resource Usage Dump
 
-#GLOBAL:"global",line = 0,ram = 75.2,rom = 0;
+#GLOBAL:"global",line = 0,ram = 76.2,rom = 0;
 __mul_16s_16s__16(signed short,signed short):"C:\Temp\mul.c",line = 337,ram = 9.0,rom = 45;
 oneWireBusReset(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 18,ram = 1.0,rom = 25;
 oneWireTxByte(unsigned char):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 39,ram = 3.0,rom = 28;
@@ -23,8 +23,8 @@ nibbleTo7Seg(unsigned char):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16
 bcdTo7Seg(unsigned char):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 334,ram = 1.0,rom = 8;
 zeroToBlank(unsigned char):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 344,ram = 0.0,rom = 17;
 tm1638UpdateDisplay(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 356,ram = 6.0,rom = 549;
-tm1638ReadKeys(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 662,ram = 2.0,rom = 33;
-convertTemp(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 735,ram = 12.2,rom = 147;
+tm1638ReadKeys(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 662,ram = 2.0,rom = 35;
+convertTemp(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 735,ram = 12.2,rom = 159;
 intToBcd(signed short):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 698,ram = 5.0,rom = 86;
 startTemp(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 775,ram = 0.0,rom = 9;
 readTemp(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 785,ram = 0.0,rom = 15;
@@ -35,10 +35,10 @@ processKeys(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_A
 interrupt(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1031,ram = 0.0,rom = 26;
 initialise(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1067,ram = 1.1,rom = 63;
 i2c_INIT(unsigned char):"C:\Program Files\SourceBoost\include\i2c_driver.h",line = 660,ram = 1.0,rom = 19;
-main(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1167,ram = 1.0,rom = 251;
+main(void):"Z:\home\dan\PIC\PIC16F_TM1638_AquariumControl\PIC16F_TM1638_AquariumControl.c",line = 1167,ram = 1.0,rom = 258;
 delay_us(unsigned char):"NoSourceFile",line = 0,ram = 0.0,rom = 10;
 delay_10us(unsigned char):"NoSourceFile",line = 0,ram = 0.0,rom = 10;
 delay_ms(unsigned char):"NoSourceFile",line = 0,ram = 0.0,rom = 12;
 __rom_get(unsigned char,unsigned char):"NoSourceFile",line = 0,ram = 4.0,rom = 96;
-_startup(void):"NoSourceFile",line = 0,ram = 0.0,rom = 101;
+_startup(void):"NoSourceFile",line = 0,ram = 0.0,rom = 102;
 #HEAP_BLOCK: 0, 167, 88;

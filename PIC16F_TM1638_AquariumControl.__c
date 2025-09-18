@@ -10,10 +10,10 @@ Warnings=1
 Model=0
 [Files]
 PIC16F_TM1638_AquariumControl.c
-Count=3
+Count=2
 PIC16F_TM1638_AquariumControl.h
-File0=Debug\PIC16F_TM1638_AquariumControl.casm
-File1=PIC16F_TM1638_AquariumControl.c
+File0=PIC16F_TM1638_AquariumControl.c
+File1=PIC16F_TM1638_AquariumControl.h
 File2=PIC16F_TM1638_AquariumControl.h
 [Plugins]
 Speed Tester=6B094201040000004E6F6E65

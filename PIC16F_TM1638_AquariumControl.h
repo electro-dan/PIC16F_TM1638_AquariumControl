@@ -61,6 +61,7 @@ char gDayOfWeek = 1; // 1 to 7
 char gBcdDayOfMonth = 1; // 1 to 0x31
 char gBcdMonth = 1; // 1 to 0x12 + century at bit 7
 char gBcdYear = 0x23; // Init to 0x23
+char gBcdDSTLastOccurred = 0; // Stores the month DST last applied
 // Days in each month
 rom char *gDaysInMonth = {0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31};
 // List of leap years, where the Feb days will be 29 instead
